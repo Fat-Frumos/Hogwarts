@@ -1,0 +1,164 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "master", "dev" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  actions: read
+  checks: write
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    services:
+      postgres:
+        image: postgres
+
+        env:
+          POSTGRES_PASSWORD: mypass
+          POSTGRES_USER: myuser
+          POSTGRES_DB: example
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - run: |
+          sudo apt-get update && sudo apt-get install --yes --no-install-recommends postgresql-client
+      - run: |
+          ls -lah ${{ github.workspace }}
+      - run: |
+          psql -h localhost -U myuser -d example -c '
+          
+          INSERT INTO "User" (firstname, lastname, username, password, isActive)
+          VALUES ('Harry', 'Potter', 'Potter', 'Password123', TRUE),
+          ('Hermione', 'Granger', 'Hermione', 'Password456', TRUE),
+          ('Ron', 'Weasley', 'Ron', 'Password789', TRUE),
+          ('Luna', 'Lovegood', 'Luna', 'Password115', TRUE),
+          ('Ginny', 'Weasley', 'Ginny', 'Password116', TRUE),
+          ('Neville', 'Longbottom', 'Neville', 'Password117', TRUE),
+          ('Albus', 'Dumbledore', 'Dumbledore', 'Password101', TRUE),
+          ('Severus', 'Snape', 'Severus', 'Password111', TRUE),
+          ('Minerva', 'McGonagall', 'Minerva', 'Password112', TRUE),
+          ('Rubeus', 'Hagrid', 'Hagrid', 'Password113', TRUE),
+          ('Sybill', 'Trelawney', 'Trelawney', 'Password114', TRUE);
+          
+          INSERT INTO TrainingType (trainingTypeName)
+          VALUES ('Quidditch Practice'),
+          ('Spell Casting'),
+          ('Potion Brewing'),
+          ('Transfiguration'),
+          ('Herbology'),
+          ('Astronomy'),
+          ('Charms'),
+          ('Defense Against the Dark Arts');
+          
+          INSERT INTO Trainer (specialization, userId)
+          VALUES ('Potions Master', (SELECT id FROM "User" WHERE username = 'Severus')),
+          ('Defense Against the Dark Arts', (SELECT id FROM "User" WHERE username = 'Dumbledore')),
+          ('Transfiguration', (SELECT id FROM "User" WHERE username = 'Minerva')),
+          ('Care of Magical Creatures', (SELECT id FROM "User" WHERE username = 'Hagrid')),
+          ('Divination', (SELECT id FROM "User" WHERE username = 'Trelawney'));
+          
+          INSERT INTO Trainee (dateOfBirth, address, userId)
+          VALUES ('1980-07-31', 'Privet Drive 4, Little Whinging', (SELECT id FROM "User" WHERE username = 'Potter')),
+          ('1979-09-19', 'Hogwarts School of Witchcraft and Wizardry',
+          (SELECT id FROM "User" WHERE username = 'Hermione')),
+          ('1981-02-15', 'The Burrow', (SELECT id FROM "User" WHERE username = 'Ginny')),
+          ('1981-07-15', 'Hogwarts School of Witchcraft and Wizardry', (SELECT id FROM "User" WHERE username = 'Neville')),
+          ('1981-05-15', 'The Lovegood House', (SELECT id FROM "User" WHERE username = 'Luna')),
+          ('1980-03-01', 'The Burrow, Ottery St Catchpole', (SELECT id FROM "User" WHERE username = 'Ron'));
+          
+          INSERT INTO Training (traineeId, trainerId, trainingName, trainingTypeId, trainingDate, trainingDuration)
+          VALUES ((SELECT id FROM Trainee WHERE userId = (SELECT id FROM "User" WHERE username = 'Potter')),
+          (SELECT id FROM Trainer WHERE userId = (SELECT id FROM "User" WHERE username = 'Severus')),
+          'Advanced Potions',
+          (SELECT id FROM TrainingType WHERE trainingTypeName = 'Potion Brewing'), '2024-09-01', 90),
+          ((SELECT id FROM Trainee WHERE userId = (SELECT id FROM "User" WHERE username = 'Hermione')),
+          (SELECT id FROM Trainer WHERE userId = (SELECT id FROM "User" WHERE username = 'Dumbledore')),
+          'Defense Strategies',
+          (SELECT id FROM TrainingType WHERE trainingTypeName = 'Defense Against the Dark Arts'), '2024-09-02', 120),
+          ((SELECT id FROM Trainee WHERE userId = (SELECT id FROM "User" WHERE username = 'Ron')),
+          (SELECT id FROM Trainer WHERE userId = (SELECT id FROM "User" WHERE username = 'Minerva')),
+          'Transfiguration Basics',
+          (SELECT id FROM TrainingType WHERE trainingTypeName = 'Transfiguration'), '2024-09-03', 60);
+          '
+
+        env:
+          PGPASSWORD: mypass
+      - run: |
+          psql -h localhost -U myuser -d example -c '\dt'
+        env:
+          PGPASSWORD: mypass
+
+
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+  ##
+  #      - name: Generate JaCoCo Report
+  #        run: mvn jacoco:report
+  #        if: success() || failure()
+
+  #      - name: Publish Test Report
+  #        uses: mikepenz/action-junit-report@v4
+  #        with:
+  #          report_paths: '**/target/surefire-reports/TEST-*.xml'
+  #        if: success() || failure()
+  #
+  #      - name: Upload JaCoCo Report
+  #        uses: actions/upload-artifact@v4
+  #        with:
+  #          name: jacoco-report
+  #          path: '**/target/site/jacoco/'
+  #        if: success() || failure()
+
+
+  check-java-code-style:
+    name: Check Java code style
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone code from repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run java checkstyle
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          checkstyle_config: 'check.xml'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: 'github-pr-check'
+          tool_name: 'Checkstyle'
