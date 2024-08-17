@@ -2,13 +2,15 @@ package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dao.TrainerDao;
 import com.epam.esm.gym.domain.Trainer;
-import com.epam.esm.gym.dto.ResponseRegistrationDto;
-import com.epam.esm.gym.dto.TrainerDto;
-import com.epam.esm.gym.dto.TrainerRegistrationDto;
+import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.TrainerDto;
+import com.epam.esm.gym.dto.trainer.TrainerRegistrationDto;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
+import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.mapper.TrainerMapper;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,15 +37,8 @@ public class DefaultTrainerService implements TrainerService {
     }
 
     @Override
-    public void updateTrainer(TrainerDto trainerDto) {
-        Trainer trainer = mapper.toEntity(trainerDto);
-        trainerDao.updateTrainer(trainer);
-    }
-
-    @Override
     public void activateTrainer(String username) {
         Optional<Trainer> trainerOptional = trainerDao.findByUsername(username);
-//        trainerOptional.ifPresent(trainer -> trainerDao.activateTrainer(trainer.getId()));
     }
 
     @Override
@@ -58,7 +53,30 @@ public class DefaultTrainerService implements TrainerService {
         trainerOptional.ifPresent(trainerDao::delete);
     }
 
-    public ResponseEntity<ResponseRegistrationDto> registerTrainer(TrainerRegistrationDto request) {
+    @Override
+    public ProfileResponse registerTrainer(TrainerRegistrationDto request) {
         return null;
+    }
+
+    @Override
+    public TrainerResponse getTrainer(String username) {
+        return null;
+    }
+
+    @Override
+    public TrainerDto updateTrainer(String username, TrainerUpdateRequest request) {
+        Trainer trainer = mapper.toEntity(request);
+        Trainer updated = trainerDao.updateTrainer(trainer);
+        return mapper.toDto(updated);
+    }
+
+    @Override
+    public List<TrainerResponse> getNotAssigned(String traineeUsername) {
+        return null;
+    }
+
+    @Override
+    public void activateDeactivateProfile(String username, Boolean isActive) {
+
     }
 }

@@ -1,17 +1,15 @@
-package com.epam.esm.gym.dto;
+package com.epam.esm.gym.dto.profile;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErrorResponse {
-    private String message;
-    private String error;
+public class ProfileResponse {
+    private String username;
+    private String password;
 }

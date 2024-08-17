@@ -51,7 +51,7 @@ public class JDBCTrainerDao implements TrainerDao {
     }
 
     @Override
-    public void updateTrainer(Trainer trainer) {
-
+    public Trainer updateTrainer(Trainer trainer) {
+        return null;
     }
 }

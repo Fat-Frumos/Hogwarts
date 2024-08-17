@@ -1,6 +1,6 @@
 package com.epam.esm.gym.service;
 
-import com.epam.esm.gym.dto.UserDto;
+import com.epam.esm.gym.dto.profile.UserDto;
 import org.springframework.stereotype.Service;
 
 @Service

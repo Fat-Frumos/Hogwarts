@@ -1,17 +1,17 @@
-package com.epam.esm.gym.dto;
+package com.epam.esm.gym.dto.trainer;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseRegistrationDto {
+public class TrainerResponse {
     private String username;
-    private String password;
+    private String firstName;
+    private String lastName;
+    private String specialization;
 }
