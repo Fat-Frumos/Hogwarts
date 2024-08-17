@@ -1,10 +1,12 @@
 package com.epam.esm.gym.service;
 
-import com.epam.esm.gym.dto.ResponseRegistrationDto;
-import com.epam.esm.gym.dto.TrainerDto;
-import com.epam.esm.gym.dto.TrainerRegistrationDto;
+import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.TrainerDto;
+import com.epam.esm.gym.dto.trainer.TrainerRegistrationDto;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
+import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
+import java.util.List;
 import java.util.Optional;
-import org.springframework.http.ResponseEntity;
 
 public interface TrainerService {
 
@@ -12,13 +14,19 @@ public interface TrainerService {
 
     void changeTrainerPassword(String username, String newPassword);
 
-    void updateTrainer(TrainerDto trainerDto);
-
     void activateTrainer(String username);
 
     void deactivateTrainer(String username);
 
     void deleteTrainer(String username);
 
-    ResponseEntity<ResponseRegistrationDto> registerTrainer(TrainerRegistrationDto request);
+    ProfileResponse registerTrainer(TrainerRegistrationDto request);
+
+    TrainerResponse getTrainer(String username);
+
+    TrainerDto updateTrainer(String username, TrainerUpdateRequest request);
+
+    List<TrainerResponse> getNotAssigned(String traineeUsername);
+
+    void activateDeactivateProfile(String username, Boolean isActive);
 }

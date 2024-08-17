@@ -1,6 +1,6 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.ErrorResponse;
+import com.epam.esm.gym.exception.ErrorResponse;
 import com.epam.esm.gym.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
