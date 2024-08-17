@@ -2,29 +2,31 @@ package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeRegistrationRequestDto;
-import com.epam.esm.gym.dto.trainee.TraineeUpdateRequestDto;
-import com.epam.esm.gym.dto.trainer.TrainerResponse;
-import com.epam.esm.gym.dto.trainee.TraineeTrainingRequest;
+import com.epam.esm.gym.dto.trainee.TraineeRequest;
+import com.epam.esm.gym.dto.training.TrainingProfile;
+import com.epam.esm.gym.dto.trainee.TraineeUpdateRequest;
+import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import java.util.List;
 
 public interface TraineeService {
-    ProfileResponse register(TraineeRegistrationRequestDto request);
+    ProfileResponse register(TraineeRequest request);
 
     void deleteTrainee(String username);
 
-    TraineeRegistrationRequestDto getTraineeByName(String username);
+    TraineeRequest getTraineeByName(String username);
 
-    TraineeRegistrationRequestDto updateTrainee(String username, TraineeUpdateRequestDto request);
+    TraineeRequest updateTrainee(String username, TraineeUpdateRequest request);
 
     void validateUser(ProfileRequest request);
 
     void changePassword(ProfileRequest request);
 
-    List<TrainerResponse> updateTraineeTrainersByName(String username, List<String> trainerUsernames);
+    List<TrainerProfile> updateTraineeTrainersByName(String username, List<String> trainersUsernames);
 
-    List<TrainingResponse> getTraineeTrainingsByName(String username, TraineeTrainingRequest request);
+    List<TrainingResponse> getTraineeTrainingsByName(String username, TrainingProfile request);
 
     void activateDeactivateProfile(String username, Boolean isActive);
+
+    List<TrainerProfile> getNotAssignedTrainers(String username);
 }

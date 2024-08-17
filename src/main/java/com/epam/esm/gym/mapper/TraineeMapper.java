@@ -2,17 +2,17 @@ package com.epam.esm.gym.mapper;
 
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeDto;
-import com.epam.esm.gym.dto.trainee.TraineeRegistrationRequestDto;
+import com.epam.esm.gym.dto.trainee.TraineeProfile;
+import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface TraineeMapper {
-    TraineeDto toDto(Trainee trainee);
+    TraineeProfile toDto(Trainee trainee);
 
     ProfileResponse toResponse(Trainee trainee);
 
-    Trainee toEntity(TraineeDto traineeDTO);
+    Trainee toEntity(TraineeProfile traineeResponse);
 
-    Trainee toEntity(TraineeRegistrationRequestDto dto);
+    Trainee toEntity(TraineeRequest dto);
 }

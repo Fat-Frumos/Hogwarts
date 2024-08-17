@@ -1,18 +1,14 @@
 package com.epam.esm.gym.dto.trainee;
 
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class TraineeRegistrationRequestDto {
-    private String firstName;
-    private String lastName;
-    private Date dateOfBirth;
-    private String address;
+@EqualsAndHashCode(callSuper = true)
+public class TraineeUpdateRequest extends TraineeRequest {
+    private Boolean isActive;
 }

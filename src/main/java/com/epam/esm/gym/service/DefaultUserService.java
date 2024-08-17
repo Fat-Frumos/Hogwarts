@@ -1,17 +1,23 @@
 package com.epam.esm.gym.service;
 
-import com.epam.esm.gym.dto.profile.UserDto;
+import com.epam.esm.gym.dto.profile.ProfileRequest;
+import com.epam.esm.gym.dto.profile.UserProfile;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DefaultUserService implements UserService {
-    @Override
-    public void createUser(String firstName, String lastName) {
 
+    Set<ProfileRequest> users = new HashSet<>();
+
+    @Override
+    public void createUser(ProfileRequest request) {
+        users.add(request);
     }
 
     @Override
-    public void updateUser(UserDto userDto) {
+    public void updateUser(UserProfile userProfile) {
 
     }
 
@@ -21,12 +27,12 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public UserDto getUserByUsername(String username) {
+    public UserProfile getUserByUsername(String username) {
         return null;
     }
 
     @Override
-    public void changePassword(String username, String newPassword) {
+    public void changePassword(ProfileRequest user) {
 
     }
 
@@ -37,6 +43,11 @@ public class DefaultUserService implements UserService {
 
     @Override
     public void deactivateUser(String username) {
+
+    }
+
+    @Override
+    public void authenticate(ProfileRequest request) {
 
     }
 }

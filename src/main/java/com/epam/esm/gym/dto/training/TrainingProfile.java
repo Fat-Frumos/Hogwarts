@@ -1,4 +1,4 @@
-package com.epam.esm.gym.dto.trainee;
+package com.epam.esm.gym.dto.training;
 
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class TraineeTrainingRequest {
+public class TrainingProfile {
     private LocalDate periodFrom;
     private LocalDate periodTo;
     private String trainerName;

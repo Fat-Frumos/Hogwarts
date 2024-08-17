@@ -1,19 +1,22 @@
 package com.epam.esm.gym.service;
 
-import com.epam.esm.gym.dto.profile.UserDto;
+import com.epam.esm.gym.dto.profile.ProfileRequest;
+import com.epam.esm.gym.dto.profile.UserProfile;
 
 public interface UserService {
-    void createUser(String firstName, String lastName);
+    void createUser(ProfileRequest user);
 
-    void updateUser(UserDto userDto);
+    void updateUser(UserProfile userProfile);
 
     void deleteUser(String username);
 
-    UserDto getUserByUsername(String username);
+    UserProfile getUserByUsername(String username);
 
-    void changePassword(String username, String newPassword);
+    void changePassword(ProfileRequest user);
 
     void activateUser(String username);
 
     void deactivateUser(String username);
+
+    void authenticate(ProfileRequest request);
 }

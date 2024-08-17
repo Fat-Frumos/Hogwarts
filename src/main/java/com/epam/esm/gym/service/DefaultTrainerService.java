@@ -3,9 +3,8 @@ package com.epam.esm.gym.service;
 import com.epam.esm.gym.dao.TrainerDao;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainer.TrainerDto;
-import com.epam.esm.gym.dto.trainer.TrainerRegistrationDto;
-import com.epam.esm.gym.dto.trainer.TrainerResponse;
+import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.mapper.TrainerMapper;
 import jakarta.transaction.Transactional;
@@ -26,7 +25,7 @@ public class DefaultTrainerService implements TrainerService {
     }
 
     @Override
-    public Optional<TrainerDto> getTrainerByUsername(String username) {
+    public Optional<TrainerProfile> getTrainerByUsername(String username) {
         return trainerDao.findByUsername(username).map(mapper::toDto);
     }
 
@@ -54,24 +53,24 @@ public class DefaultTrainerService implements TrainerService {
     }
 
     @Override
-    public ProfileResponse registerTrainer(TrainerRegistrationDto request) {
+    public ProfileResponse createTrainer(TrainerRequest request) {
         return null;
     }
 
     @Override
-    public TrainerResponse getTrainer(String username) {
+    public TrainerProfile getTrainer(String username) {
         return null;
     }
 
     @Override
-    public TrainerDto updateTrainer(String username, TrainerUpdateRequest request) {
+    public TrainerProfile updateTrainer(String username, TrainerUpdateRequest request) {
         Trainer trainer = mapper.toEntity(request);
         Trainer updated = trainerDao.updateTrainer(trainer);
         return mapper.toDto(updated);
     }
 
     @Override
-    public List<TrainerResponse> getNotAssigned(String traineeUsername) {
+    public List<TrainerProfile> getNotAssigned(String traineeUsername) {
         return null;
     }
 

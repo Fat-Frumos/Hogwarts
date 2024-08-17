@@ -1,12 +1,12 @@
 package com.epam.esm.gym.mapper;
 
 import com.epam.esm.gym.domain.User;
-import com.epam.esm.gym.dto.profile.UserDto;
+import com.epam.esm.gym.dto.profile.UserProfile;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    UserDto toDTO(User user);
+    UserProfile toDTO(User user);
 
-    User toEntity(UserDto userDTO);
+    User toEntity(UserProfile userProfile);
 }

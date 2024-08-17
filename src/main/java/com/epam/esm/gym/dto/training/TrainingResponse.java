@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TrainingResponse {
+    private String trainerName;
     private String trainingName;
-    private LocalDate trainingDate;
     private String trainingType;
     private int trainingDuration;
-    private String trainerName;
+    private LocalDate trainingDate;
 }
