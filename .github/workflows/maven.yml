@@ -44,59 +44,64 @@ jobs:
           ls -lah ${{ github.workspace }}
       - run: |
           psql -h localhost -U myuser -d example -c '
+
+          CREATE TABLE "user"
+          (
+          id         SERIAL PRIMARY KEY,
+          first_name VARCHAR(255) NOT NULL,
+          last_name  VARCHAR(255) NOT NULL,
+          username   VARCHAR(255) NOT NULL UNIQUE,
+          password   VARCHAR(255) NOT NULL,
+          is_active  BOOLEAN      NOT NULL
+          );
           
-          INSERT INTO "User" (firstname, lastname, username, password, isActive)
-          VALUES ('Harry', 'Potter', 'Potter', 'Password123', TRUE),
-          ('Hermione', 'Granger', 'Hermione', 'Password456', TRUE),
-          ('Ron', 'Weasley', 'Ron', 'Password789', TRUE),
-          ('Luna', 'Lovegood', 'Luna', 'Password115', TRUE),
-          ('Ginny', 'Weasley', 'Ginny', 'Password116', TRUE),
-          ('Neville', 'Longbottom', 'Neville', 'Password117', TRUE),
-          ('Albus', 'Dumbledore', 'Dumbledore', 'Password101', TRUE),
-          ('Severus', 'Snape', 'Severus', 'Password111', TRUE),
-          ('Minerva', 'McGonagall', 'Minerva', 'Password112', TRUE),
-          ('Rubeus', 'Hagrid', 'Hagrid', 'Password113', TRUE),
-          ('Sybill', 'Trelawney', 'Trelawney', 'Password114', TRUE);
+          CREATE TABLE "trainee"
+          (
+          id            SERIAL PRIMARY KEY,
+          date_of_birth DATE,
+          address       VARCHAR(255),
+          user_id       BIGINT NOT NULL,
+          FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE
+          );
           
-          INSERT INTO TrainingType (trainingTypeName)
-          VALUES ('Quidditch Practice'),
-          ('Spell Casting'),
-          ('Potion Brewing'),
-          ('Transfiguration'),
-          ('Herbology'),
-          ('Astronomy'),
-          ('Charms'),
-          ('Defense Against the Dark Arts');
           
-          INSERT INTO Trainer (specialization, userId)
-          VALUES ('Potions Master', (SELECT id FROM "User" WHERE username = 'Severus')),
-          ('Defense Against the Dark Arts', (SELECT id FROM "User" WHERE username = 'Dumbledore')),
-          ('Transfiguration', (SELECT id FROM "User" WHERE username = 'Minerva')),
-          ('Care of Magical Creatures', (SELECT id FROM "User" WHERE username = 'Hagrid')),
-          ('Divination', (SELECT id FROM "User" WHERE username = 'Trelawney'));
+          CREATE TABLE "training_type"
+          (
+          id                 SERIAL PRIMARY KEY,
+          training_type_name VARCHAR(50) NOT NULL
+          );
           
-          INSERT INTO Trainee (dateOfBirth, address, userId)
-          VALUES ('1980-07-31', 'Privet Drive 4, Little Whinging', (SELECT id FROM "User" WHERE username = 'Potter')),
-          ('1979-09-19', 'Hogwarts School of Witchcraft and Wizardry',
-          (SELECT id FROM "User" WHERE username = 'Hermione')),
-          ('1981-02-15', 'The Burrow', (SELECT id FROM "User" WHERE username = 'Ginny')),
-          ('1981-07-15', 'Hogwarts School of Witchcraft and Wizardry', (SELECT id FROM "User" WHERE username = 'Neville')),
-          ('1981-05-15', 'The Lovegood House', (SELECT id FROM "User" WHERE username = 'Luna')),
-          ('1980-03-01', 'The Burrow, Ottery St Catchpole', (SELECT id FROM "User" WHERE username = 'Ron'));
+          CREATE TABLE "trainer"
+          (
+          id                SERIAL PRIMARY KEY,
+          specialization_id BIGINT NOT NULL,
+          user_id           BIGINT NOT NULL,
+          FOREIGN KEY (specialization_id) REFERENCES training_type (id),
+          FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE
+          );
           
-          INSERT INTO Training (traineeId, trainerId, trainingName, trainingTypeId, trainingDate, trainingDuration)
-          VALUES ((SELECT id FROM Trainee WHERE userId = (SELECT id FROM "User" WHERE username = 'Potter')),
-          (SELECT id FROM Trainer WHERE userId = (SELECT id FROM "User" WHERE username = 'Severus')),
-          'Advanced Potions',
-          (SELECT id FROM TrainingType WHERE trainingTypeName = 'Potion Brewing'), '2024-09-01', 90),
-          ((SELECT id FROM Trainee WHERE userId = (SELECT id FROM "User" WHERE username = 'Hermione')),
-          (SELECT id FROM Trainer WHERE userId = (SELECT id FROM "User" WHERE username = 'Dumbledore')),
-          'Defense Strategies',
-          (SELECT id FROM TrainingType WHERE trainingTypeName = 'Defense Against the Dark Arts'), '2024-09-02', 120),
-          ((SELECT id FROM Trainee WHERE userId = (SELECT id FROM "User" WHERE username = 'Ron')),
-          (SELECT id FROM Trainer WHERE userId = (SELECT id FROM "User" WHERE username = 'Minerva')),
-          'Transfiguration Basics',
-          (SELECT id FROM TrainingType WHERE trainingTypeName = 'Transfiguration'), '2024-09-03', 60);
+          CREATE TABLE "training"
+          (
+          id                SERIAL PRIMARY KEY,
+          trainee_id        BIGINT       NOT NULL,
+          trainer_id        BIGINT       NOT NULL,
+          training_name     VARCHAR(255) NOT NULL,
+          training_type_id  BIGINT       NOT NULL,
+          training_date     DATE         NOT NULL,
+          training_duration INTEGER      NOT NULL,
+          FOREIGN KEY (trainee_id) REFERENCES "trainee" (id) ON DELETE CASCADE,
+          FOREIGN KEY (trainer_id) REFERENCES "trainer" (id) ON DELETE CASCADE,
+          FOREIGN KEY (training_type_id) REFERENCES "training_type" (id)
+          );
+          
+          CREATE TABLE "trainee_trainer"
+          (
+          trainee_id BIGINT NOT NULL,
+          trainer_id BIGINT NOT NULL,
+          PRIMARY KEY (trainee_id, trainer_id),
+          FOREIGN KEY (trainee_id) REFERENCES "trainee" (id) ON DELETE CASCADE,
+          FOREIGN KEY (trainer_id) REFERENCES "trainer" (id) ON DELETE CASCADE
+          );        
           '
 
         env:

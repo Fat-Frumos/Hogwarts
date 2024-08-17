@@ -1,5 +1,7 @@
 # Java Specialization X-Stack
 
+[![Java CI with Maven](https://github.com/Fat-Frumos/XStack/actions/workflows/maven.yml/badge.svg)](https://github.com/Fat-Frumos/XStack/actions/workflows/maven.yml)
+
 ### General description
 
 Here's a revised version of your text suitable for B2+ English level learners:
