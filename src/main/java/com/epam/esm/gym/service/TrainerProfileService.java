@@ -8,6 +8,7 @@ import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.mapper.TrainerMapper;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -69,12 +70,12 @@ public class TrainerProfileService implements TrainerService {
     }
 
     @Override
-    public List<TrainerProfile> getNotAssigned(String traineeUsername) {
-        return null;
+    public List<TrainerProfile> getNotAssigned(String username) {
+        return new ArrayList<>();
     }
 
     @Override
-    public void activateDeactivateProfile(String username, Boolean isActive) {
+    public void activateDeactivateProfile(String username, Boolean active) {
 
     }
 }

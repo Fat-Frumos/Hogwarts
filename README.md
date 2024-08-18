@@ -80,14 +80,14 @@ Below is a description of each component of the solution.
 #### Following REST API endpoints (as a RestController) are implemented:
 
 1. Trainee Registration (POST method)
-   a. Request
-   i. First Name (required)
-   ii. Last Name (required)
-   iii. Date of Birth (optional)
-   iv. Address (optional)
-   b. Response
-   i. Username
-   ii. Password
+   - Request
+     - First Name (required)
+     - Last Name (required)
+     - Date of Birth (optional)
+     - Address (optional)
+   - Response
+     - Username
+     - Password
 2. Trainer Registration (POST method)
    a. Request
    i. First Name (required)

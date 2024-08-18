@@ -27,5 +27,5 @@ public interface TrainerService {
 
     List<TrainerProfile> getNotAssigned(String traineeUsername);
 
-    void activateDeactivateProfile(String username, Boolean isActive);
+    void activateDeactivateProfile(String username, Boolean active);
 }

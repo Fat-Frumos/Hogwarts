@@ -5,9 +5,8 @@ import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import com.epam.esm.gym.service.TraineeService;
 import com.epam.esm.gym.web.data.TraineeData;
-import java.time.LocalDate;
+import com.epam.esm.gym.web.data.TrainingData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -36,24 +34,24 @@ class TraineeControllerTest extends ControllerTest {
     private Map<String, Object> activateTrainee;
     private Map<String, String> registration;
     private Map<String, Object> trainees;
-    private String username;
-    @MockBean
-    private TraineeService traineeService;
-    private TraineeRequest traineeRequest;
-    private ProfileResponse profileResponse;
     private List<TrainerProfile> trainers;
     private List<String> trainersUsernames;
+    private ProfileResponse profileResponse;
+    private ProfileResponse expectedProfile;
+    private TraineeRequest traineeRequest;
+    private String username;
 
     @BeforeEach
     void setUp() {
-        username = "harry.potter";
-        trainees = TraineeData.trainees;
+        username = "Harry.Potter";
+        trainees = TraineeData.harryMap;
         registration = TraineeData.registration;
         traineeRequest = TraineeData.traineeRequest;
         activateTrainee = TraineeData.activateTrainee;
         profileResponse = getProfileResponse(registration);
+        trainersUsernames = List.of("Severus", "Albus", "Dumbledore");
         trainers = List.of(new TrainerProfile(), new TrainerProfile());
-        trainersUsernames = List.of("trainer1", "trainer2");
+        expectedProfile = getProfileResponse("Harry", "Potter");
     }
 
     @Test
@@ -62,14 +60,14 @@ class TraineeControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(traineeRequest)));
         result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("harry.potter"))
+                .andExpect(jsonPath("$.username").value("Harry.Potter"))
                 .andExpect(jsonPath("$.password").value("randomGeneratedPassword"));
     }
 
     @Test
     void testGetTraineeProfile2() throws Exception {
         when(traineeService.register(traineeRequest)).thenReturn(profileResponse);
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainees/harry.potter")
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainees/Harry.Potter")
                 .content(objectMapper.writeValueAsString(traineeRequest))
                 .contentType(MediaType.APPLICATION_JSON));
         result.andExpect(status().isCreated())
@@ -81,9 +79,7 @@ class TraineeControllerTest extends ControllerTest {
 
     @Test
     public void testRegisterTrainee() throws Exception {
-        when(traineeService.register(traineeRequest)).thenReturn(profileResponse);
-
-        mockMvc.perform(post("/api/trainees/register")
+        mockMvc.perform(post(BASE_URL + "/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(traineeRequest)))
                 .andExpect(status().isCreated());
@@ -92,44 +88,22 @@ class TraineeControllerTest extends ControllerTest {
     @Test
     void testTraineeRegistration() throws Exception {
         when(traineeService.register(traineeRequest)).thenReturn(profileResponse);
-        TraineeRequest traineeRequest = new TraineeRequest();
-        traineeRequest.setFirstName("Harry");
-        traineeRequest.setLastName("Potter");
-        traineeRequest.setDateOfBirth(LocalDate.parse("1980-07-31"));
-        traineeRequest.setAddress("4 Privet Drive, Little Whinging, Surrey");
-
-        var expectedUsername = "Harry.Potter";
-        var expectedPassword = "Password123!";
-
         mockMvc.perform(post(BASE_URL + "/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(traineeRequest)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value(expectedUsername))
-                .andExpect(jsonPath("$.password").value(expectedPassword));
+                .andExpect(jsonPath("$.username").value(username))
+                .andExpect(jsonPath("$.password").value(password));
     }
 
     @Test
     void testTraineeRegistrations() throws Exception {
-        var expectedCredentials = generateUserCredentials("Harry", "Potter");
         mockMvc.perform(post(BASE_URL + "/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(trainees)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value(expectedCredentials.get("username")))
-                .andExpect(jsonPath("$.password").value(expectedCredentials.get("password")));
-    }
-
-    @Test
-    void testTraineeRegistrationss() throws Exception {
-
-        var expectedCredentials = generateUserCredentials("Harry", "Potter");
-        mockMvc.perform(post(BASE_URL + "/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(trainees)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value(expectedCredentials.get("username")))
-                .andExpect(jsonPath("$.password").value(expectedCredentials.get("password")));
+                .andExpect(jsonPath("$.username").value(expectedProfile.getUsername()))
+                .andExpect(jsonPath("$.password").value(expectedProfile.getPassword()));
     }
 
     @Test
@@ -144,15 +118,14 @@ class TraineeControllerTest extends ControllerTest {
 
     @Test
     void testGetTraineeProfile() throws Exception {
-
         mockMvc.perform(get(BASE_URL + "/{username}", username))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value("Harry"))
                 .andExpect(jsonPath("$.lastName").value("Potter"))
                 .andExpect(jsonPath("$.dateOfBirth").value("1980-07-31"))
                 .andExpect(jsonPath("$.address").value("4 Privet Drive, Little Whinging, Surrey"))
-                .andExpect(jsonPath("$.isActive").value(true))
-                .andExpect(jsonPath("$.isActive").exists())
+                .andExpect(jsonPath("$.active").value(true))
+                .andExpect(jsonPath("$.active").exists())
                 .andExpect(jsonPath("$.trainers").isArray())
                 .andExpect(jsonPath("$.trainers[0].trainerUsername").exists())
                 .andExpect(jsonPath("$.trainers[0].trainerFirstName").exists())
@@ -166,12 +139,12 @@ class TraineeControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registration)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("harry.potter"))
+                .andExpect(jsonPath("$.username").value("Harry.Potter"))
                 .andExpect(jsonPath("$.firstName").value("Harry"))
                 .andExpect(jsonPath("$.lastName").value("Potter"))
                 .andExpect(jsonPath("$.dateOfBirth").value("1980-07-31"))
                 .andExpect(jsonPath("$.address").value("12 Grimmauld Place, London"))
-                .andExpect(jsonPath("$.isActive").value(true))
+                .andExpect(jsonPath("$.active").value(true))
                 .andExpect(jsonPath("$.trainers").isArray());
     }
 
@@ -199,7 +172,7 @@ class TraineeControllerTest extends ControllerTest {
 
     @Test
     void testDeleteTraineeProfile() throws Exception {
-        mockMvc.perform(delete(BASE_URL + "/harry.potter"))
+        mockMvc.perform(delete(BASE_URL + "/Harry.Potter"))
                 .andExpect(status().is2xxSuccessful());
     }
 
@@ -215,7 +188,7 @@ class TraineeControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.lastName").value("Potter"))
                 .andExpect(jsonPath("$.dateOfBirth").value("1980-07-31"))
                 .andExpect(jsonPath("$.address").value("4 Privet Drive"))
-                .andExpect(jsonPath("$.isActive").value(true))
+                .andExpect(jsonPath("$.active").value(true))
                 .andExpect(jsonPath("$.trainers[0].trainerUsername").exists())
                 .andExpect(jsonPath("$.trainers[0].trainerFirstName").exists())
                 .andExpect(jsonPath("$.trainers[0].trainerLastName").exists())
@@ -225,7 +198,7 @@ class TraineeControllerTest extends ControllerTest {
     @Test
     void testUpdateTraineeTrainerList() throws Exception {
         Map<String, Object> request = new HashMap<>();
-        request.put("traineeUsername", "harry.potter");
+        request.put("traineeUsername", "Harry.Potter");
         request.put("trainers", List.of("severus.snape"));
 
         mockMvc.perform(put(BASE_URL + "/trainers/update")
@@ -253,7 +226,7 @@ class TraineeControllerTest extends ControllerTest {
 
     @Test
     void testDeactivateTrainee() throws Exception {
-        var request = Map.of("username", "harry.potter", "isActive", false);
+        var request = Map.of("username", "Harry.Potter", "active", false);
 
         mockMvc.perform(patch(BASE_URL + "/activate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -282,12 +255,12 @@ class TraineeControllerTest extends ControllerTest {
 
     @Test
     void testGetTraineeTrainings() throws Exception {
-        TrainingProfile request = new TrainingProfile();
-        List<TrainingResponse> trainingResponses = List.of(new TrainingResponse(), new TrainingResponse());
-        when(traineeService.getTraineeTrainingsByName(username, request)).thenReturn(trainingResponses);
+        TrainingProfile trainingProfile = getProfile(TrainingData.training);
+        List<TrainingResponse> trainingResponses = List.of(getTrainingResponse(TrainingData.training));
+        when(traineeService.getTraineeTrainingsByName(username, trainingProfile)).thenReturn(trainingResponses);
         mockMvc.perform(get(BASE_URL + "/" + username + "/trainings")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(trainingProfile)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("training1"))
                 .andExpect(jsonPath("$[1].name").value("training2"));
@@ -295,10 +268,10 @@ class TraineeControllerTest extends ControllerTest {
 
     @Test
     void testActivateDeactivateTrainee() throws Exception {
-        Boolean isActive = true;
+        Boolean active = true;
         mockMvc.perform(patch(BASE_URL + "/" + username + "/activate")
-                        .param("isActive", isActive.toString()))
+                        .param("active", active.toString()))
                 .andExpect(status().isOk());
-        verify(traineeService).activateDeactivateProfile(username, isActive);
+        verify(traineeService).activateDeactivateProfile(username, active);
     }
 }

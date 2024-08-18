@@ -26,7 +26,7 @@ public interface TraineeService {
 
     List<TrainingResponse> getTraineeTrainingsByName(String username, TrainingProfile request);
 
-    void activateDeactivateProfile(String username, Boolean isActive);
+    void activateDeactivateProfile(String username, Boolean active);
 
     List<TrainerProfile> getNotAssignedTrainers(String username);
 }

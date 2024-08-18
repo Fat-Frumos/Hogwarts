@@ -71,7 +71,7 @@ public class TraineeProfileService implements TraineeService {
     }
 
     @Override
-    public void activateDeactivateProfile(String username, Boolean isActive) {
+    public void activateDeactivateProfile(String username, Boolean active) {
 
     }
 

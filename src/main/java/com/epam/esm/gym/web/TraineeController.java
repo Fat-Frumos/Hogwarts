@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/trainees")
@@ -66,14 +68,6 @@ public class TraineeController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/{username}/unassigned")
-    @Operation(summary = "10. Get Not Assigned Trainers")
-    public ResponseEntity<List<TrainerProfile>> getNotAssignedTrainerProfiles(
-            @PathVariable String username) {
-        List<TrainerProfile> trainers = traineeService.getNotAssignedTrainers(username);
-        return ResponseEntity.ok(trainers);
-    }
-
     @PutMapping("/{username}/trainers")
     @Operation(summary = "11. Update Trainee's Trainer List")
     public ResponseEntity<List<TrainerProfile>> updateTraineeTrainers(
@@ -95,8 +89,8 @@ public class TraineeController {
     @PatchMapping("/{username}/activate")
     @Operation(summary = "15. Activate/Deactivate Trainee")
     public ResponseEntity<Void> activateDeactivateTrainee(
-            @PathVariable String username, @RequestParam Boolean isActive) {
-        traineeService.activateDeactivateProfile(username, isActive);
+            @PathVariable String username, @RequestParam Boolean active) {
+        traineeService.activateDeactivateProfile(username, active);
         return ResponseEntity.ok().build();
     }
 }

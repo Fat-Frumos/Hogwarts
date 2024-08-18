@@ -90,7 +90,7 @@ public class UserProfileService implements UserService {
                 .lastName(dto.getLastName())
                 .username(username)
                 .password(password)
-                .isActive(true)
+                .active(true)
                 .build();
     }
 
@@ -100,7 +100,7 @@ public class UserProfileService implements UserService {
                 .lastName(dto.getLastName())
                 .username(username)
                 .password(password)
-                .isActive(true)
+                .active(true)
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.profile.ProfileResponse;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,18 +19,18 @@ class LoginControllerTest extends ControllerTest {
     @BeforeEach
     void setUp() {
         loginRequest = new HashMap<>();
-        loginRequest.put("username", "harry.potter");
+        loginRequest.put("username", "Harry.Potter");
         loginRequest.put("password", "password123");
 
         changeLogin = new HashMap<>();
-        changeLogin.put("username", "harry.potter");
+        changeLogin.put("username", "Harry.Potter");
         changeLogin.put("oldPassword", "password123");
         changeLogin.put("newPassword", "newpassword123");
 
-        var credentials = generateUserCredentials("Harry", "Potter");
+        ProfileResponse credentials = getProfileResponse("Harry", "Potter");
         login = Map.of(
-                "username", credentials.get("username"),
-                "oldPassword", credentials.get("password"),
+                "username", credentials.getUsername(),
+                "oldPassword", credentials.getPassword(),
                 "newPassword", "newPassword123");
     }
 
