@@ -12,7 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class LoginControllerTest extends ControllerTest {
 
     private Map<String, String> loginRequest;
-    private Map<String, Object> changeLogin;
+    private Map<String, String> changeLogin;
+    private Map<String, String> login;
 
     @BeforeEach
     void setUp() {
@@ -24,14 +25,19 @@ class LoginControllerTest extends ControllerTest {
         changeLogin.put("username", "harry.potter");
         changeLogin.put("oldPassword", "password123");
         changeLogin.put("newPassword", "newpassword123");
+
+        var credentials = generateUserCredentials("Harry", "Potter");
+        login = Map.of(
+                "username", credentials.get("username"),
+                "oldPassword", credentials.get("password"),
+                "newPassword", "newPassword123");
     }
 
     @Test
     void testLogin() throws Exception {
-        var credentials = generateUserCredentials("Harry", "Potter");
         mockMvc.perform(get("/api/login")
-                        .param("username", credentials.get("username"))
-                        .param("password", credentials.get("password")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk());
     }
 
@@ -42,17 +48,12 @@ class LoginControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(changeLogin)))
                 .andExpect(status().isOk());
     }
+
     @Test
     void testChangeLoginUserCredentials() throws Exception {
-        var credentials = generateUserCredentials("Harry", "Potter");
-        var request = Map.of(
-                "username", credentials.get("username"),
-                "oldPassword", credentials.get("password"),
-                "newPassword", "newPassword123");
-
-        mockMvc.perform(put("/login/change")
+        mockMvc.perform(put("/api/login/change")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(login)))
                 .andExpect(status().isOk());
     }
 }

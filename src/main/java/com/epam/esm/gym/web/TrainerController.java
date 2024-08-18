@@ -1,10 +1,10 @@
 package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.training.TrainingProfile;
-import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
+import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.service.TrainerService;
 import com.epam.esm.gym.service.TrainingService;
@@ -33,15 +33,13 @@ public class TrainerController {
 
     private final TrainingService trainingService;
 
-
     @PostMapping("/register")
     @Operation(summary = "2. Register a new trainer")
-    public ResponseEntity<ProfileResponse> registerTrainer(
+    public ResponseEntity<ProfileResponse> registerTrainerProfile(
             @Valid @RequestBody TrainerRequest request) {
-        ProfileResponse response = trainerService.createTrainer(request);
+        ProfileResponse response = trainerService.registerTrainer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
 
     @GetMapping("/{username}")
     @Operation(summary = "8. Get Trainer Profile")

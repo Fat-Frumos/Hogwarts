@@ -2,9 +2,9 @@ package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.trainee.TraineeUpdateRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.service.TraineeService;
 import io.swagger.v3.oas.annotations.Operation;

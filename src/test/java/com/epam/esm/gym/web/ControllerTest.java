@@ -1,12 +1,9 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,10 +19,23 @@ public class ControllerTest {
 
     @Autowired
     protected ObjectMapper objectMapper;
+    private final String password = "Password123!";
 
     protected Map<String, String> generateUserCredentials(String firstName, String lastName) {
         String username = firstName.toLowerCase() + "." + lastName.toLowerCase();
-        String password = "password123";
         return Map.of("username", username, "password", password);
+    }
+
+    protected ProfileResponse getProfileResponse(Map<String, String> registration) {
+        String username = registration.get("firstName") + "." + registration.get("lastName");
+        return new ProfileResponse(username, password);
+    }
+
+    protected TrainerRequest getTrainerRequest(Map<String, Object> trainers) {
+        return TrainerRequest.builder()
+                .firstName((String) trainers.get("firstName"))
+                .lastName((String) trainers.get("lastName"))
+                .specialization((String) trainers.get("specialization"))
+                .build();
     }
 }

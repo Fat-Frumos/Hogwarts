@@ -17,12 +17,9 @@ public class ProfileRequest {
     @Size(min = 1, max = 50, message = "Username must be between 1 and 50 characters")
     private String username;
 
+    @NotNull(message = "Password is required")
     @Size(min = 6, max = 50, message = "Password must be between 6 and 50 characters")
     private String password;
 
-    @Size(min = 6, max = 50, message = "Old Password must be between 6 and 50 characters")
-    private String oldPassword;
-
-    @Size(min = 6, max = 50, message = "New Password must be between 6 and 50 characters")
     private String newPassword;
 }

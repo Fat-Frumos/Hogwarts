@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,10 +26,10 @@ public class LoginController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/change")
+    @PutMapping("/login/change")
     @Operation(summary = "4. Change Login")
     public ResponseEntity<Void> changeLogin(
-            @RequestParam ProfileRequest request) {
+            @RequestBody ProfileRequest request) {
         userService.changePassword(request);
         return ResponseEntity.ok().build();
     }

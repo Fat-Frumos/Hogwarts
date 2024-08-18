@@ -10,51 +10,50 @@ import com.epam.esm.gym.mapper.TrainerMapper;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
-public class DefaultTrainerService implements TrainerService {
+@AllArgsConstructor
+public class TrainerProfileService implements TrainerService {
 
-    private final TrainerDao trainerDao;
+    private final UserProfileService userService;
+    private final TrainerDao dao;
     private final TrainerMapper mapper;
 
-    public DefaultTrainerService(TrainerDao trainerDao, TrainerMapper trainerMapper) {
-        this.trainerDao = trainerDao;
-        this.mapper = trainerMapper;
+    @Override
+    public ProfileResponse registerTrainer(TrainerRequest dto) {
+        TrainerProfile profile = userService.saveTrainer(dto);
+        Trainer trainer = dao.save(mapper.toEntity(profile));
+        return mapper.toProfileDto(trainer.getUser());
     }
 
     @Override
     public Optional<TrainerProfile> getTrainerByUsername(String username) {
-        return trainerDao.findByUsername(username).map(mapper::toDto);
+        return dao.findByUsername(username).map(mapper::toDto);
     }
 
     @Override
     public void changeTrainerPassword(String username, String newPassword) {
-        Optional<Trainer> trainerOptional = trainerDao.findByUsername(username);
-        trainerOptional.ifPresent(trainerDao::updateTrainer);
+        Optional<Trainer> trainerOptional = dao.findByUsername(username);
+        trainerOptional.ifPresent(dao::updateTrainer);
     }
 
     @Override
     public void activateTrainer(String username) {
-        Optional<Trainer> trainerOptional = trainerDao.findByUsername(username);
     }
 
     @Override
     public void deactivateTrainer(String username) {
-        Optional<Trainer> trainerOptional = trainerDao.findByUsername(username);
-        trainerOptional.ifPresent(trainerDao::delete);
+        Optional<Trainer> trainerOptional = dao.findByUsername(username);
+        trainerOptional.ifPresent(dao::delete);
     }
 
     @Override
     public void deleteTrainer(String username) {
-        Optional<Trainer> trainerOptional = trainerDao.findByUsername(username);
-        trainerOptional.ifPresent(trainerDao::delete);
-    }
-
-    @Override
-    public ProfileResponse createTrainer(TrainerRequest request) {
-        return null;
+        Optional<Trainer> trainerOptional = dao.findByUsername(username);
+        trainerOptional.ifPresent(dao::delete);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class DefaultTrainerService implements TrainerService {
     @Override
     public TrainerProfile updateTrainer(String username, TrainerUpdateRequest request) {
         Trainer trainer = mapper.toEntity(request);
-        Trainer updated = trainerDao.updateTrainer(trainer);
+        Trainer updated = dao.updateTrainer(trainer);
         return mapper.toDto(updated);
     }
 

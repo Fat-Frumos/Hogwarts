@@ -1,9 +1,8 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainer.TrainerResponse;
-import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +19,7 @@ public interface TrainerService {
 
     void deleteTrainer(String username);
 
-    ProfileResponse createTrainer(TrainerRequest request);
+    ProfileResponse registerTrainer(TrainerRequest request);
 
     TrainerProfile getTrainer(String username);
 
