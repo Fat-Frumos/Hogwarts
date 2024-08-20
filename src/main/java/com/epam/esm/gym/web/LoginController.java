@@ -1,8 +1,10 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.profile.LoginRequest;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,7 +25,7 @@ public class LoginController {
     @GetMapping("/login")
     @Operation(summary = "3. Login a user")
     public ResponseEntity<Void> login(
-            @RequestBody ProfileRequest request) {
+            @Valid @RequestBody LoginRequest request) {
         userService.authenticate(request);
         return ResponseEntity.ok().build();
     }

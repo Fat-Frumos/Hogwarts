@@ -89,13 +89,13 @@ Below is a description of each component of the solution.
      - Username
      - Password
 2. Trainer Registration (POST method)
-   a. Request
-   i. First Name (required)
-   ii. Last Name (required)
-   iii. Specialization (required) (Training type reference)
-   b. Response
-   i. Username
-   ii. Password
+   - Request
+     - First Name (required)
+     - Last Name (required)
+     - Specialization (required) (Training type reference)
+   - Response
+     - Username
+     - Password
 3. Login (GET method)
    a. Request
    i. Username (required)

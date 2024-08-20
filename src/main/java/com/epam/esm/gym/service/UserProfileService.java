@@ -2,6 +2,7 @@ package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dao.UserDao;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.profile.LoginRequest;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.UserProfile;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
@@ -81,7 +82,7 @@ public class UserProfileService implements UserService {
     }
 
     @Override
-    public void authenticate(ProfileRequest request) {
+    public void authenticate(LoginRequest request) {
     }
 
     private UserProfile createUser(TrainerRequest dto, String username, String password) {

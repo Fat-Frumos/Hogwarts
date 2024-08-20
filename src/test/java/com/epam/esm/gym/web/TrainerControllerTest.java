@@ -1,7 +1,7 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.domain.Specialization;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.training.TrainingProfile;
@@ -23,7 +23,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class TrainerControllerTest extends ControllerTest {
-
     private final String BASE_URL = "/api/trainers";
     private Map<String, String> registration;
     private Map<String, Object> trainer;
@@ -50,31 +48,42 @@ class TrainerControllerTest extends ControllerTest {
     }
 
     @Test
-    void testTraineeRegistrationMissingFirstName() throws Exception {
-        TraineeRequest traineeRequest = TraineeRequest.builder().lastName("Granger").build();
-
-        MvcResult result = mockMvc.perform(post("/api/trainees/register")
+    void testTrainerRegistrationMissingFirstName() throws Exception {
+        TrainerRequest traineeRequest = TrainerRequest.builder().lastName("Dumbledore")
+                .specialization(Specialization.DEFENSE).build();
+        String responseContent = mockMvc.perform(post("/api/trainers/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(traineeRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.firstName").value("FirstName is required"))
-                .andReturn();
-
-        String responseContent = result.getResponse().getContentAsString();
+                .andReturn().getResponse().getContentAsString();
         assertThat(responseContent).contains("FirstName is required");
     }
 
     @Test
-    void testTraineeRegistrationMissingLastName() throws Exception {
-        TraineeRequest traineeRequest = TraineeRequest.builder().firstName("Hermione").build();
-        String responseContent = mockMvc.perform(post("/api/trainees/register")
+    void testTrainerRegistrationMissingLastName() throws Exception {
+        TrainerRequest traineeRequest = TrainerRequest.builder().firstName("Albus")
+                .specialization(Specialization.DEFENSE).build();
+        String responseContent = mockMvc.perform(post("/api/trainers/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(traineeRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.lastName").value("LastName is required"))
+                .andExpect(jsonPath("$.lastName")
+                        .value("LastName is required"))
                 .andReturn().getResponse().getContentAsString();
-
         assertThat(responseContent).contains("LastName is required");
+    }
+
+    @Test
+    void testRegisterTrainerWithInvalidSpecialization() throws Exception {
+        TrainerRequest traineeRequest = TrainerRequest.builder()
+                .firstName("Albus").lastName("Dumbledore").build();
+        mockMvc.perform(post("/api/trainers/register")
+                        .content(objectMapper.writeValueAsString(traineeRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.specialization")
+                        .value("Specialization is required"));
     }
 
     @Test
@@ -85,7 +94,6 @@ class TrainerControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(registration)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
-
         Assertions.assertThat(objectMapper.readValue(result, ProfileResponse.class))
                 .usingRecursiveComparison()
                 .isEqualTo(profileResponse);
@@ -98,7 +106,6 @@ class TrainerControllerTest extends ControllerTest {
         when(trainerService.registerTrainer(trainerRequest))
                 .thenReturn(profileResponse)
                 .thenAnswer(this::getProfileResponse);
-
         mockMvc.perform(post(BASE_URL + "/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(trainerRequest)))

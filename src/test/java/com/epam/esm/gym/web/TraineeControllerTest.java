@@ -1,15 +1,20 @@
 package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
+import static com.epam.esm.gym.web.data.DataMapper.getTraineeProfile;
 import com.epam.esm.gym.web.data.TraineeData;
+import com.epam.esm.gym.web.data.TrainerData;
 import com.epam.esm.gym.web.data.TrainingData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,52 +38,88 @@ class TraineeControllerTest extends ControllerTest {
     private final String BASE_URL = "/api/trainees";
     private Map<String, Object> activateTrainee;
     private Map<String, String> registration;
-    private Map<String, Object> trainees;
+    private Map<String, Object> trainee;
     private List<TrainerProfile> trainers;
     private List<String> trainersUsernames;
     private ProfileResponse profileResponse;
     private ProfileResponse expectedProfile;
+    private TraineeProfile traineeProfile;
     private TraineeRequest traineeRequest;
     private String username;
 
     @BeforeEach
     void setUp() {
         username = "Harry.Potter";
-        trainees = TraineeData.harryMap;
+        trainee = TraineeData.harryMap;
         registration = TraineeData.registration;
         traineeRequest = TraineeData.traineeRequest;
         activateTrainee = TraineeData.activateTrainee;
         profileResponse = getProfileResponse(registration);
         trainersUsernames = List.of("Severus", "Albus", "Dumbledore");
-        trainers = List.of(new TrainerProfile(), new TrainerProfile());
         expectedProfile = getProfileResponse("Harry", "Potter");
+        traineeProfile = getTraineeProfile(TraineeData.harryMap);
+        trainers = getTrainerProfiles(List.of(TrainerData.snapeMap, TrainerData.horaceMap));
     }
 
     @Test
-    void testRegisterTrainee1() throws Exception {
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/trainees/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(traineeRequest)));
-        result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("Harry.Potter"))
-                .andExpect(jsonPath("$.password").value("randomGeneratedPassword"));
+    void testTraineeRegistrationMissingFirstName() throws Exception {
+        TraineeRequest traineeRequest = TraineeRequest.builder().lastName("Granger").build();
+        MvcResult result = mockMvc.perform(post("/api/trainers/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(traineeRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.firstName").value("FirstName is required"))
+                .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+        assertThat(responseContent).contains("FirstName is required");
     }
 
     @Test
-    void testGetTraineeProfile2() throws Exception {
-        when(traineeService.register(traineeRequest)).thenReturn(profileResponse);
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainees/Harry.Potter")
-                .content(objectMapper.writeValueAsString(traineeRequest))
-                .contentType(MediaType.APPLICATION_JSON));
-        result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.firstName").value("Harry"))
-                .andExpect(jsonPath("$.lastName").value("Potter"))
-                .andExpect(jsonPath("$.dateOfBirth").value("1980-07-31"))
-                .andExpect(jsonPath("$.address").value("4 Privet Drive, Little Whinging, Surrey"));
+    void testTraineeRegistrationMissingLastName() throws Exception {
+        TraineeRequest traineeRequest = TraineeRequest.builder().firstName("Hermione").build();
+        String responseContent = mockMvc.perform(post("/api/trainees/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(traineeRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.lastName").value("LastName is required"))
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(responseContent).contains("LastName is required");
     }
 
     @Test
-    public void testRegisterTrainee() throws Exception {
+    void testRegisterTrainee() throws Exception {
+        when(traineeService.register(traineeRequest)).thenReturn(expectedProfile);
+        String result = mockMvc.perform(MockMvcRequestBuilders.post("/api/trainees/register")
+                        .content(objectMapper.writeValueAsString(traineeRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse()
+                .getContentAsString();
+        ProfileResponse actualProfile = objectMapper.readValue(result, ProfileResponse.class);
+        Assertions.assertThat(actualProfile)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedProfile);
+    }
+
+    @Test
+    void testGetTraineeProfileByUsername() throws Exception {
+        when(traineeService.getTraineeByName(username)).thenReturn(traineeProfile);
+        String result = mockMvc.perform(get("/api/trainees/{username}", username)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        TraineeProfile actualProfile = objectMapper.readValue(result, TraineeProfile.class);
+        Assertions.assertThat(actualProfile)
+                .usingRecursiveComparison()
+                .isEqualTo(traineeProfile);
+    }
+
+
+    @Test
+    public void testRegisterTraineeIsCreated() throws Exception {
         mockMvc.perform(post(BASE_URL + "/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(traineeRequest)))
@@ -100,7 +141,7 @@ class TraineeControllerTest extends ControllerTest {
     void testTraineeRegistrations() throws Exception {
         mockMvc.perform(post(BASE_URL + "/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(trainees)))
+                        .content(objectMapper.writeValueAsString(trainee)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value(expectedProfile.getUsername()))
                 .andExpect(jsonPath("$.password").value(expectedProfile.getPassword()));
@@ -181,7 +222,7 @@ class TraineeControllerTest extends ControllerTest {
 
         mockMvc.perform(put(BASE_URL + "/{username}", username)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(trainees)))
+                        .content(objectMapper.writeValueAsString(trainee)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value(username))
                 .andExpect(jsonPath("$.firstName").value("Harry"))

@@ -23,7 +23,7 @@ public class TrainingType {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Type trainingType;
+    private Specialization trainingType;
 
     @OneToMany(mappedBy = "type")
     private Set<Training> trainings = new HashSet<>();

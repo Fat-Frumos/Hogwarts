@@ -79,7 +79,7 @@ public class TrainerController {
     }
 
     @GetMapping("/{username}/unassigned")
-    public ResponseEntity<?> getNotAssignedActiveTrainers(
+    public ResponseEntity<List<TrainerProfile>> getNotAssignedActiveTrainers(
             @PathVariable String username) {
         if (!username.matches("^[a-zA-Z0-9._-]+$")) {
             throw new ValidationException("Invalid username");

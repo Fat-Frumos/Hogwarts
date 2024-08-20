@@ -69,7 +69,7 @@ public class ControllerTest {
         return DataMapper.getTrainingProfile(training);
     }
 
-    protected List<TraineeProfile> getTraineeProfile(List<Map<String, Object>> traineeMaps) {
+    protected List<TraineeProfile> getTraineesProfile(List<Map<String, Object>> traineeMaps) {
         return DataMapper.getTraineeProfile(traineeMaps);
     }
 

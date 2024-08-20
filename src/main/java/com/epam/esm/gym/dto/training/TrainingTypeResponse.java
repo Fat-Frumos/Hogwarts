@@ -1,6 +1,6 @@
 package com.epam.esm.gym.dto.training;
 
-import com.epam.esm.gym.domain.Type;
+import com.epam.esm.gym.domain.Specialization;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TrainingTypeResponse {
-    private Type trainingType;
+    private Specialization trainingType;
     private Long trainingTypeId;
 }

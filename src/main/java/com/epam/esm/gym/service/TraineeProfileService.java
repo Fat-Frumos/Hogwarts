@@ -37,7 +37,7 @@ public class TraineeProfileService implements TraineeService {
     }
 
     @Override
-    public TraineeRequest getTraineeByName(String username) {
+    public TraineeProfile getTraineeByName(String username) {
         return null;
     }
 

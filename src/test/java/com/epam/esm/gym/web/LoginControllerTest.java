@@ -1,8 +1,10 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.profile.LoginRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import java.util.HashMap;
 import java.util.Map;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -56,5 +58,60 @@ class LoginControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(login)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testLoginWithMissingUsername() throws Exception {
+        LoginRequest loginRequest = LoginRequest.builder().password(password).build();
+        String responseContent = mockMvc.perform(get("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(responseContent).contains("Username is required");
+    }
+
+    @Test
+    void testLoginWithMissingCred() throws Exception {
+        LoginRequest loginRequest = LoginRequest.builder().build();
+        String responseContent = mockMvc.perform(get("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(responseContent).contains("Username is required");
+        assertThat(responseContent).contains("Password is required");
+    }
+
+    @Test
+    void testLoginWithMissingPassword() throws Exception {
+        LoginRequest loginRequest = LoginRequest.builder().username("validUsername").build();
+        String responseContent = mockMvc.perform(get("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        assertThat(responseContent).contains("Password is required");
+    }
+
+    @Test
+    void testLoginWithShortPassword() throws Exception {
+        LoginRequest loginRequest = LoginRequest.builder().username("validUsername").password("short").build();
+        String responseContent = mockMvc.perform(get("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        assertThat(responseContent).contains("Password must be between 6 and 50 characters");
     }
 }

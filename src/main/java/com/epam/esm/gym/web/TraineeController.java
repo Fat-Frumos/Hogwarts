@@ -1,6 +1,7 @@
 package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainee.TraineeUpdateRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
@@ -45,9 +46,9 @@ public class TraineeController {
 
     @GetMapping("/{username}")
     @Operation(summary = " 5. Get Trainee Profile by username")
-    public ResponseEntity<TraineeRequest> getTraineeProfile(
+    public ResponseEntity<TraineeProfile> getTraineeProfile(
             @PathVariable String username) {
-        TraineeRequest profile = traineeService.getTraineeByName(username);
+        TraineeProfile profile = traineeService.getTraineeByName(username);
         return ResponseEntity.ok(profile);
     }
 

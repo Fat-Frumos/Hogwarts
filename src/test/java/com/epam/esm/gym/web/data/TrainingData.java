@@ -1,8 +1,8 @@
 package com.epam.esm.gym.web.data;
 
-import static com.epam.esm.gym.domain.Type.DEFENSE;
-import static com.epam.esm.gym.domain.Type.POTIONS;
-import static com.epam.esm.gym.domain.Type.TRANSFIGURATION;
+import static com.epam.esm.gym.domain.Specialization.DEFENSE;
+import static com.epam.esm.gym.domain.Specialization.POTIONS;
+import static com.epam.esm.gym.domain.Specialization.TRANSFIGURATION;
 import com.epam.esm.gym.dto.training.TrainingTypeResponse;
 import java.util.HashMap;
 import java.util.List;

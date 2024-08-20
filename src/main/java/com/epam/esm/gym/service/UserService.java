@@ -1,5 +1,6 @@
 package com.epam.esm.gym.service;
 
+import com.epam.esm.gym.dto.profile.LoginRequest;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.UserProfile;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
@@ -23,7 +24,7 @@ public interface UserService {
 
     void deactivateUser(String username);
 
-    void authenticate(ProfileRequest request);
+    void authenticate(LoginRequest request);
 
     TraineeProfile saveTrainee(TraineeRequest dto);
 }

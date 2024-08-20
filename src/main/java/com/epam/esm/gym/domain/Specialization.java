@@ -1,6 +1,6 @@
 package com.epam.esm.gym.domain;
 
-public enum Type {
+public enum Specialization {
     CARDIO,
     BALANCE,
     STRENGTH,
