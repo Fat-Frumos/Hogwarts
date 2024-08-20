@@ -1,19 +1,19 @@
 package com.epam.esm.gym.dto.trainee;
 
-import com.epam.esm.gym.dto.profile.UserDto;
-import java.util.Date;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class TraineeDto {
-    private Long id;
-    private UserDto user;
-    private Date dateOfBirth;
+@EqualsAndHashCode
+public class TraineeUpdateRequest {
+    private String firstName;
+    private String lastName;
+    private LocalDate dateOfBirth;
     private String address;
+    private Boolean active;
 }

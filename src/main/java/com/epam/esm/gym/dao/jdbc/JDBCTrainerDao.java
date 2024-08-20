@@ -1,19 +1,18 @@
-package com.epam.esm.gym.dao;
+package com.epam.esm.gym.dao.jdbc;
 
+import com.epam.esm.gym.dao.TrainerDao;
 import com.epam.esm.gym.domain.Trainer;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@AllArgsConstructor
 public class JDBCTrainerDao implements TrainerDao {
 
     private final SessionFactory factory;
-
-    public JDBCTrainerDao(SessionFactory sessionFactory) {
-        this.factory = sessionFactory;
-    }
 
     @Override
     public List<Trainer> findAll() {

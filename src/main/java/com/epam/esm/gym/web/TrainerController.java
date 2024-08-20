@@ -1,20 +1,21 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeTrainingRequest;
-import com.epam.esm.gym.dto.trainer.TrainerDto;
-import com.epam.esm.gym.dto.trainer.TrainerRegistrationDto;
-import com.epam.esm.gym.dto.trainer.TrainerResponse;
+import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
+import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import com.epam.esm.gym.service.TraineeService;
+import com.epam.esm.gym.exception.ValidationException;
 import com.epam.esm.gym.service.TrainerService;
 import com.epam.esm.gym.service.TrainingService;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,75 +26,65 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/trainers")
 public class TrainerController {
 
-    private final TraineeService traineeService;
-
     private final TrainerService trainerService;
 
     private final TrainingService trainingService;
 
-
-    @PostMapping("/")
-    public ResponseEntity<ProfileResponse> registerTrainer(
-            @RequestBody TrainerRegistrationDto request) {
+    @PostMapping("/register")
+    @Operation(summary = "2. Register a new trainer")
+    public ResponseEntity<ProfileResponse> registerTrainerProfile(
+            @Valid @RequestBody TrainerRequest request) {
         ProfileResponse response = trainerService.registerTrainer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<Void> login(
-            @RequestParam ProfileRequest request) {
-        traineeService.validateUser(request);
-        return ResponseEntity.ok().build();
-    }
-
-    @PutMapping("/change-login")
-    public ResponseEntity<Void> changeLogin(
-            @RequestParam ProfileRequest request) {
-        traineeService.changePassword(request);
-        return ResponseEntity.ok().build();
-    }
-
-
     @GetMapping("/{username}")
-    public ResponseEntity<TrainerResponse> getTrainerProfile(
+    @Operation(summary = "8. Get Trainer Profile")
+    public ResponseEntity<TrainerProfile> getTrainerProfile(
             @PathVariable String username) {
-        TrainerResponse response = trainerService.getTrainer(username);
-        return ResponseEntity.ok(response);
+        TrainerProfile profile = trainerService.getTrainer(username);
+        return ResponseEntity.ok(profile);
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<TrainerDto> updateTrainerProfile(
+    @Operation(summary = "9. Update Trainer Profile")
+    public ResponseEntity<TrainerProfile> updateTrainerProfile(
             @PathVariable String username,
-            @RequestBody TrainerUpdateRequest request) {
-        TrainerDto response = trainerService.updateTrainer(username, request);
-        return ResponseEntity.ok(response);
+            @Valid @RequestBody TrainerUpdateRequest request) {
+        TrainerProfile profile = trainerService.updateTrainer(username, request);
+        return ResponseEntity.ok(profile);
     }
-
-    @GetMapping("/not-assigned/{traineeUsername}")
-    public ResponseEntity<List<TrainerResponse>> getNotAssignedTrainers(
-            @PathVariable String traineeUsername) {
-        List<TrainerResponse> response = trainerService.getNotAssigned(traineeUsername);
-        return ResponseEntity.ok(response);
-    }
-
 
     @GetMapping("/{username}/trainings")
+    @Operation(summary = "13. Get Trainer Trainings List")
     public ResponseEntity<List<TrainingResponse>> getTrainerTrainings(
             @PathVariable String username,
-            @RequestBody TraineeTrainingRequest request) {
+            @Valid @RequestBody TrainingProfile request) {
         List<TrainingResponse> response = trainingService.getTrainerTrainingsByName(username, request);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{username}/activate")
+    @Operation(summary = "16. Activate/Deactivate Trainer")
     public ResponseEntity<Void> activateTrainer(
-            @PathVariable String username, @RequestParam Boolean isActive) {
-        trainerService.activateDeactivateProfile(username, isActive);
+            @PathVariable String username, @RequestParam Boolean active) {
+        trainerService.activateDeactivateProfile(username, active);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{username}/unassigned")
+    public ResponseEntity<List<TrainerProfile>> getNotAssignedActiveTrainers(
+            @PathVariable String username) {
+        if (!username.matches("^[a-zA-Z0-9._-]+$")) {
+            throw new ValidationException("Invalid username");
+        } else {
+            return ResponseEntity.ok(trainerService.getNotAssigned(username));
+        }
     }
 }

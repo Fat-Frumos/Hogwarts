@@ -1,19 +1,18 @@
-package com.epam.esm.gym.dao;
+package com.epam.esm.gym.dao.jdbc;
 
+import com.epam.esm.gym.dao.TraineeDao;
 import com.epam.esm.gym.domain.Trainee;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@AllArgsConstructor
 public class JDBCTraineeDao implements TraineeDao {
 
     private final SessionFactory factory;
-
-    public JDBCTraineeDao(SessionFactory sessionFactory) {
-        this.factory = sessionFactory;
-    }
 
     @Override
     public List<Trainee> findAll() {
@@ -37,11 +36,10 @@ public class JDBCTraineeDao implements TraineeDao {
 
     @Override
     public void update(Trainee entity) {
-
     }
 
     @Override
     public void delete(Trainee trainee) {
-
+        factory.close();
     }
 }

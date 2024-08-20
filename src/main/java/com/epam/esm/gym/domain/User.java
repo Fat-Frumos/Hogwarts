@@ -32,7 +32,7 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private Boolean isActive;
+    private Boolean active;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Trainer trainer;

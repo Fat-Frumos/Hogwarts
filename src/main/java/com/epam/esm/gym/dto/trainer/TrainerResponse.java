@@ -1,5 +1,7 @@
 package com.epam.esm.gym.dto.trainer;
 
+import com.epam.esm.gym.dto.profile.UserProfile;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,8 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TrainerResponse {
-    private String username;
-    private String firstName;
-    private String lastName;
-    private String specialization;
+    private Long id;
+    private UserProfile user;
+    private Set<String> specializations;
 }

@@ -1,18 +1,21 @@
 package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeRegistrationRequestDto;
-import com.epam.esm.gym.dto.trainee.TraineeTrainingRequest;
-import com.epam.esm.gym.dto.trainee.TraineeUpdateRequestDto;
-import com.epam.esm.gym.dto.trainer.TrainerResponse;
+import com.epam.esm.gym.dto.trainee.TraineeProfile;
+import com.epam.esm.gym.dto.trainee.TraineeRequest;
+import com.epam.esm.gym.dto.trainee.TraineeUpdateRequest;
+import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.service.TraineeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/trainees")
@@ -32,55 +36,62 @@ public class TraineeController {
 
     private TraineeService traineeService;
 
-    @PostMapping("/")
-    @Operation(summary = "Register a new trainee")
+    @PostMapping("/register")
+    @Operation(summary = "1. Register a new trainee")
     public ResponseEntity<ProfileResponse> registerTrainee(
-            @RequestBody TraineeRegistrationRequestDto request) {
+            @Valid @RequestBody TraineeRequest request) {
         ProfileResponse response = traineeService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<TraineeRegistrationRequestDto> getTraineeProfile(
+    @Operation(summary = " 5. Get Trainee Profile by username")
+    public ResponseEntity<TraineeProfile> getTraineeProfile(
             @PathVariable String username) {
-        TraineeRegistrationRequestDto response = traineeService.getTraineeByName(username);
-        return ResponseEntity.ok(response);
+        TraineeProfile profile = traineeService.getTraineeByName(username);
+        return ResponseEntity.ok(profile);
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<TraineeRegistrationRequestDto> updateTraineeProfile(
+    @Operation(summary = "6. Update Trainee Profile")
+    public ResponseEntity<TraineeRequest> updateTraineeProfile(
             @PathVariable String username,
-            @RequestBody TraineeUpdateRequestDto request) {
-        TraineeRegistrationRequestDto response = traineeService.updateTrainee(username, request);
+            @Valid @RequestBody TraineeUpdateRequest request) {
+        TraineeRequest response = traineeService.updateTrainee(username, request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{username}")
-    public ResponseEntity<Void> deleteTraineeProfile(@PathVariable String username) {
+    @Operation(summary = "7. Delete Trainee Profile")
+    public ResponseEntity<Void> deleteTraineeProfile(
+            @PathVariable String username) {
         traineeService.deleteTrainee(username);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/{username}/trainers")
-    public ResponseEntity<List<TrainerResponse>> updateTraineeTrainers(
+    @Operation(summary = "11. Update Trainee's Trainer List")
+    public ResponseEntity<List<TrainerProfile>> updateTraineeTrainers(
             @PathVariable String username,
-            @RequestBody List<String> trainerUsernames) {
-        List<TrainerResponse> response = traineeService.updateTraineeTrainersByName(username, trainerUsernames);
-        return ResponseEntity.ok(response);
+            @Valid @RequestBody List<String> trainersUsernames) {
+        List<TrainerProfile> trainers = traineeService.updateTraineeTrainersByName(username, trainersUsernames);
+        return ResponseEntity.ok(trainers);
     }
 
     @GetMapping("/{username}/trainings")
+    @Operation(summary = "12. Get Trainee Trainings List")
     public ResponseEntity<List<TrainingResponse>> getTraineeTrainings(
             @PathVariable String username,
-            @RequestBody TraineeTrainingRequest request) {
+            @RequestBody TrainingProfile request) {
         List<TrainingResponse> response = traineeService.getTraineeTrainingsByName(username, request);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{username}/activate")
-    public ResponseEntity<Void> activateTrainee(
-            @PathVariable String username, @RequestParam Boolean isActive) {
-        traineeService.activateDeactivateProfile(username, isActive);
+    @Operation(summary = "15. Activate/Deactivate Trainee")
+    public ResponseEntity<Void> activateDeactivateTrainee(
+            @PathVariable String username, @RequestParam Boolean active) {
+        traineeService.activateDeactivateProfile(username, active);
         return ResponseEntity.ok().build();
     }
 }

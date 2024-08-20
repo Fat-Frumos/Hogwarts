@@ -1,16 +1,15 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainer.TrainerDto;
-import com.epam.esm.gym.dto.trainer.TrainerRegistrationDto;
-import com.epam.esm.gym.dto.trainer.TrainerResponse;
+import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import java.util.List;
 import java.util.Optional;
 
 public interface TrainerService {
 
-    Optional<TrainerDto> getTrainerByUsername(String username);
+    Optional<TrainerProfile> getTrainerByUsername(String username);
 
     void changeTrainerPassword(String username, String newPassword);
 
@@ -20,13 +19,13 @@ public interface TrainerService {
 
     void deleteTrainer(String username);
 
-    ProfileResponse registerTrainer(TrainerRegistrationDto request);
+    ProfileResponse registerTrainer(TrainerRequest request);
 
-    TrainerResponse getTrainer(String username);
+    TrainerProfile getTrainer(String username);
 
-    TrainerDto updateTrainer(String username, TrainerUpdateRequest request);
+    TrainerProfile updateTrainer(String username, TrainerUpdateRequest request);
 
-    List<TrainerResponse> getNotAssigned(String traineeUsername);
+    List<TrainerProfile> getNotAssigned(String traineeUsername);
 
-    void activateDeactivateProfile(String username, Boolean isActive);
+    void activateDeactivateProfile(String username, Boolean active);
 }

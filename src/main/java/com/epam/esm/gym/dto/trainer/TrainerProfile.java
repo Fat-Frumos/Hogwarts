@@ -1,26 +1,25 @@
 package com.epam.esm.gym.dto.trainer;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.epam.esm.gym.dto.trainee.TraineeProfile;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrainerUpdateRequest {
-
-    @NotBlank(message = "First Name is required")
+public class TrainerProfile {
+    private String username;
     private String firstName;
-
-    @NotBlank(message = "Last Name is required")
     private String lastName;
-
-    @NotNull(message = "Is Active status is required")
-    private Boolean active;
+    private String specialization;
+    private boolean active;
+    private List<TraineeProfile> trainees;
 }

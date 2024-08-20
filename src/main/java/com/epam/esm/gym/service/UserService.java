@@ -1,19 +1,30 @@
 package com.epam.esm.gym.service;
 
-import com.epam.esm.gym.dto.profile.UserDto;
+import com.epam.esm.gym.dto.profile.LoginRequest;
+import com.epam.esm.gym.dto.profile.ProfileRequest;
+import com.epam.esm.gym.dto.profile.UserProfile;
+import com.epam.esm.gym.dto.trainee.TraineeProfile;
+import com.epam.esm.gym.dto.trainee.TraineeRequest;
+import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.TrainerRequest;
 
 public interface UserService {
-    void createUser(String firstName, String lastName);
 
-    void updateUser(UserDto userDto);
+    TrainerProfile saveTrainer(TrainerRequest dto);
+
+    void updateUser(UserProfile userProfile);
 
     void deleteUser(String username);
 
-    UserDto getUserByUsername(String username);
+    UserProfile getUserByUsername(String username);
 
-    void changePassword(String username, String newPassword);
+    void changePassword(ProfileRequest user);
 
     void activateUser(String username);
 
     void deactivateUser(String username);
+
+    void authenticate(LoginRequest request);
+
+    TraineeProfile saveTrainee(TraineeRequest dto);
 }
