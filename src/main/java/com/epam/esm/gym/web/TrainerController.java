@@ -48,7 +48,7 @@ public class TrainerController {
     @Operation(summary = "8. Get Trainer Profile")
     public ResponseEntity<TrainerProfile> getTrainerProfile(
             @PathVariable String username) {
-        TrainerProfile profile = trainerService.getTrainer(username);
+        TrainerProfile profile = trainerService.getTrainerProfileByName(username);
         return ResponseEntity.ok(profile);
     }
 

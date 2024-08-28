@@ -2,8 +2,11 @@ package com.epam.esm.gym.dao;
 
 import com.epam.esm.gym.domain.Trainer;
 
-public interface TrainerDao extends Dao<Trainer, Long> {
-    void activateTrainer(Long id);
+import java.util.List;
 
-    Trainer updateTrainer(Trainer trainer);
+public interface TrainerDao extends Dao<Trainer> {
+
+    void activateTrainer(String name, Boolean active);
+
+    List<Trainer> findNotAssigned(String username);
 }

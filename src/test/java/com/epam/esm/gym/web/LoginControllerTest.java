@@ -2,14 +2,18 @@ package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.profile.LoginRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import java.util.HashMap;
-import java.util.Map;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class LoginControllerTest extends ControllerTest {
@@ -22,17 +26,17 @@ class LoginControllerTest extends ControllerTest {
     void setUp() {
         loginRequest = new HashMap<>();
         loginRequest.put("username", "Harry.Potter");
-        loginRequest.put("password", "password123");
+        loginRequest.put("password", "Password123");
 
         changeLogin = new HashMap<>();
         changeLogin.put("username", "Harry.Potter");
-        changeLogin.put("oldPassword", "password123");
+        changeLogin.put("password", password);
         changeLogin.put("newPassword", "newpassword123");
 
         ProfileResponse credentials = getProfileResponse("Harry", "Potter");
         login = Map.of(
                 "username", credentials.getUsername(),
-                "oldPassword", credentials.getPassword(),
+                "password", credentials.getPassword(),
                 "newPassword", "newPassword123");
     }
 
@@ -50,6 +54,16 @@ class LoginControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changeLogin)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Update User Password")
+    void updateUserPassword() throws Exception {
+        mockMvc.perform(put("/api/login/change")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(changeLogin)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Password updated successfully"));
     }
 
     @Test

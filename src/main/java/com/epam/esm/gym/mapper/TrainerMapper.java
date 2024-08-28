@@ -9,6 +9,8 @@ import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import org.mapstruct.Mapper;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface TrainerMapper {
     TrainerProfile toDto(Trainer trainer);
@@ -20,4 +22,6 @@ public interface TrainerMapper {
     Trainee toEntity(TraineeProfile trainee);
 
     ProfileResponse toProfileDto(User user);
+
+    List<TrainerProfile> toDtos(List<Trainer> notAssigned);
 }

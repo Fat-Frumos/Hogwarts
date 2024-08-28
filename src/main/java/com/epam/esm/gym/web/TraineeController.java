@@ -11,7 +11,9 @@ import com.epam.esm.gym.service.TraineeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,16 +50,16 @@ public class TraineeController {
     @Operation(summary = " 5. Get Trainee Profile by username")
     public ResponseEntity<TraineeProfile> getTraineeProfile(
             @PathVariable String username) {
-        TraineeProfile profile = traineeService.getTraineeByName(username);
+        TraineeProfile profile = traineeService.getTraineeProfileByName(username);
         return ResponseEntity.ok(profile);
     }
 
     @PutMapping("/{username}")
     @Operation(summary = "6. Update Trainee Profile")
-    public ResponseEntity<TraineeRequest> updateTraineeProfile(
+    public ResponseEntity<TraineeProfile> updateTraineeProfile(
             @PathVariable String username,
             @Valid @RequestBody TraineeUpdateRequest request) {
-        TraineeRequest response = traineeService.updateTrainee(username, request);
+        TraineeProfile response = traineeService.updateTrainee(username, request);
         return ResponseEntity.ok(response);
     }
 

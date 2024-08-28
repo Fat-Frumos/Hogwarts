@@ -3,16 +3,14 @@ package com.epam.esm.gym.dao;
 import java.util.List;
 import java.util.Optional;
 
-public interface Dao<T, ID> {
+public interface Dao<T> {
     List<T> findAll();
 
-    Optional<T> findById(ID id);
-
-    Optional<T> findByUsername(String username);
+    Optional<T> findByUserName(String username);
 
     T save(T t);
 
-    void update(T entity);
+    T update(T t);
 
     void delete(T t);
 }

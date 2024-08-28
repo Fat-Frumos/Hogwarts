@@ -2,44 +2,46 @@ package com.epam.esm.gym.dao.jdbc;
 
 import com.epam.esm.gym.dao.TraineeDao;
 import com.epam.esm.gym.domain.Trainee;
-import java.util.List;
-import java.util.Optional;
-import lombok.AllArgsConstructor;
+import com.epam.esm.gym.domain.Trainer;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
-@AllArgsConstructor
-public class JDBCTraineeDao implements TraineeDao {
+public class JDBCTraineeDao extends AbstractDao<Trainee> implements TraineeDao {
 
-    private final SessionFactory factory;
-
-    @Override
-    public List<Trainee> findAll() {
-        return null;
+    public JDBCTraineeDao(SessionFactory sessionFactory) {
+        super(Trainee.class, sessionFactory);
     }
 
     @Override
-    public Optional<Trainee> findById(Long aLong) {
-        return Optional.empty();
+    public Optional<Trainee> findByUserName(String username) {
+        String hql = """
+                SELECT t
+                FROM Trainee t
+                JOIN FETCH t.user u
+                WHERE u.username = :username
+                """;
+        return getSession().createQuery(hql, Trainee.class)
+                .setParameter("username", username)
+                .uniqueResultOptional();
     }
 
     @Override
-    public Optional<Trainee> findByUsername(String username) {
-        return Optional.empty();
-    }
+    public List<Trainer> findNotAssignedTrainers(String username) {
+        String hql = """
+                    SELECT t
+                    FROM Trainer t
+                    LEFT JOIN Training tr ON tr.trainer.id = t.id
+                    JOIN t.user u
+                    WHERE tr.id IS NULL
+                      AND u.username != :username
+                """;
 
-    @Override
-    public Trainee save(Trainee trainee) {
-        return null;
-    }
-
-    @Override
-    public void update(Trainee entity) {
-    }
-
-    @Override
-    public void delete(Trainee trainee) {
-        factory.close();
+        return getSession().createQuery(hql, Trainer.class)
+                .setParameter("username", username)
+                .getResultList();
     }
 }

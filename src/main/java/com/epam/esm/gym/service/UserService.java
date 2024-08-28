@@ -1,5 +1,6 @@
 package com.epam.esm.gym.service;
 
+import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.LoginRequest;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.UserProfile;
@@ -12,7 +13,7 @@ public interface UserService {
 
     TrainerProfile saveTrainer(TrainerRequest dto);
 
-    void updateUser(UserProfile userProfile);
+    void updateUser(User user);
 
     void deleteUser(String username);
 

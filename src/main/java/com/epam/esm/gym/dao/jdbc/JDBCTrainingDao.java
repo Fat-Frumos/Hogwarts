@@ -2,45 +2,53 @@ package com.epam.esm.gym.dao.jdbc;
 
 import com.epam.esm.gym.dao.TrainingDao;
 import com.epam.esm.gym.domain.Training;
-import java.util.List;
-import java.util.Optional;
-import lombok.AllArgsConstructor;
+import com.epam.esm.gym.domain.TrainingType;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
-@AllArgsConstructor
-public class JDBCTrainingDao implements TrainingDao {
-
-    private final SessionFactory factory;
-
-    @Override
-    public List<Training> findAll() {
-        return null;
+public class JDBCTrainingDao extends AbstractDao<Training> implements TrainingDao {
+    public JDBCTrainingDao(SessionFactory sessionFactory) {
+        super(Training.class, sessionFactory);
     }
 
     @Override
-    public Optional<Training> findById(Long aLong) {
-        return Optional.empty();
+    public Optional<Training> findByUserName(String username) {
+        String hql = """
+                SELECT tr
+                FROM Training tr
+                LEFT JOIN FETCH tr.trainer trainer
+                LEFT JOIN FETCH tr.trainee trainee
+                LEFT JOIN FETCH trainer.user trainerUser
+                LEFT JOIN FETCH trainee.user traineeUser
+                WHERE trainerUser.username = :username
+                   OR traineeUser.username = :username
+                """;
+        return getSession().createQuery(hql, Training.class)
+                .setParameter("username", username)
+                .uniqueResultOptional();
     }
 
     @Override
-    public Optional<Training> findByUsername(String username) {
-        return Optional.empty();
+    public List<TrainingType> findAllTrainingTypes() {
+        return getSession().createQuery("FROM TrainingType", TrainingType.class)
+                .getResultList();
     }
 
     @Override
-    public Training save(Training training) {
-        return null;
-    }
-
-    @Override
-    public void update(Training entity) {
-
-    }
-
-    @Override
-    public void delete(Training training) {
-
+    public List<Training> findTrainingsByTrainerUsername(String username) {
+        String hql = """
+                    SELECT t
+                    FROM Training t
+                    JOIN t.trainer tr
+                    JOIN tr.user u
+                    WHERE u.username = :username
+                """;
+        return getSession().createQuery(hql, Training.class)
+                .setParameter("username", username)
+                .getResultList();
     }
 }

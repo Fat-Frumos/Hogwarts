@@ -6,8 +6,7 @@ import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import com.epam.esm.gym.web.data.TrainerData;
-import com.epam.esm.gym.web.data.TrainingData;
+import com.epam.esm.gym.web.data.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -127,7 +126,7 @@ class TrainerControllerTest extends ControllerTest {
 
     @Test
     void testGetTrainerProfile() throws Exception {
-        when(trainerService.getTrainer(username)).thenReturn(TrainerData.TRAINER_PROFILE);
+        when(trainerService.getTrainerProfileByName(username)).thenReturn(TrainerData.TRAINER_PROFILE);
         String result = mockMvc.perform(get(BASE_URL + "/{username}", username))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -137,7 +136,7 @@ class TrainerControllerTest extends ControllerTest {
         Assertions.assertThat(objectMapper.readValue(result, TrainerProfile.class))
                 .usingRecursiveComparison()
                 .isEqualTo(TrainerData.TRAINER_PROFILE);
-        verify(trainerService, times(1)).getTrainer(username);
+        verify(trainerService, times(1)).getTrainerProfileByName(username);
     }
 
 

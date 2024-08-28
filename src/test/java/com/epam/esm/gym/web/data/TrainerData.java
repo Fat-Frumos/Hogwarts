@@ -1,7 +1,10 @@
 package com.epam.esm.gym.web.data;
 
+import com.epam.esm.gym.domain.Specialization;
+import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +51,7 @@ public class TrainerData {
                 .username("Severus.Snape")
                 .firstName("Severus")
                 .lastName("Snape")
-                .specialization("POTIONS")
+                .specialization(TrainingType.builder().trainingType(Specialization.POTIONS).build())
                 .active(true)
                 .build();
 

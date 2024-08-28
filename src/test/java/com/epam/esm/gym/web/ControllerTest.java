@@ -34,7 +34,7 @@ public class ControllerTest {
     protected TrainerService trainerService;
     @MockBean
     protected TraineeService traineeService;
-    protected final String password = "Password123!";
+    protected final String password = "Password123";
 
     protected ProfileResponse getProfileResponse(String firstName, String lastName) {
         return new ProfileResponse(getUsername(firstName, lastName), password);

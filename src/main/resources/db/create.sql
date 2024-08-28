@@ -17,7 +17,6 @@ CREATE TABLE "trainee"
     FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE
 );
 
-
 CREATE TABLE "training_type"
 (
     id                 SERIAL PRIMARY KEY,

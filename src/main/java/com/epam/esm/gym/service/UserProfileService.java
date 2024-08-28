@@ -10,14 +10,19 @@ import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.mapper.UserMapper;
+
 import java.security.SecureRandom;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserProfileService implements UserService {
@@ -32,8 +37,7 @@ public class UserProfileService implements UserService {
     public TraineeProfile saveTrainee(TraineeRequest dto) {
         String username = generateUsername(dto.getFirstName(), dto.getLastName());
         String password = generateRandomPassword();
-        UserProfile profile = createUser(dto, username, password);
-        User user = mapper.toEntity(profile);
+        User user = mapper.toUser(dto.getFirstName(), dto.getLastName(), username, password);
         User save = dao.save(user);
         return mapper.toTraineeProfile(save);
     }
@@ -44,65 +48,74 @@ public class UserProfileService implements UserService {
     public TrainerProfile saveTrainer(TrainerRequest dto) {
         String username = generateUsername(dto.getFirstName(), dto.getLastName());
         String password = generateRandomPassword();
-
-        UserProfile profile = createUser(dto, username, password);
-        User user = mapper.toEntity(profile);
+        User user = mapper.toUser(dto.getFirstName(), dto.getLastName(), username, password);
         User save = dao.save(user);
         return mapper.toTrainerProfile(save);
     }
 
     @Override
-    public void updateUser(UserProfile userProfile) {
-
+    public void updateUser(User user) {
+        dao.update(user);
     }
 
     @Override
     public void deleteUser(String username) {
-
+        dao.delete(getUser(username));
     }
 
     @Override
     public UserProfile getUserByUsername(String username) {
-        return null;
+        return mapper.toDto(getUser(username));
+    }
+
+    private User getUser(String username) {
+        return dao.findByUserName(username).orElseThrow(
+                () -> new EntityNotFoundException(username));
     }
 
     @Override
-    public void changePassword(ProfileRequest user) {
+    public void changePassword(ProfileRequest request) {
+        User user = getUser(request.getUsername());
+        log.info(user.toString());
+        if (!(request.getPassword().equals(user.getPassword()))) {
+            throw new IllegalArgumentException("Old password is incorrect.");
+        }
+
+        if (!request.getNewPassword().equals(request.getPassword())) {
+            user.setPassword(request.getNewPassword());
+            updateUser(user);
+        } else {
+            throw new IllegalArgumentException("New password the same as old password .");
+        }
 
     }
 
     @Override
     public void activateUser(String username) {
-
+        User user = dao.findByUserName(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setActive(true);
+        dao.save(user);
     }
+
 
     @Override
     public void deactivateUser(String username) {
-
+        User user = dao.findByUserName(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setActive(false);
+        dao.save(user);
     }
 
     @Override
     public void authenticate(LoginRequest request) {
-    }
-
-    private UserProfile createUser(TrainerRequest dto, String username, String password) {
-        return UserProfile.builder()
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
-                .username(username)
-                .password(password)
-                .active(true)
-                .build();
-    }
-
-    private UserProfile createUser(TraineeRequest dto, String username, String password) {
-        return UserProfile.builder()
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
-                .username(username)
-                .password(password)
-                .active(true)
-                .build();
+        log.info(request.toString());
+        User user = dao.findByUserName(request.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
+        log.info(user.toString());
+        if (!(request.getPassword().equals(user.getPassword()))) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
     }
 
     private String generateUsername(String firstName, String lastName) {

@@ -6,24 +6,24 @@ import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import static com.epam.esm.gym.web.data.DataMapper.getTraineeProfile;
-import com.epam.esm.gym.web.data.TraineeData;
-import com.epam.esm.gym.web.data.TrainerData;
-import com.epam.esm.gym.web.data.TrainingData;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.epam.esm.gym.web.data.*;
 import org.assertj.core.api.Assertions;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.epam.esm.gym.web.data.DataMapper.getTraineeProfile;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -105,7 +105,7 @@ class TraineeControllerTest extends ControllerTest {
 
     @Test
     void testGetTraineeProfileByUsername() throws Exception {
-        when(traineeService.getTraineeByName(username)).thenReturn(traineeProfile);
+        when(traineeService.getTraineeProfileByName(username)).thenReturn(traineeProfile);
         String result = mockMvc.perform(get("/api/trainees/{username}", username)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

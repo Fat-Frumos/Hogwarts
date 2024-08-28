@@ -18,4 +18,14 @@ public interface UserMapper {
     TraineeProfile toTraineeProfile(User user);
 
     TrainerProfile toTrainerProfile(User user);
+
+    default User toUser(String firstName, String lastName, String username, String password) {
+        return toEntity(UserProfile.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .username(username)
+                .password(password)
+                .active(true)
+                .build());
+    }
 }

@@ -97,11 +97,11 @@ Below is a description of each component of the solution.
      - Username
      - Password
 3. Login (GET method)
-   a. Request
-   i. Username (required)
-   ii. Password (required)
-   b. Response
-   i. 200 OK
+   - Request
+     - Username (required)
+     - Password (required)
+   - Response
+   - 200 OK
 4. Change Login (PUT method)
    a. Request
    i. Username (required)

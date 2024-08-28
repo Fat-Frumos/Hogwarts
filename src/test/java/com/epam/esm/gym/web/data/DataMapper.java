@@ -1,11 +1,13 @@
 package com.epam.esm.gym.web.data;
 
 import com.epam.esm.gym.domain.Specialization;
+import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +37,7 @@ public class DataMapper {
                 .username((String) trainer.get("username"))
                 .firstName((String) trainer.get("firstName"))
                 .lastName((String) trainer.get("lastName"))
-                .specialization((String) trainer.get("specialization"))
+                .specialization(TrainingType.builder().trainingType((Specialization) trainer.get("specialization")).build())
                 .active((Boolean) trainer.get("active"))
                 .trainees(getTraineeProfile(List.of(TraineeData.ronMap, TraineeData.harryMap, TraineeData.hermioneMap)))
                 .build();

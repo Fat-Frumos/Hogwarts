@@ -1,5 +1,6 @@
 package com.epam.esm.gym.service;
 
+import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
@@ -8,6 +9,7 @@ import com.epam.esm.gym.dto.trainee.TraineeUpdateRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
+
 import java.util.List;
 
 public interface TraineeService {
@@ -15,11 +17,11 @@ public interface TraineeService {
 
     void deleteTrainee(String username);
 
-    TraineeProfile getTraineeByName(String username);
+    TraineeProfile getTraineeProfileByName(String username);
 
-    TraineeRequest updateTrainee(String username, TraineeUpdateRequest request);
+    TraineeProfile updateTrainee(String username, TraineeUpdateRequest request);
 
-    void validateUser(ProfileRequest request);
+    boolean validateUser(ProfileRequest request);
 
     void changePassword(ProfileRequest request);
 
@@ -30,4 +32,6 @@ public interface TraineeService {
     void activateDeactivateProfile(String username, Boolean active);
 
     List<TrainerProfile> getNotAssignedTrainers(String username);
+
+    Trainee getTrainee(String traineeUsername);
 }
