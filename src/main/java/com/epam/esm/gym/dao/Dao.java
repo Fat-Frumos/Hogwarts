@@ -6,7 +6,7 @@ import java.util.Optional;
 public interface Dao<T> {
     List<T> findAll();
 
-    Optional<T> findByUserName(String username);
+    Optional<T> findByUsername(String username);
 
     T save(T t);
 

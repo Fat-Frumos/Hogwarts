@@ -102,7 +102,7 @@ public class TraineeProfileService implements TraineeService {
     }
 
     public Trainee getTrainee(String username) {
-        return dao.findByUserName(username).orElseThrow(
+        return dao.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Trainee not found: " + username));
     }
 }

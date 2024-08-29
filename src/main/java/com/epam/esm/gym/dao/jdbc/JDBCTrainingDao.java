@@ -16,7 +16,7 @@ public class JDBCTrainingDao extends AbstractDao<Training> implements TrainingDa
     }
 
     @Override
-    public Optional<Training> findByUserName(String username) {
+    public Optional<Training> findByUsername(String username) {
         String hql = """
                 SELECT tr
                 FROM Training tr

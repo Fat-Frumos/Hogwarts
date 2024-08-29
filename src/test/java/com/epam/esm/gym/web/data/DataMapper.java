@@ -14,11 +14,11 @@ import java.util.Map;
 
 public class DataMapper {
 
-    public static TrainerRequest getTrainerRequest(Map<String, Object> trainers) {
+    public static TrainerRequest getTrainerRequest(Map<String, Object> trainer) {
         return TrainerRequest.builder()
-                .firstName((String) trainers.get("firstName"))
-                .lastName((String) trainers.get("lastName"))
-                .specialization(Specialization.valueOf(((String) trainers.get("specialization")).toUpperCase()))
+                .firstName((String) trainer.get("firstName"))
+                .lastName((String) trainer.get("lastName"))
+                .specialization(getSpecialization(trainer))
                 .build();
     }
 
@@ -37,10 +37,14 @@ public class DataMapper {
                 .username((String) trainer.get("username"))
                 .firstName((String) trainer.get("firstName"))
                 .lastName((String) trainer.get("lastName"))
-                .specialization(TrainingType.builder().trainingType((Specialization) trainer.get("specialization")).build())
+                .specialization(TrainingType.builder().trainingType(getSpecialization(trainer)).build())
                 .active((Boolean) trainer.get("active"))
                 .trainees(getTraineeProfile(List.of(TraineeData.ronMap, TraineeData.harryMap, TraineeData.hermioneMap)))
                 .build();
+    }
+
+    private static Specialization getSpecialization(Map<String, Object> trainer) {
+        return Specialization.fromString((String) trainer.get("specialization"));
     }
 
     public static TrainingProfile getTrainingProfile(Map<String, Object> training) {

@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
@@ -37,4 +38,17 @@ public class TrainingType {
 
     @OneToMany(mappedBy = "specialization")
     private Set<Trainer> trainers = new HashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TrainingType that = (TrainingType) o;
+        return Objects.equals(id, that.id) && trainingType == that.trainingType && Objects.equals(trainings, that.trainings) && Objects.equals(trainers, that.trainers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, trainingType, trainings, trainers);
+    }
 }

@@ -103,12 +103,12 @@ Below is a description of each component of the solution.
    - Response
    - 200 OK
 4. Change Login (PUT method)
-   a. Request
-   i. Username (required)
-   ii. Old Password (required)
-   iii. New Password (required)
-   b. Response
-   i. 200 OK
+   - Request
+     - Username (required)
+     - Old Password (required)
+     - New Password (required)
+   - Response
+   - 200 OK
 5. Get Trainee Profile (GET method)
    a. Request
    i. Username (required)

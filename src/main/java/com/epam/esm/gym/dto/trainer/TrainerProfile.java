@@ -4,17 +4,16 @@ import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
 @Builder
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class TrainerProfile {
@@ -24,4 +23,17 @@ public class TrainerProfile {
     private TrainingType specialization;
     private boolean active;
     private List<TraineeProfile> trainees;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TrainerProfile profile = (TrainerProfile) o;
+        return active == profile.active && Objects.equals(username, profile.username) && Objects.equals(firstName, profile.firstName) && Objects.equals(lastName, profile.lastName) && Objects.equals(specialization, profile.specialization) && Objects.equals(trainees, profile.trainees);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, firstName, lastName, specialization, active, trainees);
+    }
 }

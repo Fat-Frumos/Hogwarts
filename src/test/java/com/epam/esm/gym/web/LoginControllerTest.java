@@ -1,131 +1,84 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.profile.LoginRequest;
-import com.epam.esm.gym.dto.profile.ProfileResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.profile.ProfileRequest;
+import com.epam.esm.gym.service.UserService;
+import com.epam.esm.gym.web.provider.AuthenticateArgumentsProvider;
+import com.epam.esm.gym.web.provider.ChangePasswordArgumentsProvider;
+import com.epam.esm.gym.web.provider.ChangePasswordValidationConstraintsArgumentsProvider;
+import com.epam.esm.gym.web.provider.ValidationConstraintsAuthenticateArgumentsProvider;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Objects;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hibernate.validator.internal.util.Contracts.assertTrue;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class LoginControllerTest extends ControllerTest {
 
-    private Map<String, String> loginRequest;
-    private Map<String, String> changeLogin;
-    private Map<String, String> login;
+    @MockBean
+    private UserService userService;
 
-    @BeforeEach
-    void setUp() {
-        loginRequest = new HashMap<>();
-        loginRequest.put("username", "Harry.Potter");
-        loginRequest.put("password", "Password123");
+    @ParameterizedTest
+    @ArgumentsSource(AuthenticateArgumentsProvider.class)
+    void testAuthenticate(String username, String password, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
+        when(userService.authenticate(username, password)).thenReturn(expectedResponse);
 
-        changeLogin = new HashMap<>();
-        changeLogin.put("username", "Harry.Potter");
-        changeLogin.put("password", password);
-        changeLogin.put("newPassword", "newpassword123");
-
-        ProfileResponse credentials = getProfileResponse("Harry", "Potter");
-        login = Map.of(
-                "username", credentials.getUsername(),
-                "password", credentials.getPassword(),
-                "newPassword", "newPassword123");
-    }
-
-    @Test
-    void testLogin() throws Exception {
         mockMvc.perform(get("/api/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk());
+                        .param("username", username)
+                        .param("password", password))
+                .andExpect(status().is(expectedResponse.getStatusCode().value()))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
     }
 
-    @Test
-    void testChangeLogin() throws Exception {
+    @ParameterizedTest
+    @ArgumentsSource(ChangePasswordArgumentsProvider.class)
+    void testChangePassword(ProfileRequest request, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
+        when(userService.changePassword(request)).thenReturn(expectedResponse);
+
         mockMvc.perform(put("/api/login/change")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeLogin)))
-                .andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is(expectedResponse.getStatusCode().value()))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
     }
 
-    @Test
-    @DisplayName("Update User Password")
-    void updateUserPassword() throws Exception {
-        mockMvc.perform(put("/api/login/change")
+    @ParameterizedTest
+    @ArgumentsSource(ChangePasswordValidationConstraintsArgumentsProvider.class)
+    void testChangePasswordValidationConstraints(ProfileRequest request, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
+        when(userService.changePassword(request)).thenReturn(expectedResponse);
+
+        String actualResponseContent = mockMvc.perform(put("/api/login/change")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeLogin)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Password updated successfully"));
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is(expectedResponse.getStatusCode().value()))
+                .andReturn().getResponse().getContentAsString();
+        MessageResponse actualResponse = objectMapper.readValue(actualResponseContent, MessageResponse.class);
+
+        String expectedMessages = Objects.requireNonNull(expectedResponse.getBody()).getMessage();
+        String actualMessages = actualResponse.getMessage();
+        Arrays.stream(expectedMessages.split(", ")).forEach(expectedMessage -> assertTrue(actualMessages.contains(expectedMessage),
+                "Expected message to be present in the response but was not: " + expectedMessage));
     }
 
-    @Test
-    void testChangeLoginUserCredentials() throws Exception {
-        mockMvc.perform(put("/api/login/change")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(login)))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testLoginWithMissingUsername() throws Exception {
-        LoginRequest loginRequest = LoginRequest.builder().password(password).build();
-        String responseContent = mockMvc.perform(get("/api/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+    @ParameterizedTest
+    @ArgumentsSource(ValidationConstraintsAuthenticateArgumentsProvider.class)
+    void testLoginValidationConstraints(String username, String password, String expectedMessage) throws Exception {
+        mockMvc.perform(get("/api/login")
+                        .param("username", username)
+                        .param("password", password)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        assertThat(responseContent).contains("Username is required");
-    }
-
-    @Test
-    void testLoginWithMissingCred() throws Exception {
-        LoginRequest loginRequest = LoginRequest.builder().build();
-        String responseContent = mockMvc.perform(get("/api/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        assertThat(responseContent).contains("Username is required");
-        assertThat(responseContent).contains("Password is required");
-    }
-
-    @Test
-    void testLoginWithMissingPassword() throws Exception {
-        LoginRequest loginRequest = LoginRequest.builder().username("validUsername").build();
-        String responseContent = mockMvc.perform(get("/api/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseContent).contains("Password is required");
-    }
-
-    @Test
-    void testLoginWithShortPassword() throws Exception {
-        LoginRequest loginRequest = LoginRequest.builder().username("validUsername").password("short").build();
-        String responseContent = mockMvc.perform(get("/api/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseContent).contains("Password must be between 6 and 50 characters");
+                .andExpect(jsonPath("$.message").value(expectedMessage));
     }
 }

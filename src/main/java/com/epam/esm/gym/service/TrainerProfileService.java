@@ -74,7 +74,7 @@ public class TrainerProfileService implements TrainerService {
     }
 
     public Trainer getTrainer(String username) {
-        return dao.findByUserName(username)
+        return dao.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException(username));
     }
 }

@@ -16,7 +16,7 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
     }
 
     @Override
-    public Optional<Trainer> findByUserName(String username) {
+    public Optional<Trainer> findByUsername(String username) {
         String hql = """
                     SELECT t
                     FROM Trainer t

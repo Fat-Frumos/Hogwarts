@@ -12,4 +12,12 @@ public enum Specialization {
     HERBOLOGY,
     DIVINATION,
     TRANSFIGURATION;
+
+    public static Specialization fromString(String specialization) {
+        try {
+            return Specialization.valueOf(specialization.trim().toUpperCase());
+        } catch (Exception e) {
+            return FLEXIBILITY;
+        }
+    }
 }

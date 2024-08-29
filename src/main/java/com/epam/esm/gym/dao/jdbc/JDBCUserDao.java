@@ -30,7 +30,7 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
     }
 
     @Override
-    public Optional<User> findByUserName(String username) {
+    public Optional<User> findByUsername(String username) {
         Session session = getSession();
         Optional<User> user = Optional.empty();
         try {
