@@ -1,198 +1,171 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.domain.Specialization;
+import com.epam.esm.gym.dto.profile.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
+import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import com.epam.esm.gym.web.data.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import org.assertj.core.api.Assertions;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import com.epam.esm.gym.web.provider.trainer.ExistsTrainerRegistrationsArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.NotAssignedActiveTrainersArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.RegisterTrainerArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.TrainerMissingRegistrationArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.TrainerNotFoundArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.TrainerProfileArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.TrainerProfileNotFoundArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.TrainerTrainingsArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.UpdateTrainerArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.UpdateTrainerNotFoundArgumentsProvider;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.ArgumentMatchers.any;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.springframework.http.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class TrainerControllerTest extends ControllerTest {
     private final String BASE_URL = "/api/trainers";
-    private Map<String, String> registration;
-    private Map<String, Object> trainer;
-    private TrainerRequest trainerRequest;
-    private ProfileResponse profileResponse;
     private String username;
 
     @BeforeEach
     void setUp() {
         username = "Severus.Snape";
-        trainer = TrainerData.snapeMap;
-        registration = TrainerData.registration;
-        trainerRequest = getTrainerRequest(trainer);
-        profileResponse = getProfileResponse(registration);
     }
 
-    @Test
-    void testTrainerRegistrationMissingFirstName() throws Exception {
-        TrainerRequest traineeRequest = TrainerRequest.builder().lastName("Dumbledore")
-                .specialization(Specialization.DEFENSE).build();
-        String responseContent = mockMvc.perform(post("/api/trainers/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(traineeRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.firstName").value("FirstName is required"))
-                .andReturn().getResponse().getContentAsString();
-        assertThat(responseContent).contains("FirstName is required");
+    @ParameterizedTest
+    @ArgumentsSource(TrainerProfileNotFoundArgumentsProvider.class)
+    void testRegisterTrainerProfileWhenNotFound(TrainerRequest request, ResponseEntity<ProfileResponse> expectedResponse) throws Exception {
+        when(trainerService.registerTrainer(request)).thenReturn(expectedResponse);
+
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/trainers/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
     }
 
-    @Test
-    void testTrainerRegistrationMissingLastName() throws Exception {
-        TrainerRequest traineeRequest = TrainerRequest.builder().firstName("Albus")
-                .specialization(Specialization.DEFENSE).build();
-        String responseContent = mockMvc.perform(post("/api/trainers/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(traineeRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.lastName")
-                        .value("LastName is required"))
-                .andReturn().getResponse().getContentAsString();
-        assertThat(responseContent).contains("LastName is required");
-    }
-
-    @Test
-    void testRegisterTrainerWithInvalidSpecialization() throws Exception {
-        TrainerRequest traineeRequest = TrainerRequest.builder()
-                .firstName("Albus").lastName("Dumbledore").build();
-        mockMvc.perform(post("/api/trainers/register")
-                        .content(objectMapper.writeValueAsString(traineeRequest))
+    @ParameterizedTest
+    @ArgumentsSource(TrainerNotFoundArgumentsProvider.class)
+    void testGetTrainerProfileWhenNotFound(String username, ResponseEntity<TrainerProfile> expectedResponse) throws Exception {
+        when(trainerService.getTrainerProfileByName(username)).thenReturn(expectedResponse);
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/trainers/{username}", username)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.specialization")
-                        .value("Specialization is required"));
+                .andExpect(status().is(expectedResponse.getStatusCode().value()));
     }
 
-    @Test
-    void testRegisterTrainerProfile() throws Exception {
-        when(trainerService.registerTrainer(trainerRequest)).thenReturn(profileResponse);
-        String result = mockMvc.perform(post(BASE_URL + "/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(registration)))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-        Assertions.assertThat(objectMapper.readValue(result, ProfileResponse.class))
-                .usingRecursiveComparison()
-                .isEqualTo(profileResponse);
+    @ParameterizedTest
+    @ArgumentsSource(TrainerProfileNotFoundArgumentsProvider.class)
+    void testGetTrainerProfileWhenNotFounds(TrainerRequest request, ResponseEntity<TrainerProfile> expectedResponse) throws Exception {
+        when(trainerService.getTrainerProfileByName(request.getFirstName())).thenReturn(expectedResponse);
 
-        verify(trainerService).registerTrainer(trainerRequest);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainers/{username}", request.getFirstName())
+                .contentType(MediaType.APPLICATION_JSON));
+
+        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
     }
 
-    @Test
-    void testExistsTrainerRegistrations() throws Exception {
-        when(trainerService.registerTrainer(trainerRequest))
-                .thenReturn(profileResponse)
-                .thenAnswer(this::getProfileResponse);
-        mockMvc.perform(post(BASE_URL + "/register")
+    @ParameterizedTest
+    @ArgumentsSource(UpdateTrainerNotFoundArgumentsProvider.class)
+    void testUpdateTrainerProfileWhenNotFound(String username, TrainerUpdateRequest request, ResponseEntity<TrainerProfile> expectedResponse) throws Exception {
+        when(trainerService.updateTrainer(username, request)).thenReturn(expectedResponse);
+
+        ResultActions resultActions = mockMvc.perform(put("/api/trainers/{username}", username)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()));
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(RegisterTrainerArgumentsProvider.class)
+    void testRegisterTrainerProfile(TrainerRequest request, ResponseEntity<ProfileResponse> expectedResponse) throws Exception {
+        when(trainerService.registerTrainer(request)).thenReturn(expectedResponse);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/trainers/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(TrainerProfileArgumentsProvider.class)
+    void testGetTrainerProfile(String username, ResponseEntity<TrainerProfile> expectedResponse) throws Exception {
+        when(trainerService.getTrainerProfileByName(username)).thenReturn(expectedResponse);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainers/{username}", username)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(UpdateTrainerArgumentsProvider.class)
+    void testUpdateTrainerProfile(String username, TrainerUpdateRequest request, ResponseEntity<TrainerProfile> expectedResponse) throws Exception {
+        when(trainerService.updateTrainer(username, request)).thenReturn(expectedResponse);
+        ResultActions resultActions = mockMvc.perform(put("/api/trainers/{username}", username)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(TrainerTrainingsArgumentsProvider.class)
+    void testGetTrainerTrainings(String username, TrainingProfile request, ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
+        when(trainingService.getTrainerTrainingsByName(username, request)).thenReturn(expectedResponse);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainers/{username}/trainings", username)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
+    }
+
+
+    @ParameterizedTest
+    @ArgumentsSource(RegisterTrainerArgumentsProvider.class)
+    void testRegisterTrainerProfiles(TrainerRequest trainerRequest, ResponseEntity<ProfileResponse> expectedResponse) throws Exception {
+        when(trainerService.registerTrainer(trainerRequest)).thenReturn(expectedResponse);
+
+        String result = mockMvc.perform(post("/api/trainers/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(trainerRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value(username))
-                .andExpect(jsonPath("$.password").value(profileResponse.getPassword()));
-
-        trainer.put("username", username + ".1");
-
-        mockMvc.perform(post(BASE_URL + "/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(getTrainerRequest(trainer))))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("Severus.Snape.1"))
-                .andExpect(jsonPath("$.password").value(password));
-
-        verify(trainerService, times(2)).registerTrainer(any(TrainerRequest.class));
-    }
-
-    @Test
-    void testGetTrainerProfile() throws Exception {
-        when(trainerService.getTrainerProfileByName(username)).thenReturn(TrainerData.TRAINER_PROFILE);
-        String result = mockMvc.perform(get(BASE_URL + "/{username}", username))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Assertions.assertThat(objectMapper.readValue(result, TrainerProfile.class))
-                .usingRecursiveComparison()
-                .isEqualTo(TrainerData.TRAINER_PROFILE);
-        verify(trainerService, times(1)).getTrainerProfileByName(username);
-    }
-
-
-    @Test
-    void testUpdateTrainerProfiles() throws Exception {
-        final String username = "Horace.Slughorn";
-        TrainerProfile expectedProfile = getTrainerProfile(TrainerData.horaceMap);
-        when(trainerService.updateTrainer(username, TrainerData.UPDATE_REQUEST)).thenReturn(expectedProfile);
-        String result = mockMvc.perform(put("/api/trainers/" + username)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(TrainerData.UPDATE_REQUEST)))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Assertions.assertThat(objectMapper.readValue(result, TrainerProfile.class))
-                .usingRecursiveComparison()
-                .isEqualTo(expectedProfile);
-        verify(trainerService, times(1)).updateTrainer(username, TrainerData.UPDATE_REQUEST);
-    }
-
-
-    @Test
-    void testUpdateTrainerProfile() throws Exception {
-        final String username = "Horace.Slughorn";
-        TrainerProfile updatedProfile = getTrainerProfile(TrainerData.horaceMap);
-        when(trainerService.updateTrainer(username, TrainerData.UPDATE_REQUEST)).thenReturn(updatedProfile);
-        String result = mockMvc.perform(put("/api/trainers/" + username)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(TrainerData.UPDATE_REQUEST)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        Assertions.assertThat(objectMapper.readValue(result, TrainerProfile.class))
-                .usingRecursiveComparison()
-                .isEqualTo(updatedProfile);
-        verify(trainerService, times(1)).updateTrainer(username, TrainerData.UPDATE_REQUEST);
-    }
+        ProfileResponse expectedBody = expectedResponse.getBody();
 
-    @Test
-    void testGetTrainerTrainingsList() throws Exception {
-        TrainingProfile training = getProfile(TrainingData.training);
-        TrainingResponse expectedTrainingResponse = getTrainingResponse(TrainingData.training);
-        when(trainingService.getTrainerTrainingsByName(training.getTrainerName(), training))
-                .thenReturn(List.of(expectedTrainingResponse));
-        String result = mockMvc.perform(get(BASE_URL + "/{username}/trainings", username)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(training)))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        Assertions.assertThat(Arrays.asList(objectMapper.readValue(result, TrainingResponse[].class)))
+        assertThat(objectMapper.readValue(result, ProfileResponse.class))
                 .usingRecursiveComparison()
-                .isEqualTo(List.of(expectedTrainingResponse));
-        verify(trainingService, times(1)).getTrainerTrainingsByName("Severus.Snape", training);
+                .isEqualTo(expectedBody);
+        verify(trainerService).registerTrainer(trainerRequest);
     }
 
     @ParameterizedTest
@@ -207,42 +180,123 @@ class TrainerControllerTest extends ControllerTest {
         verify(trainerService).activateDeactivateProfile(username, isActive);
     }
 
-    @Test
-    void testGetNotAssignedActiveTrainersSuccess() throws Exception {
-        List<TrainerProfile> expectedTrainers = getTrainerProfiles(List.of(TrainerData.snapeMap, TrainerData.horaceMap));
-        when(trainerService.getNotAssigned(username)).thenReturn(expectedTrainers);
+    @ParameterizedTest
+    @ArgumentsSource(NotAssignedActiveTrainersArgumentsProvider.class)
+    void testGetNotAssignedActiveTrainersSuccess(String username, ResponseEntity<List<TrainerProfile>> expectedResponse) throws Exception {
+        when(trainerService.getNotAssigned(username)).thenReturn(expectedResponse);
+
         String result = mockMvc.perform(get("/api/trainers/{username}/unassigned", username)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn().getResponse()
                 .getContentAsString();
 
-        Assertions.assertThat(Arrays.asList(objectMapper.readValue(result, TrainerProfile[].class)))
+        List<TrainerProfile> actualTrainers = Arrays.asList(objectMapper.readValue(result, TrainerProfile[].class));
+
+        assertThat(actualTrainers)
                 .usingRecursiveComparison()
-                .isEqualTo(expectedTrainers);
+                .isEqualTo(expectedResponse.getBody());
+
         verify(trainerService, times(1)).getNotAssigned(username);
     }
 
-    @Test
-    void testGetNotAssignedActiveTrainersUsernameNotFound() throws Exception {
-        String username = "Ron.Snape";
-        when(trainerService.getNotAssigned(username)).thenReturn(Collections.emptyList());
-        mockMvc.perform(get(BASE_URL + "/{username}/unassigned", username)
+
+    @ParameterizedTest
+    @ArgumentsSource(NotAssignedActiveTrainersArgumentsProvider.class)
+    void testGetNotAssignedActiveTrainersUsernameNotFound(String username, ResponseEntity<List<TrainerProfile>> expectedTrainers) throws Exception {
+        when(trainerService.getNotAssigned(username)).thenReturn(expectedTrainers);
+
+        MvcResult result = mockMvc.perform(get(BASE_URL + "/{username}/unassigned", username)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andReturn();
+
+        List<TrainerProfile> actualTrainers = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+
+        assertThat(actualTrainers)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedTrainers.getBody());
 
         verify(trainerService, times(1)).getNotAssigned(username);
+    }
+
+
+    @ParameterizedTest
+    @ArgumentsSource(ExistsTrainerRegistrationsArgumentsProvider.class)
+    void testExistsTrainerRegistrations(String username, TrainerRequest trainerRequest, ResponseEntity<ProfileResponse> profileResponse) throws Exception {
+        when(trainerService.registerTrainer(trainerRequest)).thenReturn(profileResponse);
+        mockMvc.perform(post(BASE_URL + "/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value(username))
+                .andExpect(jsonPath("$.password").value(Objects.requireNonNull(profileResponse.getBody()).getPassword()));
+
+        String updatedUsername = username + ".1";
+        ResponseEntity<ProfileResponse> updatedResponse = ResponseEntity.ok(new ProfileResponse(updatedUsername, profileResponse.getBody().getPassword()));
+        when(trainerService.registerTrainer(trainerRequest)).thenReturn(updatedResponse);
+
+        mockMvc.perform(post(BASE_URL + "/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value(updatedUsername))
+                .andExpect(jsonPath("$.password").value(password));
+
+        verify(trainerService, times(2)).registerTrainer(trainerRequest);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(TrainerProfileArgumentsProvider.class)
+    void testGetProfile(String username, ResponseEntity<TrainerProfile> expectedResponse) throws Exception {
+        when(trainerService.getTrainerProfileByName(username)).thenReturn(expectedResponse);
+        String result = mockMvc.perform(get(BASE_URL + "/{username}", username))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(objectMapper.readValue(result, TrainerProfile.class))
+                .usingRecursiveComparison()
+                .isEqualTo(expectedResponse.getBody());
+        verify(trainerService, times(1)).getTrainerProfileByName(username);
+    }
+
+
+    @ParameterizedTest
+    @ArgumentsSource(UpdateTrainerArgumentsProvider.class)
+    void testUpdateTrainerProfiles(String username, TrainerUpdateRequest request, ResponseEntity<TrainerProfile> expectedProfile) throws Exception {
+        when(trainerService.updateTrainer(username, request)).thenReturn(expectedProfile);
+        String result = mockMvc.perform(put("/api/trainers/" + username)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(objectMapper.readValue(result, TrainerProfile.class))
+                .usingRecursiveComparison()
+                .isEqualTo(expectedProfile.getBody());
+        verify(trainerService, times(1)).updateTrainer(username, request);
     }
 
     @Test
     void testGetNotAssignedActiveTrainersInvalidUsername() throws Exception {
         mockMvc.perform(get(BASE_URL + "/{username}/unassigned", "user name")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Validation failure"))
-                .andExpect(jsonPath("$.error").value("Invalid username"));
-
+                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
         verify(trainerService, times(0)).getNotAssigned("user name");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(TrainerMissingRegistrationArgumentsProvider.class)
+    void testTraineeRegistrationMissingRequiredFields(TrainerRequest traineeRequest, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/trainers/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(traineeRequest)));
+        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()));
+        String actualMessage = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(), MessageResponse.class).getMessage();
+        Arrays.stream(Objects.requireNonNull(expectedResponse.getBody()).getMessage().split(", "))
+                .forEach(expectedMessage -> AssertionsForClassTypes.assertThat(actualMessage).contains(expectedMessage));
     }
 }

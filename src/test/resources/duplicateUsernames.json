@@ -1,0 +1,12 @@
+[
+  {
+    "firstName": "Harry",
+    "lastName": "Potter",
+    "specialization": "CARDIO"
+  },
+  {
+    "firstName": "Hermione",
+    "lastName": "Granger",
+    "specialization": "BALANCE"
+  }
+]

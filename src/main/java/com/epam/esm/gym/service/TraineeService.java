@@ -5,21 +5,21 @@ import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainee.TraineeUpdateRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface TraineeService {
-    ProfileResponse register(TraineeRequest request);
+    ResponseEntity<ProfileResponse> register(TraineeRequest request);
 
-    void deleteTrainee(String username);
+    ResponseEntity<Void> deleteTrainee(String username);
 
-    TraineeProfile getTraineeProfileByName(String username);
+    ResponseEntity<TraineeProfile> getTraineeProfileByName(String username);
 
-    TraineeProfile updateTrainee(String username, TraineeUpdateRequest request);
+    TraineeProfile updateTrainee(String username, TraineeRequest request);
 
     boolean validateUser(ProfileRequest request);
 

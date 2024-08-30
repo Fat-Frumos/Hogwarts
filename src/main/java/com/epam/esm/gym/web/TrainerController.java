@@ -6,14 +6,11 @@ import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import com.epam.esm.gym.exception.ValidationException;
 import com.epam.esm.gym.service.TrainerService;
 import com.epam.esm.gym.service.TrainingService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,13 +23,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Validated
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/trainers")
 public class TrainerController {
 
-    private final TrainerService trainerService;
+    private final TrainerService service;
 
     private final TrainingService trainingService;
 
@@ -40,16 +39,14 @@ public class TrainerController {
     @Operation(summary = "2. Register a new trainer")
     public ResponseEntity<ProfileResponse> registerTrainerProfile(
             @Valid @RequestBody TrainerRequest request) {
-        ProfileResponse response = trainerService.registerTrainer(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return service.registerTrainer(request);
     }
 
     @GetMapping("/{username}")
     @Operation(summary = "8. Get Trainer Profile")
     public ResponseEntity<TrainerProfile> getTrainerProfile(
             @PathVariable String username) {
-        TrainerProfile profile = trainerService.getTrainerProfileByName(username);
-        return ResponseEntity.ok(profile);
+        return service.getTrainerProfileByName(username);
     }
 
     @PutMapping("/{username}")
@@ -57,8 +54,7 @@ public class TrainerController {
     public ResponseEntity<TrainerProfile> updateTrainerProfile(
             @PathVariable String username,
             @Valid @RequestBody TrainerUpdateRequest request) {
-        TrainerProfile profile = trainerService.updateTrainer(username, request);
-        return ResponseEntity.ok(profile);
+        return service.updateTrainer(username, request);
     }
 
     @GetMapping("/{username}/trainings")
@@ -66,25 +62,21 @@ public class TrainerController {
     public ResponseEntity<List<TrainingResponse>> getTrainerTrainings(
             @PathVariable String username,
             @Valid @RequestBody TrainingProfile request) {
-        List<TrainingResponse> response = trainingService.getTrainerTrainingsByName(username, request);
-        return ResponseEntity.ok(response);
+        return trainingService.getTrainerTrainingsByName(username, request);
     }
 
     @PatchMapping("/{username}/activate")
     @Operation(summary = "16. Activate/Deactivate Trainer")
     public ResponseEntity<Void> activateTrainer(
             @PathVariable String username, @RequestParam Boolean active) {
-        trainerService.activateDeactivateProfile(username, active);
-        return ResponseEntity.ok().build();
+        return service.activateDeactivateProfile(username, active);
     }
 
     @GetMapping("/{username}/unassigned")
     public ResponseEntity<List<TrainerProfile>> getNotAssignedActiveTrainers(
             @PathVariable String username) {
-        if (!username.matches("^[a-zA-Z0-9._-]+$")) {
-            throw new ValidationException("Invalid username");
-        } else {
-            return ResponseEntity.ok(trainerService.getNotAssigned(username));
-        }
+        return !username.matches("^[a-zA-Z0-9._-]+$")
+                ? ResponseEntity.badRequest().build()
+                : service.getNotAssigned(username);
     }
 }

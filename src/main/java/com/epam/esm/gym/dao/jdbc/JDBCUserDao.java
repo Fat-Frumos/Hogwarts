@@ -23,8 +23,8 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
 
     @Override
     public boolean existsByUsername(String username) {
-        String hql = "SELECT count(*) FROM User WHERE username = :username";
-        Query<Long> query = getSession().createQuery(hql, Long.class);
+        String sql = "SELECT COUNT(*) FROM \"users\" WHERE username = :username";
+        Query<Long> query = getSession().createNativeQuery(sql, Long.class);
         query.setParameter("username", username);
         return query.getSingleResult() > 0;
     }
@@ -35,7 +35,7 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
         Optional<User> user = Optional.empty();
         try {
             Transaction transaction = session.beginTransaction();
-            String sql = "SELECT * FROM \"user\" WHERE username = :username";
+            String sql = "SELECT * FROM \"users\" WHERE username = :username";
             Query<User> query = session.createNativeQuery(sql, User.class);
             query.setParameter("username", username);
             user = query.uniqueResultOptional();

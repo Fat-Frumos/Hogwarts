@@ -3,7 +3,6 @@ package com.epam.esm.gym.web;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainee.TraineeUpdateRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
@@ -14,8 +13,8 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,39 +35,35 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Trainee", description = "Trainee related operations")
 public class TraineeController {
 
-    private TraineeService traineeService;
+    private TraineeService service;
 
     @PostMapping("/register")
     @Operation(summary = "1. Register a new trainee")
     public ResponseEntity<ProfileResponse> registerTrainee(
             @Valid @RequestBody TraineeRequest request) {
-        ProfileResponse response = traineeService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return service.register(request);
     }
 
     @GetMapping("/{username}")
-    @Operation(summary = " 5. Get Trainee Profile by username")
+    @Operation(summary = "5. Get Trainee Profile by username")
     public ResponseEntity<TraineeProfile> getTraineeProfile(
-            @PathVariable String username) {
-        TraineeProfile profile = traineeService.getTraineeProfileByName(username);
-        return ResponseEntity.ok(profile);
+            @PathVariable @NotNull @Valid String username) {
+        return service.getTraineeProfileByName(username);
     }
 
     @PutMapping("/{username}")
     @Operation(summary = "6. Update Trainee Profile")
     public ResponseEntity<TraineeProfile> updateTraineeProfile(
             @PathVariable String username,
-            @Valid @RequestBody TraineeUpdateRequest request) {
-        TraineeProfile response = traineeService.updateTrainee(username, request);
-        return ResponseEntity.ok(response);
+            @Valid @RequestBody TraineeRequest request) {
+        return ResponseEntity.ok(service.updateTrainee(username, request));
     }
 
     @DeleteMapping("/{username}")
     @Operation(summary = "7. Delete Trainee Profile")
     public ResponseEntity<Void> deleteTraineeProfile(
             @PathVariable String username) {
-        traineeService.deleteTrainee(username);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return service.deleteTrainee(username);
     }
 
     @PutMapping("/{username}/trainers")
@@ -76,8 +71,7 @@ public class TraineeController {
     public ResponseEntity<List<TrainerProfile>> updateTraineeTrainers(
             @PathVariable String username,
             @Valid @RequestBody List<String> trainersUsernames) {
-        List<TrainerProfile> trainers = traineeService.updateTraineeTrainersByName(username, trainersUsernames);
-        return ResponseEntity.ok(trainers);
+        return ResponseEntity.ok(service.updateTraineeTrainersByName(username, trainersUsernames));
     }
 
     @GetMapping("/{username}/trainings")
@@ -85,15 +79,14 @@ public class TraineeController {
     public ResponseEntity<List<TrainingResponse>> getTraineeTrainings(
             @PathVariable String username,
             @RequestBody TrainingProfile request) {
-        List<TrainingResponse> response = traineeService.getTraineeTrainingsByName(username, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(service.getTraineeTrainingsByName(username, request));
     }
 
     @PatchMapping("/{username}/activate")
     @Operation(summary = "15. Activate/Deactivate Trainee")
     public ResponseEntity<Void> activateDeactivateTrainee(
             @PathVariable String username, @RequestParam Boolean active) {
-        traineeService.activateDeactivateProfile(username, active);
+        service.activateDeactivateProfile(username, active);
         return ResponseEntity.ok().build();
     }
 }

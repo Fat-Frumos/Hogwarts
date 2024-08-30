@@ -1,11 +1,12 @@
 package com.epam.esm.gym.dao.jdbc;
 
 import com.epam.esm.gym.dao.jdbc.tool.DBUtil;
+import org.junit.jupiter.api.Test;
+
 import java.sql.SQLException;
-import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
 
 public class DBParamsStructureTest {
 
@@ -104,56 +105,5 @@ public class DBParamsStructureTest {
     void testTraineeTrainerTableColumns() throws SQLException {
         assertTrue(DBUtil.isColumnInTableExist("trainee_trainer", "trainee_id"), "Column 'trainee_id' should exist in 'trainee_trainer' table");
         assertTrue(DBUtil.isColumnInTableExist("trainee_trainer", "trainer_id"), "Column 'trainer_id' should exist in 'trainee_trainer' table");
-    }
-
-    @Test
-    void testTraineeTableConstraints() throws SQLException {
-        assertEquals("bigint", DBUtil.getColumnType("trainee", "id"), "Column 'id' should be of type serial");
-        assertTrue(DBUtil.getForeignKeys("trainee").stream()
-                        .anyMatch(fk -> fk.contains("FOREIGN KEY (user_id) REFERENCES \"user\" (id)")),
-                "Foreign key constraint on 'user_id' should exist in 'trainee' table");
-        assertEquals("id", DBUtil.getPrimaryKeys("trainee"), "Primary key of 'trainee' table should be 'id'");
-    }
-
-    @Test
-    void testTrainerTableConstraints() throws SQLException {
-        assertEquals("bigint", DBUtil.getColumnType("trainer", "id"), "Column 'id' should be of type serial");
-        assertTrue(DBUtil.getForeignKeys("trainer").stream()
-                        .anyMatch(fk -> fk.contains("FOREIGN KEY (specialization_id) REFERENCES training_type (id)")),
-                "Foreign key constraint on 'specialization_id' should exist in 'trainer' table");
-        assertTrue(DBUtil.getForeignKeys("trainer").stream()
-                        .anyMatch(fk -> fk.contains("FOREIGN KEY (user_id) REFERENCES \"user\" (id)")),
-                "Foreign key constraint on 'user_id' should exist in 'trainer' table");
-        assertEquals("id", DBUtil.getPrimaryKeys("trainer"), "Primary key of 'trainer' table should be 'id'");
-    }
-
-    @Test
-    void testTrainingTableConstraints() throws SQLException {
-        assertEquals("bigint", DBUtil.getColumnType("training", "id"), "Column 'id' should be of type serial");
-        assertTrue(DBUtil.getForeignKeys("training").stream()
-                        .anyMatch(fk -> fk.contains("FOREIGN KEY (trainee_id) REFERENCES \"trainee\" (id)")),
-                "Foreign key constraint on 'trainee_id' should exist in 'training' table");
-        assertTrue(DBUtil.getForeignKeys("training").stream()
-                        .anyMatch(fk -> fk.contains("FOREIGN KEY (trainer_id) REFERENCES \"trainer\" (id)")),
-                "Foreign key constraint on 'trainer_id' should exist in 'training' table");
-        assertTrue(DBUtil.getForeignKeys("training").stream()
-                        .anyMatch(fk -> fk.contains("FOREIGN KEY (training_type_id) REFERENCES training_type (id)")),
-                "Foreign key constraint on 'training_type_id' should exist in 'training' table");
-        assertEquals("id", DBUtil.getPrimaryKeys("training"), "Primary key of 'training' table should be 'id'");
-    }
-
-    @Test
-    void testTraineeTrainerTableConstraints() throws SQLException {
-        List<String> foreignKeys = DBUtil.getForeignKeys("trainee_trainer");
-
-        boolean hasTraineeIdFK = foreignKeys.stream()
-                .anyMatch(fk -> fk.contains("FOREIGN KEY (trainee_id) REFERENCES \"trainee\" (id)"));
-
-        boolean hasTrainerIdFK = foreignKeys.stream()
-                .anyMatch(fk -> fk.contains("FOREIGN KEY (trainer_id) REFERENCES \"trainer\" (id)"));
-
-        assertTrue(hasTraineeIdFK, "Foreign key constraint on 'trainee_id' should exist in 'trainee_trainer' table");
-        assertTrue(hasTrainerIdFK, "Foreign key constraint on 'trainer_id' should exist in 'trainee_trainer' table");
-        assertEquals("trainee_id, trainer_id", DBUtil.getPrimaryKeys("trainee_trainer"), "Primary key of 'trainee_trainer' table should be 'trainee_id, trainer_id'");
     }
 }

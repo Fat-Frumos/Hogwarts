@@ -43,8 +43,8 @@ class AuthenticationTests {
 
     private static Stream<Arguments> provideValidCredentials() {
         return Stream.of(
-                Arguments.of("Harry.Potter", "correctpassword"),
-                Arguments.of("Hermione.Granger", "correctpassword")
+                Arguments.of("Harry.Potter", "Password123"),
+                Arguments.of("Hermione.Granger", "Password456")
         );
     }
 

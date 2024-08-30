@@ -1,4 +1,4 @@
-CREATE TABLE "user"
+CREATE TABLE "users"
 (
     id         SERIAL PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE "trainee"
     date_of_birth DATE,
     address       VARCHAR(255),
     user_id       BIGINT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES "users" (id) ON DELETE CASCADE
 );
 
 CREATE TABLE "training_type"
@@ -29,7 +29,7 @@ CREATE TABLE "trainer"
     specialization_id BIGINT NOT NULL,
     user_id           BIGINT NOT NULL,
     FOREIGN KEY (specialization_id) REFERENCES training_type (id),
-    FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES "users" (id) ON DELETE CASCADE
 );
 
 CREATE TABLE "training"
@@ -54,3 +54,13 @@ CREATE TABLE "trainee_trainer"
     FOREIGN KEY (trainee_id) REFERENCES "trainee" (id) ON DELETE CASCADE,
     FOREIGN KEY (trainer_id) REFERENCES "trainer" (id) ON DELETE CASCADE
 );
+
+SELECT column_name
+FROM information_schema.columns
+WHERE table_name = 'user';
+
+
+SELECT id
+FROM "users"
+WHERE username = 'Ginevra.Granger'
+LIMIT 1;

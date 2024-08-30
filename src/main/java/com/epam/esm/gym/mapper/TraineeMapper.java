@@ -6,7 +6,7 @@ import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
-import com.epam.esm.gym.dto.trainee.TraineeUpdateRequest;
+import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import org.mapstruct.Mapper;
@@ -18,13 +18,11 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", uses = {UserMapper.class, TrainerMapper.class})
 public interface TraineeMapper {
 
-    TraineeProfile toDto(Trainee trainee);
-
     Trainee toEntity(TraineeProfile traineeProfile);
 
     ProfileResponse toProfile(User user);
 
-    default Trainee update(TraineeUpdateRequest request, Trainee trainee) {
+    default Trainee update(TraineeRequest request, Trainee trainee) {
         if (request == null || trainee == null) {
             return trainee;
         }
@@ -58,6 +56,20 @@ public interface TraineeMapper {
         return trainee;
     }
 
+    default TraineeProfile toTraineeProfile(Trainee trainee) {
+        return TraineeProfile.builder()
+                .firstName(trainee.getUser().getFirstName())
+                .lastName(trainee.getUser().getLastName())
+                .username(trainee.getUser().getUsername())
+                .address(trainee.getAddress())
+                .active(trainee.getUser().getActive())
+                .dateOfBirth(trainee.getDateOfBirth())
+                .trainers(trainee.getTrainers().stream()
+                        .map(this::toTrainerProfile)
+                        .toList())
+                .build();
+    }
+
     default TrainingResponse toResponse(Training training) {
         return TrainingResponse.builder()
                 .trainerName(training.getTrainer().getUser().getUsername())
@@ -72,18 +84,22 @@ public interface TraineeMapper {
         return trainers.stream()
                 .map(trainerProfile -> Trainer.builder()
                         .id(null)
-                        .user(User.builder()
-                                .username(trainerProfile.getUsername())
-                                .firstName(trainerProfile.getFirstName())
-                                .lastName(trainerProfile.getLastName())
-                                .active(trainerProfile.isActive())
-                                .build())
+                        .user(toUser(trainerProfile))
                         .specialization(trainerProfile.getSpecialization())
                         .build())
                 .collect(Collectors.toSet());
     }
 
-    default TrainerProfile toTrainer(Trainer trainer) {
+    default User toUser(TrainerProfile trainerProfile) {
+        return User.builder()
+                .username(trainerProfile.getUsername())
+                .firstName(trainerProfile.getFirstName())
+                .lastName(trainerProfile.getLastName())
+                .active(trainerProfile.isActive())
+                .build();
+    }
+
+    default TrainerProfile toTrainerProfile(Trainer trainer) {
         return TrainerProfile.builder()
                 .username(trainer.getUser().getUsername())
                 .firstName(trainer.getUser().getFirstName())
@@ -91,14 +107,7 @@ public interface TraineeMapper {
                 .specialization(trainer.getSpecialization())
                 .active(trainer.getUser().getActive())
                 .trainees(trainer.getTrainees().stream()
-                        .map(trainee -> TraineeProfile.builder()
-                                .firstName(trainee.getUser().getFirstName())
-                                .lastName(trainee.getUser().getLastName())
-                                .username(trainee.getUser().getUsername())
-                                .address(trainee.getAddress())
-                                .active(trainee.getUser().getActive())
-                                .dateOfBirth(trainee.getDateOfBirth())
-                                .build())
+                        .map(this::toTraineeProfile)
                         .toList())
                 .build();
     }

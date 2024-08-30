@@ -11,6 +11,8 @@ import com.epam.esm.gym.mapper.TrainerMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,10 +27,11 @@ public class TrainerProfileService implements TrainerService {
     private final TrainerDao dao;
 
     @Override
-    public ProfileResponse registerTrainer(TrainerRequest dto) {
+    public ResponseEntity<ProfileResponse> registerTrainer(TrainerRequest dto) {
         TrainerProfile profile = userService.saveTrainer(dto);
         Trainer trainer = dao.save(mapper.toEntity(profile));
-        return mapper.toProfileDto(trainer.getUser());
+        ProfileResponse response = mapper.toProfileDto(trainer.getUser());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
@@ -37,40 +40,32 @@ public class TrainerProfileService implements TrainerService {
     }
 
     @Override
-    public void activateTrainer(String username) {
-        dao.activateTrainer(username, true);
-    }
-
-    @Override
-    public void deactivateTrainer(String username) {
-        dao.activateTrainer(username, false);
-    }
-
-    @Override
     public void deleteTrainer(String username) {
         dao.delete(getTrainer(username));
     }
 
     @Override
-    public TrainerProfile getTrainerProfileByName(String username) {
-        return mapper.toDto(getTrainer(username));
+    public ResponseEntity<TrainerProfile> getTrainerProfileByName(String username) {
+        return ResponseEntity.ok(mapper.toDto(getTrainer(username)));
     }
 
     @Override
-    public TrainerProfile updateTrainer(String username, TrainerUpdateRequest request) {
+    public ResponseEntity<TrainerProfile> updateTrainer(String username, TrainerUpdateRequest request) {
         Trainer trainer = mapper.toEntity(request);
-        return mapper.toDto(dao.update(trainer));
+        TrainerProfile profile = mapper.toDto(dao.update(trainer));
+        return ResponseEntity.ok(profile);
     }
 
     @Override
-    public List<TrainerProfile> getNotAssigned(String username) {
+    public ResponseEntity<List<TrainerProfile>> getNotAssigned(String username) {
         List<Trainer> notAssigned = dao.findNotAssigned(username);
-        return mapper.toDtos(notAssigned);
+        return ResponseEntity.ok(mapper.toDtos(notAssigned));
     }
 
     @Override
-    public void activateDeactivateProfile(String username, Boolean active) {
+    public ResponseEntity<Void> activateDeactivateProfile(String username, Boolean active) {
         dao.activateTrainer(username, active);
+        return ResponseEntity.ok().build();
     }
 
     public Trainer getTrainer(String username) {

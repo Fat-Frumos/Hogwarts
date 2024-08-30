@@ -8,16 +8,19 @@ import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.profile.UserProfile;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainee.TraineeUpdateRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.mapper.TraineeMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,30 +32,38 @@ public class TraineeProfileService implements TraineeService {
     private final TrainerService trainerService;
 
     @Override
-    public ProfileResponse register(TraineeRequest dto) {
+    public ResponseEntity<ProfileResponse> register(TraineeRequest dto) {
         TraineeProfile profile = userService.saveTrainee(dto);
         Trainee trainee = dao.save(mapper.toEntity(profile));
-        return mapper.toProfile(trainee.getUser());
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toProfile(trainee.getUser()));
     }
 
     @Override
-    public void deleteTrainee(String username) {
-        dao.delete(getTrainee(username));
+    public ResponseEntity<Void> deleteTrainee(String username) {
+        Optional<Trainee> traineeOptional = dao.findByUsername(username);
+
+        if (traineeOptional.isPresent()) {
+            dao.delete(traineeOptional.get());
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
+
 
     @Override
-    public TraineeProfile getTraineeProfileByName(String username) {
-        return mapper.toDto(getTrainee(username));
+    public ResponseEntity<TraineeProfile> getTraineeProfileByName(String username) {
+        Optional<Trainee> trainee = dao.findByUsername(username);
+        return trainee.map(value -> ResponseEntity.ok(mapper.toTraineeProfile(value)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
-
 
     @Override
     public TraineeProfile updateTrainee(
-            String username, TraineeUpdateRequest request) {
+            String username, TraineeRequest request) {
         Trainee trainee = getTrainee(username);
         Trainee updated = dao.update(mapper.update(request, trainee));
-        return mapper.toDto(updated);
-
+        return mapper.toTraineeProfile(updated);
     }
 
     @Override
@@ -68,20 +79,21 @@ public class TraineeProfileService implements TraineeService {
 
     @Override
     public List<TrainerProfile> updateTraineeTrainersByName(String username, List<String> trainersUsernames) {
+        List<TrainerProfile> trainerProfiles = trainersUsernames.stream()
+                .map(trainerService::getTrainer)
+                .map(mapper::toTrainerProfile)
+                .collect(Collectors.toList());
         Trainee trainee = getTrainee(username);
-        List<TrainerProfile> trainers = trainersUsernames.stream()
-                .map(trainerService::getTrainerProfileByName)
-                .toList();
-        trainee.setTrainers(mapper.toTrainers(trainers));
+        trainee.setTrainers(mapper.toTrainers(trainerProfiles));
         dao.save(trainee);
-        return trainers;
+        return trainerProfiles;
     }
+
 
     @Override
     public List<TrainingResponse> getTraineeTrainingsByName(
             String username, TrainingProfile request) {
-        Trainee trainee = getTrainee(username);
-        return trainee.getTrainings().stream()
+        return getTrainee(username).getTrainings().stream()
                 .map(mapper::toResponse)
                 .toList();
     }
@@ -97,7 +109,7 @@ public class TraineeProfileService implements TraineeService {
     public List<TrainerProfile> getNotAssignedTrainers(String username) {
         List<Trainer> trainers = dao.findNotAssignedTrainers(username);
         return trainers.stream()
-                .map(mapper::toTrainer)
+                .map(mapper::toTrainerProfile)
                 .toList();
     }
 

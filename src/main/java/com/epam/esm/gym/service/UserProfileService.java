@@ -58,7 +58,7 @@ public class UserProfileService implements UserService {
 
     @Override
     public void updateUser(User user) {
-        dao.update(user);
+        dao.save(user);
     }
 
     @Override

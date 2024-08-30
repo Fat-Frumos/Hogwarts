@@ -11,6 +11,7 @@ import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.dto.training.TrainingTypeResponse;
 import com.epam.esm.gym.mapper.TrainingMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,9 +34,10 @@ public class TrainingProfileService implements TrainingService {
     }
 
     @Override
-    public List<TrainingResponse> getTrainerTrainingsByName(String username, TrainingProfile request) {
+    public ResponseEntity<List<TrainingResponse>> getTrainerTrainingsByName(
+            String username, TrainingProfile request) {
         List<Training> trainings = dao.findTrainingsByTrainerUsername(username);
-        return mapper.toDtos(trainings);
+        return ResponseEntity.ok(mapper.toDtos(trainings));
     }
 
     @Override

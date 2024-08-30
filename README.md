@@ -110,21 +110,20 @@ Below is a description of each component of the solution.
    - Response
    - 200 OK
 5. Get Trainee Profile (GET method)
-   a. Request
-   i. Username (required)
-   b. Response
-   i. First Name
-   ii. Last Name
-   iii. Date of Birth
-   iv. Address
-   v. Is Active
-   vi. Trainers List
-
-
-1. Trainer Username
-2. Trainer First Name
-3. Trainer Last Name
-4. Trainer Specialization (Training type reference)
+   - Request
+     - Username (required)
+   - Response
+     - First Name
+     - Last Name
+     - Date of Birth
+     - Address
+     - Is Active
+     - Trainers List:
+       - Trainer Username
+       - Trainer First Name
+       - Trainer Last Name
+       - Trainer Specialization (Training type reference)
+       
 6. Update Trainee Profile (PUT method)
    a. Request
    i. Username (required)
