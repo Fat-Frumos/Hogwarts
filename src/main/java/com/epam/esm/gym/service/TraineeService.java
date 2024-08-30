@@ -6,11 +6,11 @@ import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
-import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TraineeService {
     ResponseEntity<ProfileResponse> register(TraineeRequest request);
@@ -19,19 +19,19 @@ public interface TraineeService {
 
     ResponseEntity<TraineeProfile> getTraineeProfileByName(String username);
 
-    TraineeProfile updateTrainee(String username, TraineeRequest request);
+    ResponseEntity<TraineeProfile> updateTrainee(String username, TraineeRequest request);
 
     boolean validateUser(ProfileRequest request);
 
     void changePassword(ProfileRequest request);
 
-    List<TrainerProfile> updateTraineeTrainersByName(String username, List<String> trainersUsernames);
+    ResponseEntity<List<TrainerProfile>> updateTraineeTrainersByName(String username, List<String> trainersUsernames);
 
-    List<TrainingResponse> getTraineeTrainingsByName(String username, TrainingProfile request);
+    ResponseEntity<List<TrainingResponse>> getTraineeTrainingsByName(String username, Map<String, String> params);
 
-    void activateDeactivateProfile(String username, Boolean active);
+    ResponseEntity<Void> activateDeactivateProfile(String username, Boolean active);
 
-    List<TrainerProfile> getNotAssignedTrainers(String username);
+    ResponseEntity<List<TrainerProfile>> getNotAssignedTrainers(String username);
 
     Trainee getTrainee(String traineeUsername);
 }

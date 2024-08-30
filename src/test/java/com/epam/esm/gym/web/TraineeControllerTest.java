@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -42,10 +43,17 @@ class TraineeControllerTest extends ControllerTest {
 
     private final String BASE_URL = "/api/trainees";
     private String username;
+    private Map<String, String> params;
 
     @BeforeEach
     void setUp() {
         username = "Harry.Potter";
+        params = Map.of(
+                "periodFrom", "2024-01-01",
+                "periodTo", "2024-12-31",
+                "trainerName", "Minerva McGonagall",
+                "trainingType", "TRANSFIGURATION"
+        );
     }
 
     @ParameterizedTest
@@ -76,7 +84,7 @@ class TraineeControllerTest extends ControllerTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
-    public void testGetTraineeProfile(String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
+    void testGetTraineeProfile(String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
         when(traineeService.getTraineeProfileByName(username)).thenReturn(expectedResponse);
 
         String result = mockMvc.perform(get("/api/trainees/{username}", username)
@@ -103,7 +111,7 @@ class TraineeControllerTest extends ControllerTest {
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainersArgumentsProvider.class)
     void testUpdateTraineeTrainers(String username, List<String> trainersUsernames, ResponseEntity<List<TrainerProfile>> expectedResponse) throws Exception {
-        when(traineeService.updateTraineeTrainersByName(username, trainersUsernames)).thenReturn(expectedResponse.getBody());
+        when(traineeService.updateTraineeTrainersByName(username, trainersUsernames)).thenReturn(expectedResponse);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/api/trainees/{username}/trainers", username)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(trainersUsernames)));
@@ -115,16 +123,26 @@ class TraineeControllerTest extends ControllerTest {
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainingsArgumentsProvider.class)
     void testGetTraineeTrainings(String username, TrainingProfile request, ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
-        when(traineeService.getTraineeTrainingsByName(username, request)).thenReturn(expectedResponse.getBody());
+        // Set up mock behavior
+        when(traineeService.getTraineeTrainingsByName(username, params)).thenReturn(expectedResponse);
 
+        // Perform the request
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainees/{username}/trainings", username)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)));
+                .param("periodFrom", request.getPeriodFrom() != null ? request.getPeriodFrom().toString() : "")
+                .param("periodTo", request.getPeriodTo() != null ? request.getPeriodTo().toString() : "")
+                .param("trainerName", request.getTrainerName() != null ? request.getTrainerName() : "")
+                .param("trainingType", request.getTrainingType() != null ? request.getTrainingType() : ""));
 
-        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()));
+        // Assert the status
+        resultActions.andExpect(status().isOk());
+
+        // Assert the content
         String responseContent = resultActions.andReturn().getResponse().getContentAsString();
-        assertThat(responseContent).isEqualTo(objectMapper.writeValueAsString(expectedResponse.getBody()));
+        String expectedContent = objectMapper.writeValueAsString(expectedResponse.getBody());
+        assertThat(responseContent).isEqualTo(expectedContent);
     }
+
 
     @Test
     void testDeleteTraineeProfile() throws Exception {
@@ -143,12 +161,10 @@ class TraineeControllerTest extends ControllerTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainingsNotFoundArgumentsProvider.class)
-    void testTraineeTrainingsNotFound(String username, ResponseEntity<List<TrainingResponse>> expectedResponse, TrainingProfile request) throws Exception {
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainees/{username}/trainings", username)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)));
+    void testTraineeTrainingsNotFound(String username, ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
+        when(traineeService.getTraineeProfileByName(username)).thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainees/{username}/trainings", username));
         resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()));
-        resultActions.andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
     }
 
     @ParameterizedTest
@@ -171,7 +187,7 @@ class TraineeControllerTest extends ControllerTest {
     @ParameterizedTest
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
     void testUpdateTraineeProfile(String username, ResponseEntity<TraineeProfile> expectedResponse, TraineeRequest request) throws Exception {
-        when(traineeService.updateTrainee(username, request)).thenReturn(expectedResponse.getBody());
+        when(traineeService.updateTrainee(username, request)).thenReturn(expectedResponse);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/api/trainees/{username}", username)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));

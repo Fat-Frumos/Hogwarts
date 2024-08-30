@@ -9,19 +9,27 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static java.time.LocalDate.parse;
+
 public class TraineeTrainingsNotFoundArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+        TrainingProfile profile = TrainingProfile.builder()
+                .periodFrom(parse("2023-01-01"))
+                .periodTo(parse("2023-12-31"))
+                .trainerName("Minerva.McGonagall")
+                .trainingType("Transfiguration")
+                .build();
         return Stream.of(
                 Arguments.of(
                         "Hogwarts",
                         ResponseEntity.ok().body(List.of()),
-                        new TrainingProfile()
+                        profile
                 ),
                 Arguments.of(
                         "Transfiguration",
                         ResponseEntity.ok().body(List.of()),
-                        new TrainingProfile()
+                        profile
                 )
         );
     }

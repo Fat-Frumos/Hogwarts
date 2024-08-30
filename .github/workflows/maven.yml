@@ -45,7 +45,7 @@ jobs:
       - run: |
           psql -h localhost -U myuser -d example -c '
 
-          CREATE TABLE "user"
+          CREATE TABLE "users"
           (
           id         SERIAL PRIMARY KEY,
           first_name VARCHAR(255) NOT NULL,
@@ -61,7 +61,7 @@ jobs:
           date_of_birth DATE,
           address       VARCHAR(255),
           user_id       BIGINT NOT NULL,
-          FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE
+          FOREIGN KEY (user_id) REFERENCES "users" (id) ON DELETE CASCADE
           );
           
           CREATE TABLE "training_type"
@@ -76,7 +76,7 @@ jobs:
           specialization_id BIGINT NOT NULL,
           user_id           BIGINT NOT NULL,
           FOREIGN KEY (specialization_id) REFERENCES training_type (id),
-          FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE
+          FOREIGN KEY (user_id) REFERENCES "users" (id) ON DELETE CASCADE
           );
           
           CREATE TABLE "training"
@@ -128,7 +128,7 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
 
       - name: Build with Maven
-        run: mvn -B package -DskipTests --file pom.xml
+        run: mvn -B package --file pom.xml
 
       - name: Checkout code
         uses: actions/checkout@v3

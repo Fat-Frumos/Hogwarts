@@ -28,8 +28,8 @@ public class ExistsTrainerRegistrationsArgumentsProvider implements ArgumentsPro
         return Stream.of(
                 Arguments.of(
                         "Remus.Lupin",
-                        request,
-                        ResponseEntity.ok(response)
+                        ResponseEntity.ok(response),
+                        request
                 )
         );
     }

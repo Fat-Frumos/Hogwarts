@@ -25,7 +25,7 @@ public class TraineeTrainingsArgumentsProvider implements ArgumentsProvider {
                 TrainingResponse.builder()
                         .trainerName("Severus Snape")
                         .trainingName("Potions Mastery")
-                        .trainingType("POTIONS")
+                        .trainingType("TRANSFIGURATION")
                         .trainingDuration(90)
                         .trainingDate(LocalDate.of(2024, 1, 15))
                         .build()
@@ -35,7 +35,10 @@ public class TraineeTrainingsArgumentsProvider implements ArgumentsProvider {
                 Arguments.of(
                         "Harry.Potter",
                         TrainingProfile.builder()
-                                .trainingType("SPELLS")
+                                .periodFrom(LocalDate.of(2024, 1, 1))
+                                .periodTo(LocalDate.of(2024, 12, 31))
+                                .trainerName("Minerva McGonagall")
+                                .trainingType("TRANSFIGURATION")
                                 .build(),
                         ResponseEntity.ok(trainingResponses)
                 )

@@ -220,10 +220,9 @@ class TrainerControllerTest extends ControllerTest {
         verify(trainerService, times(1)).getNotAssigned(username);
     }
 
-
     @ParameterizedTest
     @ArgumentsSource(ExistsTrainerRegistrationsArgumentsProvider.class)
-    void testExistsTrainerRegistrations(String username, TrainerRequest trainerRequest, ResponseEntity<ProfileResponse> profileResponse) throws Exception {
+    void testExistsTrainerRegistrations(String username, ResponseEntity<ProfileResponse> profileResponse, TrainerRequest trainerRequest) throws Exception {
         when(trainerService.registerTrainer(trainerRequest)).thenReturn(profileResponse);
         mockMvc.perform(post(BASE_URL + "/register")
                         .contentType(MediaType.APPLICATION_JSON)
