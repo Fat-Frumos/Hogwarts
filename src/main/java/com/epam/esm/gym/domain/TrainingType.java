@@ -33,6 +33,7 @@ public class TrainingType {
     @Column(nullable = false)
     private Specialization trainingType;
 
+    @Builder.Default
     @OneToMany(mappedBy = "type")
     private Set<Training> trainings = new HashSet<>();
 

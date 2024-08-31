@@ -45,9 +45,11 @@ public class Trainer {
     @JoinColumn(name = "training_type_id", nullable = false)
     private TrainingType specialization;
 
+    @Builder.Default
     @OneToMany(mappedBy = "trainer")
     private Set<Training> trainings = new HashSet<>();
 
+    @Builder.Default
     @ManyToMany(mappedBy = "trainers")
     private Set<Trainee> trainees = new HashSet<>();
 

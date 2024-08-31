@@ -37,9 +37,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/trainers/register", "/api/trainees/register", "/api/auth/login").permitAll()
-                        .requestMatchers("/api/trainers/**").hasRole("TRAINER")
-                        .requestMatchers("/api/trainees/**").hasRole("TRAINER")
+                        .requestMatchers("/api/trainers/register", "/api/trainees/register", "/api/login").permitAll()
+                        .requestMatchers("/api/trainers/**").hasAnyRole("TRAINER", "ADMIN")
+                        .requestMatchers("/api/trainees/**").hasAnyRole("TRAINER", "ADMIN")
                         .anyRequest().hasRole("ADMIN"))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

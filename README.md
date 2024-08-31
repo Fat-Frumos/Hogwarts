@@ -59,8 +59,10 @@ Below is a description of each component of the solution.
 2. All functions except Create Trainer/Trainee profile can be executed only after Trainee/Trainer
    authentication (on this step should be checked username and password matching)
 3. Required field validation before Create/Update action execution implemented.
-4. Users Table has parent-child (one to one) relation with Trainer and Trainee tables.
-5. Trainees and Trainers have many to many relations.
+
+-[x] Users Table has parent-child (one to one) relation with Trainer and Trainee tables.
+
+6. Trainees and Trainers have many to many relations.
 6. Activate/De-activate Trainee/Trainer profile not idempotent action.
 7. Delete Trainee profile is hard deleting action and bring the cascade deletion of relevant
    trainings.
@@ -70,7 +72,9 @@ Below is a description of each component of the solution.
 11. Is Active field in Trainee/Trainer profile has Boolean type.
 12. Training Types table include constant list of values and could not be updated from the
     application.
-13. Each table has its own PK.
+
+-[x] Each table has its own PK.
+
 14. Transaction management implemented.
 15. Hibernate configured for work with DBMS that was chosen.
 16. Code covered with unit tests and contains proper logging.
@@ -80,50 +84,50 @@ Below is a description of each component of the solution.
 #### Following REST API endpoints (as a RestController) are implemented:
 
 1. Trainee Registration (POST method)
-   - Request
-     - First Name (required)
-     - Last Name (required)
-     - Date of Birth (optional)
-     - Address (optional)
-   - Response
-     - Username
-     - Password
+    - Request
+        - First Name (required)
+        - Last Name (required)
+        - Date of Birth (optional)
+        - Address (optional)
+    - Response
+        - Username
+        - Password
 2. Trainer Registration (POST method)
-   - Request
-     - First Name (required)
-     - Last Name (required)
-     - Specialization (required) (Training type reference)
-   - Response
-     - Username
-     - Password
+    - Request
+        - First Name (required)
+        - Last Name (required)
+        - Specialization (required) (Training type reference)
+    - Response
+        - Username
+        - Password
 3. Login (GET method)
-   - Request
-     - Username (required)
-     - Password (required)
-   - Response
-   - 200 OK
+    - Request
+        - Username (required)
+        - Password (required)
+    - Response
+    - 200 OK
 4. Change Login (PUT method)
-   - Request
-     - Username (required)
-     - Old Password (required)
-     - New Password (required)
-   - Response
-   - 200 OK
+    - Request
+        - Username (required)
+        - Old Password (required)
+        - New Password (required)
+    - Response
+    - 200 OK
 5. Get Trainee Profile (GET method)
-   - Request
-     - Username (required)
-   - Response
-     - First Name
-     - Last Name
-     - Date of Birth
-     - Address
-     - Is Active
-     - Trainers List:
-       - Trainer Username
-       - Trainer First Name
-       - Trainer Last Name
-       - Trainer Specialization (Training type reference)
-       
+    - Request
+        - Username (required)
+    - Response
+        - First Name
+        - Last Name
+        - Date of Birth
+        - Address
+        - Is Active
+        - Trainers List:
+            - Trainer Username
+            - Trainer First Name
+            - Trainer Last Name
+            - Trainer Specialization (Training type reference)
+
 6. Update Trainee Profile (PUT method)
    a. Request
    i. Username (required)
@@ -320,15 +324,16 @@ Below is a description of each component of the solution.
 
 #### Spring security framework used to provide follow functionality:
 
-  [x] It configured for Authentication access for all endpoints (except Create Trainer/Trainee profile).
-  [x] salt and hashing are used to store user passwords in DB.
-  [x] Spring Security is configured to use Login functionality.
-  [x] Brute Force protector added. User is blocked for 5 minutes on 3 unsuccessful logins
-  [x] Logout functionality implemented and configured it in Spring Security.
-  [x] Authorization implemented as a Bearer token for Create Profile and Login functionality (JWT token).
-  [x] CORS policy in Spring Security configured.
+[x] It configured for Authentication access for all endpoints (except Create Trainer/Trainee profile).
+[x] salt and hashing are used to store user passwords in DB.
+[x] Spring Security is configured to use Login functionality.
+[x] Brute Force protector added. User is blocked for 5 minutes on 3 unsuccessful logins
+[x] Logout functionality implemented and configured it in Spring Security.
+[x] Authorization implemented as a Bearer token for Create Profile and Login functionality (JWT token).
+[x] CORS policy in Spring Security configured.
 
 ##### Technical Notes:
+
 1. During Create Trainer/Trainee profile username and password should be generated as described
    in previous module.
 2. All functions except Create Trainer/Trainee profile can be executed only after Trainee/Trainer

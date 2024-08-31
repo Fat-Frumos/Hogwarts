@@ -33,6 +33,7 @@ public class Token implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "token_sequence")
     private Integer id;
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private TokenType tokenType = TokenType.BEARER;
     @Column(unique = true)

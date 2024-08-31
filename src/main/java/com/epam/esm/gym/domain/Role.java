@@ -43,7 +43,6 @@ public class Role implements Serializable {
     @SequenceGenerator(name = "role_sequence",
             sequenceName = "role_id_seq",
             allocationSize = 1, initialValue = 5)
-    @Column(name = "role_id")
     private Long id;
     @Enumerated(EnumType.STRING)
     @Column(name = "permission")

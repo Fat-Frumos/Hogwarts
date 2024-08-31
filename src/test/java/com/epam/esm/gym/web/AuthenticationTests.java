@@ -1,40 +1,94 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.service.UserService;
+import com.epam.esm.gym.web.provider.AuthenticateArgumentsProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.stream.Stream;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-class AuthenticationTests {
+class AuthenticationTests extends ControllerTest {
+
+    @MockBean
+    private UserService userService;
 
     @Autowired
-    private MockMvc mockMvc;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
+    }
+
+    @Test
+    @WithMockUser(roles = "TRAINER")
+    public void testAdminAccess() throws Exception {
+        mockMvc.perform(get("/api/trainees"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testUnauthorizedAccess() throws Exception {
+        mockMvc.perform(get("/api/trainees")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt()
+                                .authorities(new SimpleGrantedAuthority("ROLE_TRAINER"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testInvalidToken() throws Exception {
+        mockMvc.perform(get("/api/trainees")
+                        .header("Authorization", "Bearer invalid.token"))
+                .andExpect(status().isUnauthorized());
+    }
 
     @ParameterizedTest
-    @MethodSource("provideValidCredentials")
     @DisplayName("Successful Login")
-    void successfulLogin(String username, String password) throws Exception {
+    @WithMockUser(roles = "TRAINEE")
+    @ArgumentsSource(AuthenticateArgumentsProvider.class)
+    void testLogin(String username, String password, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
+        when(userService.authenticate(username, password)).thenReturn(expectedResponse);
+        String passworde = passwordEncoder.encode("Password111");
+        System.out.println(passworde);
         mockMvc.perform(get("/api/login")
                         .param("username", username)
                         .param("password", password))
-                .andExpect(status().isOk());
+                .andExpect(status().is(expectedResponse.getStatusCode().value()))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidCredentials")
     @DisplayName("Failed Login Attempts")
     void failedLoginAttempts(String username, String password) throws Exception {
+
         mockMvc.perform(get("/api/login")
                         .param("username", username)
                         .param("password", password))

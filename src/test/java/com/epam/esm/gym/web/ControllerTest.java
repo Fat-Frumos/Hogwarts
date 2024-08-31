@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ControllerTest {
+public abstract class ControllerTest {
 
     @Autowired
     protected MockMvc mockMvc;
@@ -24,6 +24,5 @@ public class ControllerTest {
     protected TrainerService trainerService;
     @MockBean
     protected TraineeService traineeService;
-
     protected final String password = "Password123";
 }

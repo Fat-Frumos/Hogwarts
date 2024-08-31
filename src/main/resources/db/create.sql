@@ -1,3 +1,26 @@
+DROP TABLE IF EXISTS "trainee_trainer" CASCADE;
+DROP TABLE IF EXISTS "training" CASCADE;
+DROP TABLE IF EXISTS "trainer" CASCADE;
+DROP TABLE IF EXISTS "training_type" CASCADE;
+DROP TABLE IF EXISTS "trainee" CASCADE;
+DROP TABLE IF EXISTS "users" CASCADE;
+DROP TABLE IF EXISTS "role_authorities" CASCADE;
+DROP TABLE IF EXISTS "roles" CASCADE;
+DROP TABLE IF EXISTS "tokens" CASCADE;
+
+CREATE TABLE "roles"
+(
+    id         SERIAL PRIMARY KEY,
+    permission VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE "role_authorities"
+(
+    role_id   BIGINT       NOT NULL,
+    authority VARCHAR(255) NOT NULL,
+    FOREIGN KEY (role_id) REFERENCES "roles" (id) ON DELETE CASCADE
+);
+
 CREATE TABLE "users"
 (
     id         SERIAL PRIMARY KEY,
@@ -5,7 +28,10 @@ CREATE TABLE "users"
     last_name  VARCHAR(255) NOT NULL,
     username   VARCHAR(255) NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
-    is_active  BOOLEAN      NOT NULL
+    is_active  BOOLEAN      NOT NULL,
+    permission VARCHAR(255),
+    role_id    BIGINT,
+    FOREIGN KEY (role_id) REFERENCES "roles" (id) ON DELETE SET NULL
 );
 
 CREATE TABLE "trainee"
@@ -55,12 +81,14 @@ CREATE TABLE "trainee_trainer"
     FOREIGN KEY (trainer_id) REFERENCES "trainer" (id) ON DELETE CASCADE
 );
 
-SELECT column_name
-FROM information_schema.columns
-WHERE table_name = 'user';
-
-
-SELECT id
-FROM "users"
-WHERE username = 'Ginevra.Granger'
-LIMIT 1;
+CREATE TABLE "tokens"
+(
+    id               SERIAL PRIMARY KEY,
+    token_type       VARCHAR(255) DEFAULT 'BEARER',
+    access_token     VARCHAR(255) UNIQUE NOT NULL,
+    access_token_ttl BIGINT,
+    revoked          BOOLEAN      DEFAULT FALSE,
+    expired          BOOLEAN      DEFAULT FALSE,
+    user_id          INTEGER,
+    FOREIGN KEY (user_id) REFERENCES "users" (id) ON DELETE SET NULL
+);
