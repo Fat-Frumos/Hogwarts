@@ -1,5 +1,6 @@
 package com.epam.esm.gym.web.provider;
 
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
@@ -16,7 +17,15 @@ import java.util.stream.Stream;
 public class TraineeArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-        User harry = new User(1, "Harry", "Potter", "Harry.Potter", "password123", true);
+        User harry = User.builder()
+                .id(1)
+                .firstName("Harry")
+                .lastName("Potter")
+                .username("Harry.Potter")
+                .password("password123")
+                .active(true)
+                .permission(RoleType.TRAINER)
+                .build();
 
         Trainee trainee = Trainee.builder()
                 .id(1L)
@@ -45,7 +54,6 @@ public class TraineeArgumentsProvider implements ArgumentsProvider {
                 .address("Hogwarts")
                 .active(true)
                 .build();
-
 
         ResponseEntity<TraineeProfile> response2 = ResponseEntity
                 .status(HttpStatus.OK)

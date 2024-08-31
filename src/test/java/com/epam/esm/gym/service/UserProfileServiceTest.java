@@ -1,6 +1,7 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dao.UserDao;
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
@@ -41,14 +42,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class UserProfileServiceTest {
 
-        @InjectMocks
-        private UserProfileService userProfileService;
+    @InjectMocks
+    private UserProfileService userProfileService;
 
-        @Mock
-        private UserDao userDao;
+    @Mock
+    private UserDao userDao;
 
-        @Mock
-        private UserMapper userMapper;
+    @Mock
+    private UserMapper userMapper;
 
     @ParameterizedTest
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
@@ -157,7 +158,16 @@ public class UserProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(PasswordChangeArgumentsProvider.class)
     void changePassword(ProfileRequest request, MessageResponse expectedResponse) {
-        when(userDao.findByUsername(request.getUsername())).thenReturn(Optional.of(new User(1, "Harry", "Potter", "Harry.Potter", "oldPassword", true)));
+        User harry = User.builder()
+                .id(1)
+                .firstName("Harry")
+                .lastName("Potter")
+                .username("Harry.Potter")
+                .password("password123")
+                .active(true)
+                .permission(RoleType.TRAINER)
+                .build();
+        when(userDao.findByUsername(request.getUsername())).thenReturn(Optional.of(harry));
         ResponseEntity<MessageResponse> response = userProfileService.changePassword(request);
         assertEquals(expectedResponse.getStatus(), response.getStatusCode());
         assertEquals(expectedResponse.getMessage(), Objects.requireNonNull(response.getBody()).getMessage());

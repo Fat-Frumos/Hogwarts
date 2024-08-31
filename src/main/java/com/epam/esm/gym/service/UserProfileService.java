@@ -10,20 +10,20 @@ import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.mapper.UserMapper;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -32,6 +32,7 @@ public class UserProfileService implements UserService {
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
     private static final int PASSWORD_LENGTH = 10;
     private final Random random = new SecureRandom();
+    private final PasswordEncoder passwordEncoder;
     private final UserMapper mapper;
     private final UserDao dao;
 
@@ -39,12 +40,11 @@ public class UserProfileService implements UserService {
     @Transactional
     public TraineeProfile saveTrainee(TraineeRequest dto) {
         String username = generateUsername(dto.getFirstName(), dto.getLastName());
-        String password = generateRandomPassword();
+        String password = passwordEncoder.encode(generateRandomPassword());
         User user = mapper.toUser(dto.getFirstName(), dto.getLastName(), username, password);
         User save = dao.save(user);
         return mapper.toTraineeProfile(save);
     }
-
 
     @Override
     @Transactional

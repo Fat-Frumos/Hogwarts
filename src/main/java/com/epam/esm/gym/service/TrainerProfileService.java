@@ -72,4 +72,14 @@ public class TrainerProfileService implements TrainerService {
         return dao.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException(username));
     }
+
+    @Override
+    public ResponseEntity<List<TrainerProfile>> findAll() {
+        return ResponseEntity.ok(mapper.toDtos(dao.findAll()));
+    }
+
+    @Override
+    public void assignTraineeToTrainer(String trainerUsername, String traineeUsername) {
+        dao.assignTraineeToTrainer(trainerUsername, traineeUsername);
+    }
 }

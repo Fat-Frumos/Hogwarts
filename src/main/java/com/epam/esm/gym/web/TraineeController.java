@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +37,14 @@ public class TraineeController {
 
     private TraineeService service;
 
+    @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_TRAINER')")
+    public ResponseEntity<List<TraineeProfile>> getAllTrainees() {
+        return service.findAll();
+    }
+
     @PostMapping("/register")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "1. Register a new trainee")
     public ResponseEntity<ProfileResponse> registerTrainee(
             @Valid @RequestBody TraineeRequest request) {
@@ -44,6 +52,7 @@ public class TraineeController {
     }
 
     @GetMapping("/{username}")
+    @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "5. Get Trainee Profile by username")
     public ResponseEntity<TraineeProfile> getTraineeProfile(
             @PathVariable @NotNull @Valid String username) {
@@ -52,6 +61,7 @@ public class TraineeController {
 
     @PutMapping("/{username}")
     @Operation(summary = "6. Update Trainee Profile")
+    @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<TraineeProfile> updateTraineeProfile(
             @PathVariable String username,
             @Valid @RequestBody TraineeRequest request) {
@@ -59,6 +69,7 @@ public class TraineeController {
     }
 
     @DeleteMapping("/{username}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "7. Delete Trainee Profile")
     public ResponseEntity<Void> deleteTraineeProfile(
             @PathVariable String username) {
@@ -66,6 +77,7 @@ public class TraineeController {
     }
 
     @PutMapping("/{username}/trainers")
+    @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "11. Update Trainee's Trainer List")
     public ResponseEntity<List<TrainerProfile>> updateTraineeTrainers(
             @PathVariable String username,
@@ -74,6 +86,7 @@ public class TraineeController {
     }
 
     @GetMapping("/{username}/trainings")
+    @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "12. Get Trainee Trainings List")
     public ResponseEntity<List<TrainingResponse>> getTraineeTrainings(
             @PathVariable String username,
@@ -82,6 +95,7 @@ public class TraineeController {
     }
 
     @PatchMapping("/{username}/activate")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "15. Activate/Deactivate Trainee")
     public ResponseEntity<Void> activateDeactivateTrainee(
             @PathVariable String username, @RequestParam Boolean active) {

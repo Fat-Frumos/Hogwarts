@@ -9,4 +9,6 @@ public interface TrainerDao extends Dao<Trainer> {
     void activateTrainer(String name, Boolean active);
 
     List<Trainer> findNotAssigned(String username);
+
+    void assignTraineeToTrainer(String trainerUsername, String traineeUsername);
 }

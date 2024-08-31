@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Getter
@@ -15,7 +16,7 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class LoginRequest implements Serializable {
 
     @NotNull(message = "Username is required")
     @Size(min = 1, max = 50, message = "Username must be between 1 and 50 characters")

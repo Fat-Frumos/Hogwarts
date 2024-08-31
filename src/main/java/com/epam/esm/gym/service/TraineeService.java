@@ -34,4 +34,6 @@ public interface TraineeService {
     ResponseEntity<List<TrainerProfile>> getNotAssignedTrainers(String username);
 
     Trainee getTrainee(String traineeUsername);
+
+    ResponseEntity<List<TraineeProfile>> findAll();
 }

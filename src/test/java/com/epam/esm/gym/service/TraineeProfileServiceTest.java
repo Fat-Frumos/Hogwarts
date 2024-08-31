@@ -1,6 +1,7 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dao.TraineeDao;
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
@@ -74,7 +75,15 @@ public class TraineeProfileServiceTest {
                 .address("Hogwarts")
                 .active(true)
                 .build();
-        User harry = new User(1, "Harry", "Potter", "Harry.Potter", "password123", true);
+        User harry = User.builder()
+                .id(1)
+                .firstName("Harry")
+                .lastName("Potter")
+                .username("Harry.Potter")
+                .password("password123")
+                .active(true)
+                .permission(RoleType.TRAINER)
+                .build();
 
         Trainee trainee = Trainee.builder()
                 .id(1L)

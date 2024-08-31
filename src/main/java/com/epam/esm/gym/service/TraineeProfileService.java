@@ -35,6 +35,15 @@ public class TraineeProfileService implements TraineeService {
     private final TrainerService trainerService;
 
     @Override
+    public ResponseEntity<List<TraineeProfile>> findAll() {
+        List<TraineeProfile> trainees = dao.findAll()
+                .stream()
+                .map(mapper::toTraineeProfile)
+                .toList();
+        return ResponseEntity.ok(trainees);
+    }
+
+    @Override
     public ResponseEntity<ProfileResponse> register(TraineeRequest dto) {
         TraineeProfile profile = userService.saveTrainee(dto);
         Trainee trainee = dao.save(mapper.toEntity(profile));

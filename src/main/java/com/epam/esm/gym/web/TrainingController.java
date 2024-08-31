@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ public class TrainingController {
 
     @GetMapping("/types")
     @Operation(summary = "17. Get Training Types")
+    @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {
         List<TrainingTypeResponse> types = trainingService.getTrainingTypes();
         return ResponseEntity.ok(types);
@@ -33,6 +35,7 @@ public class TrainingController {
 
     @PostMapping("/add")
     @Operation(summary = "14. Add Training")
+    @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> addTraining(
             @Valid @RequestBody TrainingRequest request) {
         trainingService.createTraining(request);

@@ -48,13 +48,12 @@ public class Trainee {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column()
+    @Column(name = "address")
     private String address;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
 
     @OneToMany(mappedBy = "trainee")
     private Set<Training> trainings;

@@ -27,4 +27,8 @@ public interface TrainerService {
     ResponseEntity<Void> activateDeactivateProfile(String username, Boolean active);
 
     Trainer getTrainer(String trainerUsername);
+
+    ResponseEntity<List<TrainerProfile>> findAll();
+
+    void assignTraineeToTrainer(String trainerUsername, String traineeUsername);
 }
