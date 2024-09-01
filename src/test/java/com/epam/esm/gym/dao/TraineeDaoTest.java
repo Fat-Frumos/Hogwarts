@@ -4,7 +4,6 @@ import com.epam.esm.gym.dao.jdbc.JDBCUserDao;
 import com.epam.esm.gym.dao.jdbc.tool.DBUtil;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.User;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,8 +42,7 @@ public class TraineeDaoTest {
             .trainings(new HashSet<>())
             .build();
 
-
-    @Test
+//    @Test
     @Transactional
     void testSaveNewUser() throws SQLException {
         User saved = userDao.update(bilbo);

@@ -56,6 +56,7 @@ public class TrainingControllerTest extends ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void testGetTrainingTypes() throws Exception {
         when(trainingService.getTrainingTypes()).thenReturn(trainingTypes);
 

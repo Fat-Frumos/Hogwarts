@@ -47,60 +47,25 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TraineeProfileServiceTest {
-
-    @InjectMocks
-    private TraineeProfileService traineeProfileService;
-
     @Mock
     private TraineeDao dao;
-
     @Mock
     private TraineeMapper mapper;
-
     @Mock
     private UserService userService;
-
     @Mock
     private TrainerService trainerService;
+    @InjectMocks
+    private TraineeProfileService profileService;
 
     @ParameterizedTest
     @ArgumentsSource(TraineeRegistrationArgumentsProvider.class)
-    void register(TraineeRequest request, ResponseEntity<ProfileResponse> response) {
-
-        TraineeProfile expectedProfile = TraineeProfile.builder()
-                .firstName("Harry")
-                .lastName("Potter")
-                .dateOfBirth(LocalDate.parse("1980-07-31"))
-                .address("Hogwarts")
-                .active(true)
-                .build();
-
-        User harry = User.builder()
-                .id(1)
-                .firstName("Harry")
-                .lastName("Potter")
-                .username("Harry.Potter")
-                .password("password123")
-                .active(true)
-//                .permission(RoleType.TRAINER)
-                .build();
-
-        Trainee trainee = Trainee.builder()
-                .id(1L)
-                .dateOfBirth(LocalDate.parse("1980-07-31"))
-                .address("Hogwarts")
-                .user(harry)
-                .trainings(new HashSet<>())
-                .build();
-
-
+    void register(TraineeRequest request, ResponseEntity<ProfileResponse> response, Trainee trainee, TraineeProfile expectedProfile) {
         when(userService.saveTrainee(request)).thenReturn(expectedProfile);
         when(mapper.toEntity(expectedProfile)).thenReturn(trainee);
         when(dao.save(trainee)).thenReturn(trainee);
-        when(mapper.toProfile(harry)).thenReturn(response.getBody());
-
-        ResponseEntity<ProfileResponse> register = traineeProfileService.register(request);
-
+        when(mapper.toProfile(trainee.getUser())).thenReturn(response.getBody());
+        ResponseEntity<ProfileResponse> register = profileService.register(request);
         assertEquals(HttpStatus.CREATED, register.getStatusCode());
         assertEquals(response.getBody(), register.getBody());
         verify(dao).save(trainee);
@@ -110,7 +75,7 @@ public class TraineeProfileServiceTest {
     @ArgumentsSource(TraineeArgumentsProvider.class)
     void deleteTraineeWhenTraineeExists(String username, Trainee trainee) {
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
-        ResponseEntity<Void> response = traineeProfileService.deleteTrainee(username);
+        ResponseEntity<Void> response = profileService.deleteTrainee(username);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(dao).delete(trainee);
     }
@@ -119,7 +84,7 @@ public class TraineeProfileServiceTest {
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
     void deleteTraineeWhenTraineeDoesNotExist(String username) {
         when(dao.findByUsername(username)).thenReturn(Optional.empty());
-        ResponseEntity<Void> response = traineeProfileService.deleteTrainee(username);
+        ResponseEntity<Void> response = profileService.deleteTrainee(username);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         verify(dao, never()).delete(any());
     }
@@ -129,7 +94,7 @@ public class TraineeProfileServiceTest {
     void getTraineeProfileByNameWhenTraineeExists(String username, Trainee trainee, ResponseEntity<TraineeProfile> profile) {
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
         when(mapper.toTraineeProfile(trainee)).thenReturn(profile.getBody());
-        ResponseEntity<TraineeProfile> response = traineeProfileService.getTraineeProfileByName(username);
+        ResponseEntity<TraineeProfile> response = profileService.getTraineeProfileByName(username);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(profile, response);
     }
@@ -138,7 +103,7 @@ public class TraineeProfileServiceTest {
     @ArgumentsSource(TraineeArgumentsProvider.class)
     void getTraineeProfileByNameWhenTraineeDoesNotExist(String username) {
         when(dao.findByUsername(username)).thenReturn(Optional.empty());
-        ResponseEntity<TraineeProfile> response = traineeProfileService.getTraineeProfileByName(username);
+        ResponseEntity<TraineeProfile> response = profileService.getTraineeProfileByName(username);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
@@ -155,14 +120,11 @@ public class TraineeProfileServiceTest {
         Trainee trainee = new Trainee();
         Trainee updatedTrainee = new Trainee();
         TraineeProfile updatedProfile = new TraineeProfile();
-
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
         when(mapper.update(request, trainee)).thenReturn(updatedTrainee);
         when(dao.update(updatedTrainee)).thenReturn(updatedTrainee);
         when(mapper.toTraineeProfile(updatedTrainee)).thenReturn(updatedProfile);
-
-        ResponseEntity<TraineeProfile> response = traineeProfileService.updateTrainee(username, request);
-
+        ResponseEntity<TraineeProfile> response = profileService.updateTrainee(username, request);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(updatedProfile, response.getBody());
     }
@@ -170,35 +132,28 @@ public class TraineeProfileServiceTest {
     @Test
     void validateUserWhenValid() {
         ProfileRequest request = new ProfileRequest("Harry.Potter", "oldPassword", "wrongPassword");
-        UserProfile userProfile = new UserProfile();
-        userProfile.setPassword("oldPassword");
-        userProfile.setActive(true);
+        UserProfile userProfile = UserProfile.builder().password("oldPassword").active(true).build();
         when(userService.getUserByUsername(request.getUsername())).thenReturn(userProfile);
-
-        assertTrue(traineeProfileService.validateUser(request));
+        assertTrue(profileService.validateUser(request));
     }
 
     @Test
     void validateUserWhenInvalid() {
         ProfileRequest request = new ProfileRequest("Harry.Potter", "wrongPassword", "wrongPassword");
-        UserProfile userProfile = new UserProfile();
-        userProfile.setPassword("oldPassword");
-        userProfile.setActive(false);
-
+        UserProfile userProfile = UserProfile.builder().password("oldPassword").active(false).build();
         when(userService.getUserByUsername(request.getUsername())).thenReturn(userProfile);
-
-        assertFalse(traineeProfileService.validateUser(request));
+        assertFalse(profileService.validateUser(request));
     }
 
     @Test
     void changePassword() {
         ProfileRequest request = new ProfileRequest("Harry.Potter", "oldPassword", "newPassword");
         doAnswer(invocation -> null).doThrow(new RuntimeException("Password change failed")).when(userService).changePassword(request);
-        traineeProfileService.changePassword(request);
+        profileService.changePassword(request);
         verify(userService).changePassword(request);
 
         try {
-            traineeProfileService.changePassword(request);
+            profileService.changePassword(request);
             fail("Expected RuntimeException to be thrown");
         } catch (RuntimeException e) {
             assertEquals("Password change failed", e.getMessage());
@@ -217,7 +172,7 @@ public class TraineeProfileServiceTest {
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
         when(mapper.toTrainers(anyList())).thenReturn(new HashSet<>());
 
-        ResponseEntity<List<TrainerProfile>> response = traineeProfileService.updateTraineeTrainersByName(username, trainerUsernames);
+        ResponseEntity<List<TrainerProfile>> response = profileService.updateTraineeTrainersByName(username, trainerUsernames);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(trainerProfiles, response.getBody());
@@ -229,7 +184,7 @@ public class TraineeProfileServiceTest {
 
         when(dao.findByUsername(trainee.getUser().getUsername())).thenReturn(Optional.of(trainee));
         when(mapper.toResponse(training)).thenReturn(trainingResponse);
-        ResponseEntity<List<TrainingResponse>> response = traineeProfileService.getTraineeTrainingsByName(trainee.getUser().getUsername(), params);
+        ResponseEntity<List<TrainingResponse>> response = profileService.getTraineeTrainingsByName(trainee.getUser().getUsername(), params);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(List.of(trainingResponse), response.getBody());
@@ -244,7 +199,7 @@ public class TraineeProfileServiceTest {
 
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
 
-        ResponseEntity<Void> response = traineeProfileService.activateDeactivateProfile(username, true);
+        ResponseEntity<Void> response = profileService.activateDeactivateProfile(username, true);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(trainee.getUser().getActive());
@@ -259,7 +214,7 @@ public class TraineeProfileServiceTest {
         when(dao.findNotAssignedTrainers(username)).thenReturn(trainers);
         when(mapper.toTrainerProfile(any())).thenReturn(new TrainerProfile());
 
-        ResponseEntity<List<TrainerProfile>> response = traineeProfileService.getNotAssignedTrainers(username);
+        ResponseEntity<List<TrainerProfile>> response = profileService.getNotAssignedTrainers(username);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(trainerProfiles, response.getBody());

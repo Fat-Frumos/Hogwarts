@@ -141,7 +141,7 @@ public class AuthenticationService implements AuthService {
         User user = User.builder()
                 .password(encoder.encode(request.getPassword()))
                 .username(username)
-                .role(getRole())
+                .role(Role.builder().permission(ROLE_TRAINER).build())
                 .build();
         return userRepository.save(user);
     }
@@ -150,12 +150,6 @@ public class AuthenticationService implements AuthService {
     public Optional<User> findByUsername(
             final String username) {
         return userRepository.findByUsername(username);
-    }
-
-    private static Role getRole() {
-        return Role.builder()
-                .permission(ROLE_TRAINER)
-                .build();
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package com.epam.esm.gym.web.provider;
 
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.UserProfile;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -18,7 +19,7 @@ public class UserArgumentsProvider implements ArgumentsProvider {
                 .username("Harry.Potter")
                 .password("password123")
                 .active(true)
-//                .permission(RoleType.TRAINER)
+                .permission(RoleType.ROLE_TRAINER)
                 .build();
 
         UserProfile profileHarry = new UserProfile(1L, "Harry", "Potter", "Harry.Potter", "password123", true);
@@ -29,7 +30,6 @@ public class UserArgumentsProvider implements ArgumentsProvider {
                 .username("Hermione.Granger")
                 .password("password456")
                 .active(true)
-//                .permission(RoleType.TRAINER)
                 .build();
 
         UserProfile profileHermione = new UserProfile(2L, "Hermione", "Granger", "Hermione.Granger", "password456", true);
@@ -41,7 +41,7 @@ public class UserArgumentsProvider implements ArgumentsProvider {
                 .username("Ron.Weasley")
                 .password("password789")
                 .active(true)
-//                .permission(RoleType.TRAINER)
+                .permission(RoleType.ROLE_TRAINER)
                 .build();
 
         UserProfile profileRon = new UserProfile(3L, "Ron", "Weasley", "Ron.Weasley", "password789", true);

@@ -20,21 +20,20 @@ public class SuccessAuthenticationHandler implements AuthenticationSuccessHandle
 
     private final AuthenticationService authenticationService;
 
+    private final ObjectMapper objectMapper;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
         String accessToken = authenticationService.generateToken(userDetails);
         AuthenticationResponse authResponse = authenticationService.getAuthenticationResponse(userDetails, accessToken);
-
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
-
         response.getWriter().write(convertToJson(authResponse));
     }
 
     private String convertToJson(AuthenticationResponse authResponse) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.writeValueAsString(authResponse);
         } catch (JsonProcessingException e) {
             return "{}";

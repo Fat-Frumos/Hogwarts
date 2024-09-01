@@ -43,7 +43,7 @@ class LoginControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
-    @WithMockUser(roles = "TRAINER")
+    @WithMockUser(roles = "ADMIN")
     @ArgumentsSource(ChangePasswordArgumentsProvider.class)
     void testChangePassword(ProfileRequest request, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
         when(userService.changePassword(request)).thenReturn(expectedResponse);

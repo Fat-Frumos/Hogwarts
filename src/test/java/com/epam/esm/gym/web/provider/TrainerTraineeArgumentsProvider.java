@@ -1,5 +1,6 @@
 package com.epam.esm.gym.web.provider;
 
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.User;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -20,7 +21,7 @@ public class TrainerTraineeArgumentsProvider implements ArgumentsProvider {
                 .username("Harry.Potter")
                 .password("password123")
                 .active(true)
-//                .permission(RoleType.TRAINER)
+                .permission(RoleType.ROLE_TRAINEE)
                 .build();
 
         User hermione = User.builder()
@@ -30,7 +31,7 @@ public class TrainerTraineeArgumentsProvider implements ArgumentsProvider {
                 .username("Hermione.Granger")
                 .password("password456")
                 .active(true)
-//                .permission(RoleType.TRAINER)
+                .permission(RoleType.ROLE_TRAINEE)
                 .build();
 
         Trainer trainer1 = Trainer.builder().user(harry).build();

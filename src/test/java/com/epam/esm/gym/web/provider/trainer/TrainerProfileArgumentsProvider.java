@@ -7,7 +7,6 @@ import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
-import org.springframework.http.ResponseEntity;
 
 import java.util.stream.Stream;
 
@@ -33,7 +32,7 @@ public class TrainerProfileArgumentsProvider implements ArgumentsProvider {
                 .build();
 
         return Stream.of(
-                Arguments.of("Remus.Lupin", ResponseEntity.ok(profile), request)
+                Arguments.of("Remus.Lupin", profile, request)
         );
     }
 }

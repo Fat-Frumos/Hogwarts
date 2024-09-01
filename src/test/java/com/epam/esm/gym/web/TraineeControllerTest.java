@@ -84,6 +84,7 @@ class TraineeControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
+    @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
     void testGetTraineeProfile(String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
         when(traineeService.getTraineeProfileByName(username)).thenReturn(expectedResponse);
@@ -102,6 +103,7 @@ class TraineeControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
+    @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(NotFoundTraineeProfileArgumentsProvider.class)
     public void testGetNotFoundTraineeProfile(String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
         when(traineeService.getTraineeProfileByName(username)).thenReturn(expectedResponse);
@@ -123,6 +125,7 @@ class TraineeControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
+    @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TraineeTrainingResponseArgumentsProvider.class)
     void testGetTraineeTrainings(String username, TrainingProfile request, ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
         when(traineeService.getTraineeTrainingsByName(username, params)).thenReturn(expectedResponse);
@@ -148,6 +151,7 @@ class TraineeControllerTest extends ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "TRAINER")
     void testActivateDeactivateTrainee() throws Exception {
         Boolean active = true;
         mockMvc.perform(patch(BASE_URL + "/" + username + "/activate")
@@ -157,6 +161,7 @@ class TraineeControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
+    @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TraineeTrainingsNotFoundArgumentsProvider.class)
     void testTraineeTrainingsNotFound(String username, ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
         when(traineeService.getTraineeProfileByName(username)).thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());

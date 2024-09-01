@@ -118,13 +118,12 @@ class TrainerControllerTest extends ControllerTest {
     @ParameterizedTest
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TrainerProfileArgumentsProvider.class)
-    void testGetTrainerProfile(String username, ResponseEntity<TrainerProfile> expectedResponse) throws Exception {
-        when(trainerService.getTrainerProfileByName(username)).thenReturn(expectedResponse);
+    void testGetTrainerProfile(String username, TrainerProfile expectedResponse) throws Exception {
+        when(trainerService.getTrainerProfileByName(username)).thenReturn(ResponseEntity.ok(expectedResponse));
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainers/{username}", username)
                 .contentType(MediaType.APPLICATION_JSON));
-
-        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()))
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
+        resultActions.andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)));
     }
 
     @ParameterizedTest
@@ -209,7 +208,7 @@ class TrainerControllerTest extends ControllerTest {
 
 
     @ParameterizedTest
-    @WithMockUser(roles = "TRAINEE")
+    @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(NotAssignedActiveTrainersArgumentsProvider.class)
     void testGetNotAssignedActiveTrainersUsernameNotFound(String username, ResponseEntity<List<TrainerProfile>> expectedTrainers) throws Exception {
         when(trainerService.getNotAssigned(username)).thenReturn(expectedTrainers);
@@ -253,8 +252,8 @@ class TrainerControllerTest extends ControllerTest {
     @ParameterizedTest
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TrainerProfileArgumentsProvider.class)
-    void testGetProfile(String username, ResponseEntity<TrainerProfile> expectedResponse) throws Exception {
-        when(trainerService.getTrainerProfileByName(username)).thenReturn(expectedResponse);
+    void testGetProfile(String username, TrainerProfile expectedResponse) throws Exception {
+        when(trainerService.getTrainerProfileByName(username)).thenReturn(ResponseEntity.ok(expectedResponse));
         String result = mockMvc.perform(get(BASE_URL + "/{username}", username))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -263,7 +262,7 @@ class TrainerControllerTest extends ControllerTest {
 
         assertThat(objectMapper.readValue(result, TrainerProfile.class))
                 .usingRecursiveComparison()
-                .isEqualTo(expectedResponse.getBody());
+                .isEqualTo(expectedResponse);
         verify(trainerService, times(1)).getTrainerProfileByName(username);
     }
 
@@ -288,7 +287,7 @@ class TrainerControllerTest extends ControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "TRAINEE")
+    @WithMockUser(roles = "TRAINER")
     void testGetNotAssignedActiveTrainersInvalidUsername() throws Exception {
         mockMvc.perform(get(BASE_URL + "/{username}/unassigned", "user name")
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
