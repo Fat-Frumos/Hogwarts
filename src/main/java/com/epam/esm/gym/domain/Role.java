@@ -22,8 +22,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import java.io.Serializable;
 import java.util.List;
@@ -33,6 +31,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "roles")
@@ -46,7 +45,6 @@ public class Role implements Serializable {
     private Long id;
     @Enumerated(EnumType.STRING)
     @Column(name = "permission")
-    @Fetch(FetchMode.JOIN)
     private RoleType permission;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

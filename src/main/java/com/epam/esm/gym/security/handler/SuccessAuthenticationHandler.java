@@ -23,7 +23,7 @@ public class SuccessAuthenticationHandler implements AuthenticationSuccessHandle
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
-        String accessToken = authenticationService.getAccessToken(userDetails);
+        String accessToken = authenticationService.generateToken(userDetails);
         AuthenticationResponse authResponse = authenticationService.getAuthenticationResponse(userDetails, accessToken);
 
         response.setContentType("application/json");

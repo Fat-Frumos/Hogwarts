@@ -37,7 +37,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/trainers/register", "/api/trainees/register", "/api/login").permitAll()
+                        .requestMatchers(
+                                "/api/trainers/register",
+                                "/api/trainees/register",
+                                "/api/auth/login",
+                                "/api/login").permitAll()
                         .requestMatchers("/api/trainers/**").hasAnyRole("TRAINER", "ADMIN")
                         .requestMatchers("/api/trainees/**").hasAnyRole("TRAINER", "ADMIN")
                         .anyRequest().hasRole("ADMIN"))
@@ -47,9 +51,9 @@ public class SecurityConfig {
                         .authenticationEntryPoint(unauthorizedHandler())
                         .accessDeniedHandler(new BruteForceAuthenticationFailureHandler(bruteForceProtectionService)))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new BruteForceProtectionFilter(bruteForceProtectionService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new BruteForceProtectionFilter(bruteForceProtectionService), UsernamePasswordAuthenticationFilter.class)
+                .csrf(AbstractHttpConfigurer::disable);
 
-        http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
 

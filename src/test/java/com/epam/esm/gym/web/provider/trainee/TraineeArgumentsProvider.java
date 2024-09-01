@@ -1,6 +1,5 @@
-package com.epam.esm.gym.web.provider;
+package com.epam.esm.gym.web.provider.trainee;
 
-import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
@@ -24,7 +23,7 @@ public class TraineeArgumentsProvider implements ArgumentsProvider {
                 .username("Harry.Potter")
                 .password("password123")
                 .active(true)
-                .permission(RoleType.TRAINER)
+//                .permission(RoleType.TRAINER)
                 .build();
 
         Trainee trainee = Trainee.builder()

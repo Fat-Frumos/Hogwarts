@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ public class TrainingControllerTest extends ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void testAddTraining() throws Exception {
         mockMvc.perform(post(BASE_URL + "/add")
                         .contentType(MediaType.APPLICATION_JSON)

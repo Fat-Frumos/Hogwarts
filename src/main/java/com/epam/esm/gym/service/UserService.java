@@ -29,4 +29,6 @@ public interface UserService {
     ResponseEntity<MessageResponse> authenticate(String username, String password);
 
     TraineeProfile saveTrainee(TraineeRequest dto);
+
+    User getUser(String username);
 }

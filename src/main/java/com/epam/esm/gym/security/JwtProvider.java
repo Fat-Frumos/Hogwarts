@@ -14,6 +14,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+@Slf4j
 @Service
 public class JwtProvider {
     @Getter
@@ -37,7 +39,6 @@ public class JwtProvider {
     private final SecretKey secretKey;
     private final TokenDao tokenRepository;
     private final JwtProperties jwtProperty;
-    public static final String TOKEN_PREFIX = "Bearer ";
 
     public JwtProvider(JwtProperties jwtProperty, TokenDao tokenDao) {
         this.jwtProperty = jwtProperty;
@@ -46,24 +47,6 @@ public class JwtProvider {
             throw new IllegalArgumentException("Secret key cannot be null or empty");
         }
         this.secretKey = Jwts.SIG.HS256.key().build();
-    }
-
-    public String extractToken(String authorizationHeader) {
-        if (authorizationHeader != null && authorizationHeader.startsWith(TOKEN_PREFIX)) {
-            return authorizationHeader.substring(TOKEN_PREFIX.length());
-        }
-        return null;
-    }
-
-    public String generateToken(SecurityUser user, Long expiration) {
-        return Jwts.builder()
-                .signWith(secretKey, Jwts.SIG.HS256)
-                .issuer(jwtProperty.getIssuer())
-                .subject(String.valueOf(user.getUsername()))
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration * 1000))
-                .claim("username", user.getUsername())
-                .compact();
     }
 
     public String getUsername(String token, boolean expirationCheck) {
@@ -76,7 +59,7 @@ public class JwtProvider {
     }
 
     private String getUsername(Claims payload) {
-        return (String) payload.get("id");
+        return (String) payload.get("username");
     }
 
     public User extractUserInfo(String token) {
@@ -85,7 +68,6 @@ public class JwtProvider {
                 .id(Integer.valueOf(getUsername(payload)))
                 .username((String) payload.get("username"))
                 .build();
-
     }
 
     public <T> T getClaim(
@@ -126,18 +108,14 @@ public class JwtProvider {
                     .claims(claims)
                     .compact();
         } catch (Exception e) {
-            throw new InvalidJwtAuthenticationException("Invalid jwt authentication");
+            throw new InvalidJwtAuthenticationException(e.getMessage());
         }
     }
 
-    public boolean isTokenValid(
-            final String token,
-            final UserDetails userDetails) {
+    public boolean isTokenValid(final String token, final UserDetails userDetails) {
         try {
-            return getUsername(token)
-                    .equals(userDetails.getUsername())
-                    && !getClaim(token, Claims::getExpiration)
-                    .before(new Date());
+            return getUsername(token).equals(userDetails.getUsername())
+                    && !getClaim(token, Claims::getExpiration).before(new Date());
         } catch (Exception e) {
             return false;
         }
@@ -171,7 +149,7 @@ public class JwtProvider {
 
     @Transactional
     public Token updateUserTokens(
-            final User user,
+            final SecurityUser user,
             final String accessToken) {
         Token token = getToken(user, accessToken);
         return save(token);
@@ -195,10 +173,10 @@ public class JwtProvider {
     }
 
     public Token getToken(
-            final User user,
+            final SecurityUser user,
             final String accessToken) {
         return Token.builder()
-                .user(user)
+                .user(getUser(user))
                 .expired(false)
                 .revoked(false)
                 .tokenType(TokenType.BEARER)
@@ -207,8 +185,11 @@ public class JwtProvider {
                 .build();
     }
 
-    public String getUsername(
-            final String token) {
+    private User getUser(SecurityUser userDetails) {
+        return userDetails.getUser();
+    }
+
+    public String getUsername(final String token) {
         try {
             return getClaim(token, Claims::getSubject);
         } catch (MalformedJwtException e) {

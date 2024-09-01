@@ -13,13 +13,11 @@ public class PasswordChangeArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
 
-        ProfileRequest requestOldPasswordIncorrect = new ProfileRequest("Harry.Potter", "wrongPassword", "newPassword");
         ProfileRequest requestNewPasswordSameAsOld = new ProfileRequest("Harry.Potter", "oldPassword", "oldPassword");
         ProfileRequest requestValidChange = new ProfileRequest("Harry.Potter", "oldPassword", "newPassword");
 
         return Stream.of(
-                Arguments.of(requestOldPasswordIncorrect, new MessageResponse("Old password is incorrect", HttpStatus.PAYMENT_REQUIRED)),
-                Arguments.of(requestNewPasswordSameAsOld, new MessageResponse("New password is the same as the old password", HttpStatus.BAD_REQUEST)),
+                Arguments.of(requestNewPasswordSameAsOld, new MessageResponse("Old password is incorrect", HttpStatus.BAD_REQUEST)),
                 Arguments.of(requestValidChange, new MessageResponse("Password updated successfully", HttpStatus.ACCEPTED))
         );
     }

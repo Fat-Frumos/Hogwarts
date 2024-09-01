@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class TraineeTrainersArgumentsProvider implements ArgumentsProvider {
+public class TraineeTrainersResponseEntityProfileArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
         TrainingType transfiguration = TrainingType.builder()

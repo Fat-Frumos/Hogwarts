@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class TraineeTrainingsArgumentsProvider implements ArgumentsProvider {
+public class TraineeTrainingResponseArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
         List<TrainingResponse> trainingResponses = List.of(

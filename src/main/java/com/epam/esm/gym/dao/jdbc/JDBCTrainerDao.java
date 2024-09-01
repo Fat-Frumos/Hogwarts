@@ -5,6 +5,7 @@ import com.epam.esm.gym.domain.Trainer;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -66,8 +67,9 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
 
     public void assignTraineeToTrainer(String trainerUsername, String traineeUsername) {
         Session session = sessionFactory.getCurrentSession();
+        Transaction transaction = null;
         try {
-            session.beginTransaction();
+            transaction = session.beginTransaction();
 
             String hql = """
                     UPDATE Trainee t SET t.trainers = (
@@ -79,16 +81,16 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
                     .setParameter("traineeUsername", traineeUsername)
                     .executeUpdate();
 
-            session.getTransaction().commit();
+            transaction.commit();
 
             if (updatedEntities == 0) {
                 throw new EntityNotFoundException("Failed to assign trainee. Trainee might not exist.");
             }
         } catch (Exception e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
+            if (transaction != null) {
+                transaction.rollback();
             }
-            throw new RuntimeException(e.getMessage());
+            throw new EntityNotFoundException(e.getMessage());
         }
     }
 }

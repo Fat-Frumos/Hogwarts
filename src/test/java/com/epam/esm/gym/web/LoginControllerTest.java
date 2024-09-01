@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -42,10 +43,10 @@ class LoginControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
+    @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(ChangePasswordArgumentsProvider.class)
     void testChangePassword(ProfileRequest request, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
         when(userService.changePassword(request)).thenReturn(expectedResponse);
-
         mockMvc.perform(put("/api/login/change")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -54,6 +55,7 @@ class LoginControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
+    @WithMockUser(roles = "ADMIN")
     @ArgumentsSource(ChangePasswordValidationConstraintsArgumentsProvider.class)
     void testChangePasswordValidationConstraints(ProfileRequest request, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
         when(userService.changePassword(request)).thenReturn(expectedResponse);

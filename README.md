@@ -324,13 +324,13 @@ Below is a description of each component of the solution.
 
 #### Spring security framework used to provide follow functionality:
 
-[x] It configured for Authentication access for all endpoints (except Create Trainer/Trainee profile).
-[x] salt and hashing are used to store user passwords in DB.
-[x] Spring Security is configured to use Login functionality.
-[x] Brute Force protector added. User is blocked for 5 minutes on 3 unsuccessful logins
-[x] Logout functionality implemented and configured it in Spring Security.
-[x] Authorization implemented as a Bearer token for Create Profile and Login functionality (JWT token).
-[x] CORS policy in Spring Security configured.
+-[x] It configured for Authentication access for all endpoints (except Create Trainer/Trainee profile).
+-[x] salt and hashing are used to store user passwords in DB.
+-[x] Spring Security is configured to use Login functionality.
+-[x] Brute Force protector added. User is blocked for 5 minutes on 3 unsuccessful logins
+-[x] Logout functionality implemented and configured it in Spring Security.
+-[x] Authorization implemented as a Bearer token for Create Profile and Login functionality (JWT token).
+-[x] CORS policy in Spring Security configured.
 
 ##### Technical Notes:
 

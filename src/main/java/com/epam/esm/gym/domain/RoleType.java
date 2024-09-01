@@ -24,14 +24,14 @@ import static java.util.stream.Collectors.toList;
 @AllArgsConstructor
 public enum RoleType {
 
-    TRAINEE(new HashSet<>(singletonList(TRAINEE_READ))),
+    ROLE_TRAINEE(new HashSet<>(singletonList(TRAINEE_READ))),
 
-    TRAINER(new HashSet<>(asList(
+    ROLE_TRAINER(new HashSet<>(asList(
             TRAINER_CREATE,
             TRAINER_UPDATE,
             TRAINER_READ))),
 
-    ADMIN(new HashSet<>(asList(
+    ROLE_ADMIN(new HashSet<>(asList(
             ADMIN_CREATE,
             ADMIN_READ,
             ADMIN_UPDATE,

@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -24,19 +25,19 @@ import java.util.Objects;
 @Getter
 @Entity
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tokens")
 public class Token implements Serializable {
     @Id
-    @Column(name = "token_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator = "token_sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Builder.Default
+    @Column(name = "token_type")
     @Enumerated(EnumType.STRING)
     private TokenType tokenType = TokenType.BEARER;
-    @Column(unique = true)
+    @Column(name = "access_token", nullable = false, unique = true)
     private String accessToken;
     @Column(name = "access_token_ttl")
     private Long accessTokenTTL;
@@ -51,11 +52,11 @@ public class Token implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Token token = (Token) o;
-        return revoked == token.revoked && expired == token.expired && Objects.equals(id, token.id) && tokenType == token.tokenType && Objects.equals(accessToken, token.accessToken) && Objects.equals(accessTokenTTL, token.accessTokenTTL) && Objects.equals(user, token.user);
+        return revoked == token.revoked && expired == token.expired && Objects.equals(id, token.id) && tokenType == token.tokenType && Objects.equals(accessToken, token.accessToken) && Objects.equals(accessTokenTTL, token.accessTokenTTL);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, tokenType, accessToken, accessTokenTTL, revoked, expired, user);
+        return Objects.hash(id, tokenType, accessToken, accessTokenTTL, revoked, expired);
     }
 }

@@ -5,7 +5,6 @@ import com.epam.esm.gym.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
@@ -32,21 +31,10 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
     @Override
     public Optional<User> findByUsername(String username) {
         Session session = getSession();
-        Optional<User> user = Optional.empty();
-        try {
-            Transaction transaction = session.beginTransaction();
-            String sql = "SELECT * FROM \"users\" WHERE username = :username";
-            Query<User> query = session.createNativeQuery(sql, User.class);
-            query.setParameter("username", username);
-            user = query.uniqueResultOptional();
-            transaction.commit();
-        } catch (Exception e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
-            log.error("Error finding user by username: " + e.getMessage());
-        }
-        return user;
+        String sql = "SELECT * FROM \"users\" WHERE username = :username";
+        Query<User> query = session.createNativeQuery(sql, User.class);
+        query.setParameter("username", username);
+        return query.uniqueResultOptional();
     }
 
     @Override

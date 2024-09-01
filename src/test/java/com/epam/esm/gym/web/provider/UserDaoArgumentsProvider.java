@@ -4,15 +4,14 @@ import com.epam.esm.gym.domain.User;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
-import org.springframework.http.HttpStatus;
 
 import java.util.stream.Stream;
 
-public class AuthenticationArgumentsProvider implements ArgumentsProvider {
+public class UserDaoArgumentsProvider implements ArgumentsProvider {
+
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-
-        User validUser = User.builder()
+        User activeUser = User.builder()
                 .id(1)
                 .firstName("Harry")
                 .lastName("Potter")
@@ -22,20 +21,20 @@ public class AuthenticationArgumentsProvider implements ArgumentsProvider {
 //                .permission(RoleType.TRAINER)
                 .build();
 
-        User invalidUser = User.builder()
+        User inactiveUser = User.builder()
                 .id(2)
-                .firstName("Hermione")
-                .lastName("Granger")
-                .username("Hermione.Granger")
-                .password("wrongPassword")
-                .active(true)
+                .firstName("Ron")
+                .lastName("Weasley")
+                .username("Ron.Weasley")
+                .password("password456")
+                .active(false)
 //                .permission(RoleType.TRAINEE)
                 .build();
 
         return Stream.of(
-                Arguments.of("Hermione.Granger", "incorrectPassword", validUser, HttpStatus.UNAUTHORIZED),
-                Arguments.of("Harry.Potter", "wrongPassword", invalidUser, HttpStatus.UNAUTHORIZED),
-                Arguments.of("Harry.Potter", "correctPassword", validUser, HttpStatus.OK)
+                Arguments.of(activeUser, "Harry.Potter"),
+                Arguments.of(inactiveUser, "Ron.Weasley"),
+                Arguments.of(new User(), "Hermione.Granger")
         );
     }
 }

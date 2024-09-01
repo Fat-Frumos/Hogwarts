@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Optional;
 
-import static com.epam.esm.gym.domain.RoleType.TRAINER;
+import static com.epam.esm.gym.domain.RoleType.ROLE_TRAINER;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 
@@ -84,7 +85,7 @@ public class AuthenticationService implements AuthService {
                 SecurityUser user = findUser(username);
                 if (provider.isTokenValid(refreshToken, user)) {
                     String accessToken = provider.generateToken(user);
-                    Token token = provider.updateUserTokens(user.getUser(), accessToken);
+                    Token token = provider.updateUserTokens(user, accessToken);
                     return AuthenticationResponse.builder()
                             .username(username)
                             .accessToken(token.getAccessToken())
@@ -153,14 +154,14 @@ public class AuthenticationService implements AuthService {
 
     private static Role getRole() {
         return Role.builder()
-                .permission(TRAINER)
+                .permission(ROLE_TRAINER)
                 .build();
     }
 
     @Transactional
     public AuthenticationResponse getAuthenticationResponse(final SecurityUser user) {
-        String jwtToken = getAccessToken(user);
-        Token token = provider.updateUserTokens(user.getUser(), jwtToken);
+        String jwtToken = generateToken(user);
+        Token token = provider.updateUserTokens(user, jwtToken);
         return getAuthenticationResponse(user, jwtToken, token.getAccessTokenTTL());
     }
 
@@ -170,7 +171,7 @@ public class AuthenticationService implements AuthService {
     }
 
     public AuthenticationResponse getAuthenticationResponse(
-            final SecurityUser user,
+            final UserDetails user,
             final String jwtToken,
             final Long accessToken) {
         return AuthenticationResponse.builder()
@@ -182,7 +183,7 @@ public class AuthenticationService implements AuthService {
                 .build();
     }
 
-    public String getAccessToken(SecurityUser user) {
+    public String generateToken(UserDetails user) {
         return provider.generateToken(user);
     }
 }

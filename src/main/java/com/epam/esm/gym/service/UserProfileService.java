@@ -71,7 +71,7 @@ public class UserProfileService implements UserService {
         return mapper.toDto(getUser(username));
     }
 
-    private User getUser(String username) {
+    public User getUser(String username) {
         return dao.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException(username));
     }
@@ -98,18 +98,19 @@ public class UserProfileService implements UserService {
         }
 
         User user = userOptional.get();
-        if (!(request.getPassword().equals(user.getPassword()))) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return getResponseEntity(HttpStatus.PAYMENT_REQUIRED);
         }
 
-        if (request.getNewPassword().equals(request.getPassword())) {
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
             return getResponseEntity(HttpStatus.BAD_REQUEST);
         }
 
-        user.setPassword(request.getNewPassword());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         updateUser(user);
         return getResponseEntity(HttpStatus.ACCEPTED);
     }
+
 
     @Override
     public ResponseEntity<MessageResponse> authenticate(String username, String password) {
