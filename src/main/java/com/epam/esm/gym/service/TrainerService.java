@@ -30,5 +30,5 @@ public interface TrainerService {
 
     ResponseEntity<List<TrainerProfile>> findAll();
 
-    void assignTraineeToTrainer(String trainerUsername, String traineeUsername);
+    void assignTraineeToTrainer(String traineeUsername);
 }

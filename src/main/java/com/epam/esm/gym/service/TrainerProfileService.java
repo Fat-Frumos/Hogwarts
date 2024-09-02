@@ -13,6 +13,8 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,7 +52,8 @@ public class TrainerProfileService implements TrainerService {
     }
 
     @Override
-    public ResponseEntity<TrainerProfile> updateTrainer(String username, TrainerUpdateRequest request) {
+    public ResponseEntity<TrainerProfile> updateTrainer(
+            String username, TrainerUpdateRequest request) {
         Trainer trainer = mapper.toEntity(request);
         TrainerProfile profile = mapper.toDto(dao.update(trainer));
         return ResponseEntity.ok(profile);
@@ -79,7 +82,8 @@ public class TrainerProfileService implements TrainerService {
     }
 
     @Override
-    public void assignTraineeToTrainer(String trainerUsername, String traineeUsername) {
-        dao.assignTraineeToTrainer(trainerUsername, traineeUsername);
+    public void assignTraineeToTrainer(String traineeUsername) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        dao.assignTraineeToTrainer(authentication.getName(), traineeUsername);
     }
 }

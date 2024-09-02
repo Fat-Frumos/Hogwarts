@@ -1,5 +1,6 @@
 package com.epam.esm.gym.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -52,6 +53,9 @@ public class Trainer {
     @Builder.Default
     @ManyToMany(mappedBy = "trainers")
     private Set<Trainee> trainees = new HashSet<>();
+
+    @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TrainingSession> trainingSessions;
 
     @Override
     public boolean equals(Object o) {

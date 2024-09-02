@@ -72,7 +72,8 @@ public class TraineeProfileService implements TraineeService {
     public ResponseEntity<TraineeProfile> updateTrainee(
             String username, TraineeRequest request) {
         return dao.findByUsername(username)
-                .map(trainee -> ResponseEntity.ok(mapper.toTraineeProfile(dao.update(mapper.update(request, trainee)))))
+                .map(trainee -> ResponseEntity.ok(mapper.toTraineeProfile(
+                        dao.update(mapper.update(request, trainee)))))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
@@ -103,8 +104,10 @@ public class TraineeProfileService implements TraineeService {
     public ResponseEntity<List<TrainingResponse>> getTraineeTrainingsByName(
             String username, Map<String, String> params) {
         TrainingProfile filter = TrainingProfile.builder()
-                .periodFrom(params.containsKey("periodFrom") ? LocalDate.parse(params.get("periodFrom")) : null)
-                .periodTo(params.containsKey("periodTo") ? LocalDate.parse(params.get("periodTo")) : null)
+                .periodFrom(params.containsKey("periodFrom")
+                        ? LocalDate.parse(params.get("periodFrom")) : null)
+                .periodTo(params.containsKey("periodTo")
+                        ? LocalDate.parse(params.get("periodTo")) : null)
                 .trainerName(params.get("trainerName"))
                 .trainingType(params.get("trainingType"))
                 .build();

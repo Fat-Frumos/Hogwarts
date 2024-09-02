@@ -20,6 +20,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +35,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TrainerProfileServiceTest {
-
+    @Mock
+    private SecurityContext securityContext;
+    @Mock
+    private Authentication authentication;
     @Mock
     private UserProfileService userService;
 
@@ -143,8 +149,12 @@ class TrainerProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
     public void testAssignTraineeToTrainer(String trainerUsername, String traineeUsername) {
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(trainerUsername);
         doNothing().when(dao).assignTraineeToTrainer(trainerUsername, traineeUsername);
-        service.assignTraineeToTrainer(trainerUsername, traineeUsername);
+        service.assignTraineeToTrainer(traineeUsername);
         verify(dao).assignTraineeToTrainer(trainerUsername, traineeUsername);
     }
+
 }

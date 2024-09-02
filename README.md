@@ -4,7 +4,6 @@
 
 ### General description
 
-Here's a revised version of your text suitable for B2+ English level learners:
 The main goal of this project is to develop a gym application. To use the application (apart from the Registration
 page), both trainers and trainees need to log in with their credentials.
 The application features three key entities: trainers, trainees, and training sessions. It allows both trainers and
@@ -254,7 +253,6 @@ Below is a description of each component of the solution.
     b. Response
     i. Training types
 
-
 1. Training type
 2. Training type Id
 
@@ -294,10 +292,11 @@ Below is a description of each component of the solution.
 2. Trainee Service class support possibility to create/update/delete/select Trainee profile.
 3. Trainer Service class support possibility to create/update/select Trainer profile.
 4. Training Service class support possibility to create/select Training profile.
-5. Actuator is enabled.
-1. Few custom health indicators implemented.
-2. Few custom metrics using Prometheus implemented
-6. Possibility to support different environments (local, dev, stg, prod) with Spring profiles is
+
+-[x] Actuator is enabled.
+-[x] Few custom health indicators implemented.
+-[x] Few custom metrics using Prometheus implemented
+-[x] Possibility to support different environments (local, dev, stg, prod) with Spring profiles is
    implemented.
 
 #### Technical Notes:

@@ -9,7 +9,7 @@ import java.util.Map;
 public class BruteForceProtectionService {
 
     private static final int MAX_ATTEMPTS = 3;
-    private static final long LOCK_TIME_DURATION = 2 * 60 * 1000;
+    private static final long LOCK_TIME_DURATION = 5 * 60 * 1000;
 
     private final Map<String, Integer> attemptsCache = new HashMap<>();
     private final Map<String, Long> lockTimeCache = new HashMap<>();

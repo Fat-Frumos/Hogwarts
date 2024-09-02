@@ -1,8 +1,6 @@
 package com.epam.esm.gym.config;
 
-import com.epam.esm.gym.security.handler.BruteForceAuthenticationFailureHandler;
 import com.epam.esm.gym.security.filter.BruteForceProtectionFilter;
-import com.epam.esm.gym.security.BruteForceProtectionService;
 import com.epam.esm.gym.security.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -12,13 +10,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -31,30 +32,69 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final BruteForceProtectionService bruteForceProtectionService;
+    private final BruteForceProtectionFilter bruteForceProtectionFilter;
+//    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/actuator/**",
                                 "/api/trainers/register",
                                 "/api/trainees/register",
+                                "/api/login",
                                 "/api/auth/login",
-                                "/api/login").permitAll()
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/css/**",
+                                "/js/**",
+                                "/index.html"
+                        ).permitAll()
                         .requestMatchers("/api/trainers/**").hasAnyRole("TRAINER", "ADMIN")
                         .requestMatchers("/api/trainees/**").hasAnyRole("TRAINER", "ADMIN")
-                        .anyRequest().hasRole("ADMIN"))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .anyRequest().hasRole("ADMIN")
+                )
+                .formLogin(form -> form
+                        .loginPage("/authentication/login")
+                        .loginProcessingUrl("/api/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .failureUrl("/authentication/login?failed")
+                        .failureHandler(authenticationFailureHandler)
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout")
+                        .logoutSuccessHandler(logoutSuccessHandler())
+                )
                 .exceptionHandling(exception -> exception
+                        .accessDeniedPage("/403")
                         .authenticationEntryPoint(unauthorizedHandler())
-                        .accessDeniedHandler(new BruteForceAuthenticationFailureHandler(bruteForceProtectionService)))
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new BruteForceProtectionFilter(bruteForceProtectionService), UsernamePasswordAuthenticationFilter.class)
-                .csrf(AbstractHttpConfigurer::disable);
+                .addFilterBefore(bruteForceProtectionFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+
+    @Bean
+    public LogoutSuccessHandler logoutSuccessHandler() {
+        return (request, response, authentication) -> response.sendRedirect("/login?logout");
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web
+                .ignoring()
+                .requestMatchers("/css/**", "/js/**", "/index.html", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**");
     }
 
     @Bean
