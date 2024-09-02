@@ -12,6 +12,7 @@ public abstract class AbstractDao<T> {
 
     private final Class<T> clazz;
     protected final SessionFactory sessionFactory;
+    protected final static String USERNAME = "username";
 
     protected Session getSession() {
         return sessionFactory.getCurrentSession();

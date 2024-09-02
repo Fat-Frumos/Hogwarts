@@ -148,7 +148,7 @@ class TrainerProfileServiceTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testAssignTraineeToTrainer(String trainerUsername, String traineeUsername) {
+    void testAssignTraineeToTrainer(String trainerUsername, String traineeUsername) {
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(trainerUsername);

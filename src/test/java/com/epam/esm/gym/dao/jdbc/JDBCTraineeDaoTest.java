@@ -48,7 +48,7 @@ class JDBCTraineeDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
-    public void testFindByUsername(Trainee trainee) {
+    void testFindByUsername(Trainee trainee) {
         String hql = """
                 SELECT t
                 FROM Trainee t
@@ -66,7 +66,7 @@ class JDBCTraineeDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
-    public void testFindAll(Trainee trainee) {
+    void testFindAll(Trainee trainee) {
         List<Trainee> expectedList = List.of(trainee);
         when(session.createQuery("FROM com.epam.esm.gym.domain.Trainee", Trainee.class)).thenReturn(traineeQuery);
         when(traineeQuery.getResultList()).thenReturn(expectedList);
@@ -76,14 +76,14 @@ class JDBCTraineeDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
-    public void testSave(Trainee trainee) {
+    void testSave(Trainee trainee) {
         jdbcTraineeDao.save(trainee);
         verify(session).persist(trainee);
     }
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
-    public void testUpdate(Trainee trainee) {
+    void testUpdate(Trainee trainee) {
         when(session.merge(trainee)).thenReturn(trainee);
         Trainee updatedTrainee = jdbcTraineeDao.update(trainee);
         assertEquals(trainee, updatedTrainee);
@@ -91,14 +91,14 @@ class JDBCTraineeDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
-    public void testDelete(Trainee trainee) {
+    void testDelete(Trainee trainee) {
         jdbcTraineeDao.delete(trainee);
         verify(session).remove(trainee);
     }
 
     @ParameterizedTest
     @ArgumentsSource(TrainerArgumentsProvider.class)
-    public void testFindNotAssignedTrainers(List<Trainer> expectedTrainers, String username) {
+    void testFindNotAssignedTrainers(List<Trainer> expectedTrainers, String username) {
         String hql = """
                     SELECT t
                     FROM Trainer t

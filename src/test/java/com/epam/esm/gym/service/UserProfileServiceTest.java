@@ -4,7 +4,6 @@ import com.epam.esm.gym.dao.UserDao;
 import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.MessageResponse;
-import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.UserProfile;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
@@ -13,7 +12,6 @@ import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.mapper.UserMapper;
 import com.epam.esm.gym.web.provider.AuthenticationArgumentsProvider;
 import com.epam.esm.gym.web.provider.UserArgumentsProvider;
-import com.epam.esm.gym.web.provider.trainee.PasswordChangeArgumentsProvider;
 import com.epam.esm.gym.web.provider.trainee.TraineeProfileArgumentsProvider;
 import com.epam.esm.gym.web.provider.trainer.TrainerProfileArgumentsProvider;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -154,24 +151,5 @@ public class UserProfileServiceTest {
         when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
         ResponseEntity<MessageResponse> response = userProfileService.authenticate(username, password);
         assertEquals(expectedStatus, response.getStatusCode());
-    }
-
-//    @ParameterizedTest
-    @ArgumentsSource(PasswordChangeArgumentsProvider.class)
-    void changePassword(ProfileRequest request, MessageResponse expectedResponse) {
-        User harry = User.builder()
-                .id(1)
-                .firstName("Harry")
-                .lastName("Potter")
-                .username("Harry.Potter")
-                .password("encodedOldPassword")
-                .active(true)
-                .permission(RoleType.ROLE_TRAINER)
-                .build();
-        when(userDao.findByUsername(request.getUsername())).thenReturn(Optional.of(harry));
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedNewPassword");
-        ResponseEntity<MessageResponse> response = userProfileService.changePassword(request);
-        assertEquals(expectedResponse.getStatusCode(), response.getStatusCode());
-        assertEquals(expectedResponse.getMessage(), Objects.requireNonNull(response.getBody()).getMessage());
     }
 }

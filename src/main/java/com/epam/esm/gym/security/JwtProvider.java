@@ -1,6 +1,5 @@
 package com.epam.esm.gym.security;
 
-import com.epam.esm.gym.dao.TokenDao;
 import com.epam.esm.gym.domain.SecurityUser;
 import com.epam.esm.gym.domain.Token;
 import com.epam.esm.gym.domain.TokenType;
@@ -37,12 +36,13 @@ public class JwtProvider {
     @Value("${jwt.refresh-token.expiration}")
     private Long refreshExpiration;
     private final SecretKey secretKey;
-    private final TokenDao tokenRepository;
+    private final TokenService tokenService;
     private final JwtProperties jwtProperty;
+    private final static String USERNAME = "username";
 
-    public JwtProvider(JwtProperties jwtProperty, TokenDao tokenDao) {
+    public JwtProvider(JwtProperties jwtProperty, TokenService tokenService) {
         this.jwtProperty = jwtProperty;
-        this.tokenRepository = tokenDao;
+        this.tokenService = tokenService;
         if (jwtProperty.getSecret() == null || jwtProperty.getSecret().isEmpty()) {
             throw new IllegalArgumentException("Secret key cannot be null or empty");
         }
@@ -59,15 +59,7 @@ public class JwtProvider {
     }
 
     private String getUsername(Claims payload) {
-        return (String) payload.get("username");
-    }
-
-    public User extractUserInfo(String token) {
-        Claims payload = getAllClaims(token);
-        return User.builder()
-                .id(Integer.valueOf(getUsername(payload)))
-                .username((String) payload.get("username"))
-                .build();
+        return (String) payload.get(USERNAME);
     }
 
     public <T> T getClaim(
@@ -104,7 +96,7 @@ public class JwtProvider {
                     .subject(String.valueOf(user.getUsername()))
                     .issuedAt(new Date(System.currentTimeMillis()))
                     .expiration(new Date(System.currentTimeMillis() + expiration * 1000))
-                    .claim("username", user.getUsername())
+                    .claim(USERNAME, user.getUsername())
                     .claims(claims)
                     .compact();
         } catch (Exception e) {
@@ -144,7 +136,7 @@ public class JwtProvider {
 
     @Transactional
     public List<Token> findAllValidToken(final User user) {
-        return tokenRepository.findAllValidAccessTokenByUserId(user.getId());
+        return tokenService.findAllValidAccessTokenByUserId(user.getId());
     }
 
     @Transactional
@@ -164,12 +156,12 @@ public class JwtProvider {
                 token.setRevoked(true);
             });
         }
-        tokenRepository.saveAll(tokens);
+        tokenService.saveAll(tokens);
     }
 
     @Transactional
     public Optional<Token> findByToken(final String jwt) {
-        return tokenRepository.findByAccessToken(jwt);
+        return tokenService.findByAccessToken(jwt);
     }
 
     public Token getToken(
@@ -199,6 +191,6 @@ public class JwtProvider {
     }
 
     public Token save(Token token) {
-        return tokenRepository.save(token);
+        return tokenService.save(token);
     }
 }

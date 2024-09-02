@@ -26,7 +26,7 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
     public boolean existsByUsername(String username) {
         String sql = "SELECT COUNT(*) FROM \"users\" WHERE username = :username";
         Query<Long> query = getSession().createNativeQuery(sql, Long.class);
-        query.setParameter("username", username);
+        query.setParameter(USERNAME, username);
         return query.getSingleResult() > 0;
     }
 
@@ -35,7 +35,7 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
         Session session = getSession();
         String sql = "SELECT * FROM \"users\" WHERE username = :username";
         Query<User> query = session.createNativeQuery(sql, User.class);
-        query.setParameter("username", username);
+        query.setParameter(USERNAME, username);
         return query.uniqueResultOptional();
     }
 
@@ -49,7 +49,7 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
             query.setParameter("firstName", user.getFirstName());
             query.setParameter("lastName", user.getLastName());
             query.setParameter("password", user.getPassword());
-            query.setParameter("username", user.getUsername());
+            query.setParameter(USERNAME, user.getUsername());
             query.setParameter("id", user.getId());
             query.executeUpdate();
         } catch (Exception e) {

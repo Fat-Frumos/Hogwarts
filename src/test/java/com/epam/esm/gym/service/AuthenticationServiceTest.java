@@ -41,14 +41,14 @@ class AuthenticationServiceTest {
     private JwtProvider provider;
     @InjectMocks
     private AuthenticationService service;
-    private AuthenticationRequest request;
+    private AuthenticationRequest authenticationRequest;
     private Token token;
     private User user;
     private final String username = "Harry.Potter";
 
     @BeforeEach
     void setUp() {
-        request = AuthenticationRequest.builder()
+        authenticationRequest = AuthenticationRequest.builder()
                 .username(username)
                 .password("password123")
                 .build();
@@ -67,7 +67,7 @@ class AuthenticationServiceTest {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
         when(provider.generateToken(any(SecurityUser.class))).thenReturn("accessToken");
         when(provider.updateUserTokens(any(SecurityUser.class), anyString())).thenReturn(token);
-        AuthenticationResponse response = service.login(request);
+        AuthenticationResponse response = service.login(authenticationRequest);
         assertEquals(username, response.getUsername());
         assertEquals("accessToken", response.getAccessToken());
         verify(manager).authenticate(any(UsernamePasswordAuthenticationToken.class));
@@ -80,7 +80,7 @@ class AuthenticationServiceTest {
         doNothing().when(provider).revokeAllUserTokens(any(User.class));
         when(provider.generateToken(any(SecurityUser.class))).thenReturn("accessToken");
         when(provider.updateUserTokens(any(SecurityUser.class), anyString())).thenReturn(token);
-        AuthenticationResponse response = service.authenticate(request);
+        AuthenticationResponse response = service.authenticate(authenticationRequest);
         assertEquals(username, response.getUsername());
         assertEquals("accessToken", response.getAccessToken());
         verify(provider).revokeAllUserTokens(any(User.class));

@@ -375,3 +375,11 @@ Clean, install with details
 Clean, install skip Test
 
 `mvn clean install -DskipTests`
+
+Clean, install and report
+
+`mvn clean test jacoco:report`
+
+Clean, install and report
+
+`mvn sonar:sonar`

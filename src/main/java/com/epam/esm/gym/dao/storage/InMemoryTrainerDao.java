@@ -5,6 +5,7 @@ import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -62,7 +63,7 @@ public class InMemoryTrainerDao extends AbstractInMemoryDao<Trainer> implements 
 
     @Override
     public List<Trainer> findNotAssigned(String username) {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override

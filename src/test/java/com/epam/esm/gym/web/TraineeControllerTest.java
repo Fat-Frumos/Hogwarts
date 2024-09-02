@@ -104,7 +104,7 @@ class TraineeControllerTest extends ControllerTest {
     @ParameterizedTest
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(NotFoundTraineeProfileArgumentsProvider.class)
-    public void testGetNotFoundTraineeProfile(String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
+    void testGetNotFoundTraineeProfile(String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
         when(traineeService.getTraineeProfileByName(username)).thenReturn(expectedResponse);
         mockMvc.perform(get("/api/trainees/{username}", username))
                 .andExpect(status().isNotFound());

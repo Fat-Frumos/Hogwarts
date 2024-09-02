@@ -57,6 +57,7 @@ class TrainerControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
+    @ArgumentsSource(RegisterTrainerArgumentsProvider.class)
     @ArgumentsSource(TrainerProfileNotFoundArgumentsProvider.class)
     void testRegisterTrainerProfileWhenNotFound(TrainerRequest request, ResponseEntity<ProfileResponse> expectedResponse) throws Exception {
         when(trainerService.registerTrainer(request)).thenReturn(expectedResponse);
@@ -101,18 +102,6 @@ class TrainerControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
         resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()));
-    }
-
-    @ParameterizedTest
-    @ArgumentsSource(RegisterTrainerArgumentsProvider.class)
-    void testRegisterTrainerProfile(TrainerRequest request, ResponseEntity<ProfileResponse> expectedResponse) throws Exception {
-        when(trainerService.registerTrainer(request)).thenReturn(expectedResponse);
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/trainers/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)));
-
-        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()))
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
     }
 
     @ParameterizedTest

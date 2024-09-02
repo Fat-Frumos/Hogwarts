@@ -55,7 +55,7 @@ public class JDBCTrainingDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testFindByUsername(String trainerUsername, String traineeUsername) {
+    void testFindByUsername(String trainerUsername, String traineeUsername) {
         Training mockTraining = Training.builder()
                 .trainee(Trainee.builder().user(User.builder().username(traineeUsername).build()).build())
                 .trainer(Trainer.builder().user(User.builder().username(trainerUsername).build()).build()).build();
@@ -73,7 +73,7 @@ public class JDBCTrainingDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testFindTrainingsByTrainerUsername(String trainerUsername) {
+    void testFindTrainingsByTrainerUsername(String trainerUsername) {
         Training training = Training.builder().trainer(Trainer.builder().user(User.builder().username(trainerUsername).build()).build()).build();
         List<Training> mockTrainings = List.of(training);
         when(session.createQuery(anyString(), eq(Training.class))).thenReturn(trainingQuery);
@@ -85,7 +85,7 @@ public class JDBCTrainingDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testFindByUsernameFound(String username) {
+    void testFindByUsernameFound(String username) {
         Training training = Training.builder().trainer(Trainer.builder().user(User.builder().username(username).build()).build()).build();
         when(session.createQuery(anyString(), eq(Training.class))).thenReturn(trainingQuery);
         when(trainingQuery.setParameter("username", username)).thenReturn(trainingQuery);
@@ -97,7 +97,7 @@ public class JDBCTrainingDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testFindByUsernameNotFound(String username) {
+    void testFindByUsernameNotFound(String username) {
         when(session.createQuery(anyString(), eq(Training.class))).thenReturn(trainingQuery);
         when(trainingQuery.setParameter("username", username)).thenReturn(trainingQuery);
         when(trainingQuery.uniqueResultOptional()).thenReturn(Optional.empty());
@@ -106,7 +106,7 @@ public class JDBCTrainingDaoTest {
     }
 
     @Test
-    public void testFindAllTrainingTypes() {
+    void testFindAllTrainingTypes() {
         TrainingType mockType1 = new TrainingType();
         TrainingType mockType2 = new TrainingType();
         List<TrainingType> mockTypes = List.of(mockType1, mockType2);
@@ -118,7 +118,7 @@ public class JDBCTrainingDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testSave(String username) {
+    void testSave(String username) {
         Training training = Training.builder().trainer(Trainer.builder().user(User.builder().username(username).build()).build()).build();
         doNothing().when(session).persist(training);
         Training result = jdbcTrainingDao.save(training);
@@ -127,7 +127,7 @@ public class JDBCTrainingDaoTest {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         Training training = new Training();
         when(session.merge(training)).thenReturn(training);
         Training result = jdbcTrainingDao.update(training);
@@ -136,7 +136,7 @@ public class JDBCTrainingDaoTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         Training training = new Training();
         jdbcTrainingDao.delete(training);
         verify(session).remove(training);

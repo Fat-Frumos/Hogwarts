@@ -42,14 +42,14 @@ class AuthenticationTests extends ControllerTest {
 
     @Test
     @WithMockUser(roles = "TRAINER")
-    public void testAdminAccess() throws Exception {
+    void testAdminAccess() throws Exception {
         mockMvc.perform(get("/api/trainees"))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(roles = "TRAINEE")
-    public void testUnauthorizedAccess() throws Exception {
+    void testUnauthorizedAccess() throws Exception {
         mockMvc.perform(get("/api/trainers"))
                 .andExpect(status().isForbidden());
     }

@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,6 +29,8 @@ import java.util.List;
 @EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfig {
+    public static final String ADMIN = "ADMIN";
+    public static final String TRAINER = "TRAINER";
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final BruteForceProtectionFilter bruteForceProtectionFilter;
@@ -52,9 +53,9 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/index.html"
                         ).permitAll()
-                        .requestMatchers("/api/trainers/**").hasAnyRole("TRAINER", "ADMIN")
-                        .requestMatchers("/api/trainees/**").hasAnyRole("TRAINER", "ADMIN")
-                        .anyRequest().hasRole("ADMIN")
+                        .requestMatchers("/api/trainers/**").hasAnyRole(TRAINER, ADMIN)
+                        .requestMatchers("/api/trainees/**").hasAnyRole(TRAINER, ADMIN)
+                        .anyRequest().hasRole(ADMIN)
                 )
                 .formLogin(form -> form
                         .loginPage("/authentication/login")
@@ -81,7 +82,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {

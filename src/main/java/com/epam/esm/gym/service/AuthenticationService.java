@@ -47,12 +47,12 @@ public class AuthenticationService implements AuthService {
         String username = request.getUsername();
         String baseUsername = username;
         int suffix = 1;
-        while (findByUsername(username).isPresent()) {
+        while (userRepository.findByUsername(username).isPresent()) {
             username = baseUsername + suffix;
             suffix++;
         }
         SecurityUser user = SecurityUser.builder()
-                .user(saveUserWithRole(request, username))
+                .user(userRepository.save(getUserWithRole(request, username)))
                 .build();
         return getAuthenticationResponse(user);
     }
@@ -137,13 +137,12 @@ public class AuthenticationService implements AuthService {
     }
 
     @Transactional
-    public User saveUserWithRole(final RegisterRequest request, String username) {
-        User user = User.builder()
+    public User getUserWithRole(final RegisterRequest request, String username) {
+        return User.builder()
                 .password(encoder.encode(request.getPassword()))
                 .username(username)
                 .role(Role.builder().permission(ROLE_TRAINER).build())
                 .build();
-        return userRepository.save(user);
     }
 
     @Transactional

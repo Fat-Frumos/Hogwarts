@@ -32,7 +32,7 @@ public class JDBCTrainingDao extends AbstractDao<Training> implements TrainingDa
                    OR traineeUser.username = :username
                 """;
         return getSession().createQuery(hql, Training.class)
-                .setParameter("username", username)
+                .setParameter(USERNAME, username)
                 .uniqueResultOptional();
     }
 
@@ -52,7 +52,7 @@ public class JDBCTrainingDao extends AbstractDao<Training> implements TrainingDa
                     WHERE u.username = :username
                 """;
         return getSession().createQuery(hql, Training.class)
-                .setParameter("username", username)
+                .setParameter(USERNAME, username)
                 .getResultList();
     }
 

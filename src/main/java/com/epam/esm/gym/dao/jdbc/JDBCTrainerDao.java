@@ -29,7 +29,7 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
                     WHERE u.username = :username
                 """;
         return getSession().createQuery(hql, Trainer.class)
-                .setParameter("username", username)
+                .setParameter(USERNAME, username)
                 .uniqueResultOptional();
     }
 
@@ -46,7 +46,7 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
                 """;
         getSession().createMutationQuery(hql)
                 .setParameter("active", active)
-                .setParameter("username", username)
+                .setParameter(USERNAME, username)
                 .executeUpdate();
     }
 
@@ -63,7 +63,7 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
                     AND t.user.username != :username
                 """;
         return getSession().createQuery(hql, Trainer.class)
-                .setParameter("username", username)
+                .setParameter(USERNAME, username)
                 .getResultList();
     }
 

@@ -56,10 +56,5 @@ public class TrainingSessionService {
 
     private void sendEmail(String to, String subject, String text) {
         log.info("Starting weekly report email sending process: {} {} {}", to, subject, text);
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setTo(to);
-//        message.setSubject(subject);
-//        message.setText(text);
-//        emailSender.send(message);
     }
 }

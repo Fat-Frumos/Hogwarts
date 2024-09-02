@@ -47,9 +47,8 @@ class JDBCUserDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(UserDaoArgumentsProvider.class)
-    public void testFindAll(User user) {
+    void testFindAll(User user) {
         List<User> users = List.of(user);
-//        Query<User> query = mock(Query.class);
         String hql = "FROM " + User.class.getName();
         when(session.createQuery(hql, User.class)).thenReturn(nativeQuery);
         when(nativeQuery.getResultList()).thenReturn(users);
@@ -59,7 +58,7 @@ class JDBCUserDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(UserDaoArgumentsProvider.class)
-    public void testSave(User user) {
+    void testSave(User user) {
         doNothing().when(session).persist(user);
         User result = userDao.save(user);
         verify(session).persist(user);
@@ -68,7 +67,7 @@ class JDBCUserDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(UserDaoArgumentsProvider.class)
-    public void testUpdate(User user) {
+    void testUpdate(User user) {
         MutationQuery mutationQuery = mock(MutationQuery.class);
         when(session.createMutationQuery(anyString())).thenReturn(mutationQuery);
         when(mutationQuery.setParameter(anyString(), any())).thenReturn(mutationQuery);
@@ -87,7 +86,7 @@ class JDBCUserDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(UserDaoArgumentsProvider.class)
-    public void testDelete(User user) {
+    void testDelete(User user) {
         doNothing().when(session).remove(user);
         userDao.delete(user);
         verify(session).remove(user);
@@ -95,7 +94,7 @@ class JDBCUserDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(UserDaoArgumentsProvider.class)
-    public void testFindByUsername(User user, String username) {
+    void testFindByUsername(User user, String username) {
         String sql = "SELECT * FROM \"users\" WHERE username = :username";
         Optional<User> expectedUser = Optional.of(user);
         doReturn(nativeQuery).when(session).createNativeQuery(sql, User.class);
@@ -107,7 +106,7 @@ class JDBCUserDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(UserDaoArgumentsProvider.class)
-    public void testExistsByUsername(User user) {
+    void testExistsByUsername(User user) {
         String username = user.getUsername();
         String sql = "SELECT COUNT(*) FROM \"users\" WHERE username = :username";
         doReturn(nativeQuery).when(session).createNativeQuery(sql, Long.class);
@@ -118,7 +117,7 @@ class JDBCUserDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(UserDaoArgumentsProvider.class)
-    public void testUpdateUser(User user) {
+    void testUpdateUser(User user) {
         String hql = "UPDATE User SET active = :active, firstName = :firstName, lastName = :lastName, password = :password, username = :username WHERE id = :id";
         MutationQuery mutationQuery = mock(MutationQuery.class);
         when(session.createMutationQuery(hql)).thenReturn(mutationQuery);

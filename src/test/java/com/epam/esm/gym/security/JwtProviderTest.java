@@ -1,12 +1,12 @@
 package com.epam.esm.gym.security;
 
-import com.epam.esm.gym.dao.TokenDao;
 import com.epam.esm.gym.domain.Token;
 import com.epam.esm.gym.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,10 +19,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class JwtProviderTest {
 
     @Mock
-    private TokenDao tokenDao;
+    private TokenService service;
 
     @Mock
     private JwtProperties jwtProperties;
@@ -31,10 +32,8 @@ class JwtProviderTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         when(jwtProperties.getSecret()).thenReturn("mySecretKey");
-        when(jwtProperties.getIssuer()).thenReturn("issuer");
-        jwtProvider = new JwtProvider(jwtProperties, tokenDao);
+        jwtProvider = new JwtProvider(jwtProperties, service);
     }
 
     @Test
@@ -48,9 +47,9 @@ class JwtProviderTest {
         User user = mock(User.class);
         when(user.getId()).thenReturn(1);
         Token token = Token.builder().build();
-        when(tokenDao.findAllValidAccessTokenByUserId(1)).thenReturn(List.of(token));
+        when(service.findAllValidAccessTokenByUserId(1)).thenReturn(List.of(token));
         jwtProvider.revokeAllUserTokens(user);
-        verify(tokenDao).saveAll(anyList());
+        verify(service).saveAll(anyList());
         assertTrue(token.isExpired());
         assertTrue(token.isRevoked());
     }
@@ -58,7 +57,7 @@ class JwtProviderTest {
     @Test
     void testFindByToken() {
         Token token = Token.builder().build();
-        when(tokenDao.findByAccessToken("token")).thenReturn(Optional.of(token));
+        when(service.findByAccessToken("token")).thenReturn(Optional.of(token));
         Optional<Token> result = jwtProvider.findByToken("token");
         assertTrue(result.isPresent());
         assertEquals(token, result.get());
@@ -67,7 +66,7 @@ class JwtProviderTest {
     @Test
     void testSave() {
         Token token = Token.builder().build();
-        when(tokenDao.save(token)).thenReturn(token);
+        when(service.save(token)).thenReturn(token);
         Token result = jwtProvider.save(token);
         assertEquals(token, result);
     }
@@ -75,6 +74,6 @@ class JwtProviderTest {
     @Test
     void testExceptionHandling() {
         when(jwtProperties.getSecret()).thenReturn(null);
-        assertThrows(IllegalArgumentException.class, () -> new JwtProvider(jwtProperties, tokenDao));
+        assertThrows(IllegalArgumentException.class, () -> new JwtProvider(jwtProperties, service));
     }
 }

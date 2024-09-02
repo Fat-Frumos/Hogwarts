@@ -52,7 +52,7 @@ public class JDBCTrainerDaoTest {
     }
 
     @Test
-    public void testFindByUsername() {
+    void testFindByUsername() {
         String username = "trainer1";
         Trainer trainer = new Trainer();
         when(session.createQuery(anyString(), eq(Trainer.class))).thenReturn(query);
@@ -67,7 +67,7 @@ public class JDBCTrainerDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testActivateTrainer(String username) {
+    void testActivateTrainer(String username) {
         Boolean active = true;
         when(session.createMutationQuery(anyString())).thenReturn(mutationQuery);
         when(mutationQuery.setParameter("active", active)).thenReturn(mutationQuery);
@@ -79,7 +79,7 @@ public class JDBCTrainerDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testFindNotAssigned(String username) {
+    void testFindNotAssigned(String username) {
         when(session.createQuery(anyString(), eq(Trainer.class))).thenReturn(query);
         when(query.setParameter("username", username)).thenReturn(query);
         when(query.getResultList()).thenReturn(List.of(new Trainer(), new Trainer()));
@@ -90,7 +90,7 @@ public class JDBCTrainerDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testAssignTraineeToTrainerFailure(String trainerUsername, String traineeUsername) {
+    void testAssignTraineeToTrainerFailure(String trainerUsername, String traineeUsername) {
         when(session.createMutationQuery(anyString())).thenReturn(mutationQuery);
         when(mutationQuery.setParameter("trainerUsername", trainerUsername)).thenReturn(mutationQuery);
         when(mutationQuery.setParameter("traineeUsername", traineeUsername)).thenReturn(mutationQuery);
@@ -101,7 +101,7 @@ public class JDBCTrainerDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testAssignTraineeToTrainerSuccess(String trainerUsername, String traineeUsername) {
+    void testAssignTraineeToTrainerSuccess(String trainerUsername, String traineeUsername) {
         when(sessionFactory.getCurrentSession()).thenReturn(session);
         when(session.beginTransaction()).thenReturn(transaction);
         when(session.createMutationQuery(anyString())).thenReturn(query);
@@ -114,7 +114,7 @@ public class JDBCTrainerDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testAssignTraineeToTrainerTraineeNotFound(String trainerUsername, String traineeUsername) {
+    void testAssignTraineeToTrainerTraineeNotFound(String trainerUsername, String traineeUsername) {
         when(session.beginTransaction()).thenReturn(transaction);
         when(session.createMutationQuery(anyString())).thenReturn(query);
         when(query.setParameter("trainerUsername", trainerUsername)).thenReturn(query);
@@ -128,7 +128,7 @@ public class JDBCTrainerDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testAssignTraineeToTrainer_ExceptionDuringTransaction(String trainerUsername, String traineeUsername) {
+    void testAssignTraineeToTrainer_ExceptionDuringTransaction(String trainerUsername, String traineeUsername) {
         when(session.beginTransaction()).thenReturn(transaction);
         when(session.createMutationQuery(anyString())).thenReturn(query);
         when(query.setParameter("trainerUsername", trainerUsername)).thenReturn(query);
@@ -142,7 +142,7 @@ public class JDBCTrainerDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testAssignTraineeToTrainer_NoUpdate(String trainerUsername, String traineeUsername) {
+    void testAssignTraineeToTrainer_NoUpdate(String trainerUsername, String traineeUsername) {
         when(session.beginTransaction()).thenReturn(transaction);
         when(session.createMutationQuery(anyString())).thenReturn(query);
         when(query.setParameter("trainerUsername", trainerUsername)).thenReturn(query);
@@ -156,7 +156,7 @@ public class JDBCTrainerDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testAssignTraineeToTrainerExceptionHandling(String trainerUsername, String traineeUsername) {
+    void testAssignTraineeToTrainerExceptionHandling(String trainerUsername, String traineeUsername) {
         when(session.createMutationQuery(anyString())).thenReturn(mutationQuery);
         when(mutationQuery.setParameter("trainerUsername", trainerUsername)).thenReturn(mutationQuery);
         when(mutationQuery.setParameter("traineeUsername", traineeUsername)).thenReturn(mutationQuery);
@@ -168,7 +168,7 @@ public class JDBCTrainerDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    public void testAssignTraineeToTrainerTransactionNotActive(String trainerUsername, String traineeUsername) {
+    void testAssignTraineeToTrainerTransactionNotActive(String trainerUsername, String traineeUsername) {
         when(session.beginTransaction()).thenReturn(transaction);
         when(session.createMutationQuery(anyString())).thenReturn(mutationQuery);
         when(mutationQuery.setParameter("trainerUsername", trainerUsername)).thenReturn(mutationQuery);
