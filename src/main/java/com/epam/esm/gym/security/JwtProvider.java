@@ -38,7 +38,7 @@ public class JwtProvider {
     private final SecretKey secretKey;
     private final TokenService tokenService;
     private final JwtProperties jwtProperty;
-    private final static String USERNAME = "username";
+    private static final String USERNAME = "username";
 
     public JwtProvider(JwtProperties jwtProperty, TokenService tokenService) {
         this.jwtProperty = jwtProperty;

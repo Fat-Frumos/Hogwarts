@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TraineeControllerTest extends ControllerTest {
 
     private final String BASE_URL = "/api/trainees";
-    private final static String username = "Harry.Potter";
+    private static final String username = "Harry.Potter";
     private Map<String, String> params;
 
     @BeforeEach

@@ -153,7 +153,7 @@ public class AuthenticationService implements AuthService {
 
     @Transactional
     public AuthenticationResponse getAuthenticationResponse(final SecurityUser user) {
-        String jwtToken = generateToken(user);
+        String jwtToken = provider.generateToken(user);
         Token token = provider.updateUserTokens(user, jwtToken);
         return getAuthenticationResponse(user, jwtToken, token.getAccessTokenTTL());
     }

@@ -1,11 +1,14 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dao.UserDao;
+import com.epam.esm.gym.domain.Role;
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.SecurityUser;
 import com.epam.esm.gym.domain.Token;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.AuthenticationRequest;
 import com.epam.esm.gym.dto.auth.AuthenticationResponse;
+import com.epam.esm.gym.dto.auth.RegisterRequest;
 import com.epam.esm.gym.security.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -31,6 +35,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {
     @Mock
@@ -39,12 +45,16 @@ class AuthenticationServiceTest {
     private UserDao userRepository;
     @Mock
     private JwtProvider provider;
+    @Mock
+    private PasswordEncoder encoder;
     @InjectMocks
     private AuthenticationService service;
+    private RegisterRequest registerRequest;
     private AuthenticationRequest authenticationRequest;
+    private final String username = "Harry.Potter";
+    private SecurityUser securityUser;
     private Token token;
     private User user;
-    private final String username = "Harry.Potter";
 
     @BeforeEach
     void setUp() {
@@ -59,6 +69,18 @@ class AuthenticationServiceTest {
                 .build();
 
         user = User.builder().username(username).build();
+
+        registerRequest = new RegisterRequest();
+        registerRequest.setUsername("Harry.Potter");
+        registerRequest.setPassword("password123");
+
+        user = User.builder()
+                .username("Harry.Potter")
+                .password("encodedPassword")
+                .role(Role.builder().permission(RoleType.ROLE_TRAINER).build())
+                .build();
+
+        securityUser = SecurityUser.builder().user(user).build();
     }
 
     @Test
