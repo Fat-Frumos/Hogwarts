@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -43,7 +42,6 @@ public class StorageInitializer {
             storageData.getTrainers().forEach(trainer -> trainerStorage.put(trainer.getUser().getUsername(), trainer));
             storageData.getTrainees().forEach(trainee -> traineeStorage.put(trainee.getUser().getUsername(), trainee));
             storageData.getTrainings().forEach(training -> trainingStorage.put(training.getTrainingName(), training));
-
         } catch (IOException | URISyntaxException e) {
             log.error("Failed to load data from file: {}", e.getMessage());
         }
