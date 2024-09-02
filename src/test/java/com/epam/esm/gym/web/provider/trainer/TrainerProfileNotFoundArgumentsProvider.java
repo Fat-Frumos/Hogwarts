@@ -22,7 +22,7 @@ public class TrainerProfileNotFoundArgumentsProvider implements ArgumentsProvide
 
         MessageResponse response = MessageResponse.builder()
                 .message("Trainer not found")
-                .status(HttpStatus.NOT_FOUND)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .build();
 
         return Stream.of(

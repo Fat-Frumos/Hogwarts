@@ -14,9 +14,9 @@ public class AuthenticateArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
         return Stream.of(
-                Arguments.of("Harry.Potter", "Password123", new ResponseEntity<>(new MessageResponse("Authentication successful", HttpStatus.OK), HttpStatus.OK)),
-                Arguments.of("Harry.Potter", "WrongPassword", new ResponseEntity<>(new MessageResponse("Invalid credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED)),
-                Arguments.of("NonExistentUser", "Password123", new ResponseEntity<>(new MessageResponse("User not found", HttpStatus.NOT_FOUND), HttpStatus.NOT_FOUND))
+                Arguments.of("Harry.Potter", "Password123", new ResponseEntity<>(new MessageResponse("Authentication successful", HttpStatus.OK.value()), HttpStatus.OK)),
+                Arguments.of("Harry.Potter", "WrongPassword", new ResponseEntity<>(new MessageResponse("Invalid credentials", HttpStatus.UNAUTHORIZED.value()), HttpStatus.UNAUTHORIZED)),
+                Arguments.of("NonExistentUser", "Password123", new ResponseEntity<>(new MessageResponse("User not found", HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND))
         );
     }
 }

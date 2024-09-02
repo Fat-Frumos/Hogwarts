@@ -133,7 +133,7 @@ public class UserProfileService implements UserService {
             case BAD_REQUEST -> "New password is the same as the old password";
             default -> "Invalid credentials";
         };
-        return ResponseEntity.status(status).body(new MessageResponse(message, status));
+        return ResponseEntity.status(status).body(new MessageResponse(message, status.value()));
     }
 
     private boolean validateUser(User user, String username, String password) {

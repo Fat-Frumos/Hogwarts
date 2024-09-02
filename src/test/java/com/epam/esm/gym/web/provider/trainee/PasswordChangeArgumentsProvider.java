@@ -17,8 +17,8 @@ public class PasswordChangeArgumentsProvider implements ArgumentsProvider {
         ProfileRequest requestValidChange = new ProfileRequest("Harry.Potter", "oldPassword", "newPassword");
 
         return Stream.of(
-                Arguments.of(requestNewPasswordSameAsOld, new MessageResponse("Old password is incorrect", HttpStatus.PAYMENT_REQUIRED)),
-                Arguments.of(requestValidChange, new MessageResponse("Password updated successfully", HttpStatus.PAYMENT_REQUIRED))
+                Arguments.of(requestNewPasswordSameAsOld, new MessageResponse("Old password is incorrect", HttpStatus.PAYMENT_REQUIRED.value())),
+                Arguments.of(requestValidChange, new MessageResponse("Password updated successfully", HttpStatus.PAYMENT_REQUIRED.value()))
         );
     }
 }

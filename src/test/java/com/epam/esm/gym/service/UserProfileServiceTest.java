@@ -171,7 +171,7 @@ public class UserProfileServiceTest {
         when(userDao.findByUsername(request.getUsername())).thenReturn(Optional.of(harry));
         when(passwordEncoder.encode(anyString())).thenReturn("encodedNewPassword");
         ResponseEntity<MessageResponse> response = userProfileService.changePassword(request);
-        assertEquals(expectedResponse.getStatus(), response.getStatusCode());
+        assertEquals(expectedResponse.getStatusCode(), response.getStatusCode());
         assertEquals(expectedResponse.getMessage(), Objects.requireNonNull(response.getBody()).getMessage());
     }
 }
