@@ -16,7 +16,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 @Configuration
 @EnableJpaRepositories(basePackages = "com.epam.esm.gym.dao")
-public class JPAConfig {
+public class JdbcConfig {
 
     @Value("${spring.datasource.url}")
     private String dataSourceUrl;

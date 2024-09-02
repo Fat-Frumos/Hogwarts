@@ -33,6 +33,10 @@ public class TrainingSession {
     @JoinColumn(name = "trainer_id")
     private Trainer trainer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "training_id")
+    private Training training;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 

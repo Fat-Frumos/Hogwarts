@@ -7,12 +7,14 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Slf4j
+@Primary
 @Repository
 public class JDBCUserDao extends AbstractDao<User> implements UserDao {
 

@@ -6,11 +6,13 @@ import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Primary
 @Repository
 public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
 

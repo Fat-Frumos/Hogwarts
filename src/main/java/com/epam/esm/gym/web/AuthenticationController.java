@@ -8,32 +8,29 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
 @AllArgsConstructor
-public class AuthenticationController {
+public class AuthenticationController implements IAuthenticationController {
 
     private final AuthenticationService service;
 
-    @PostMapping("/signup")
+    @Override
     public ResponseEntity<AuthenticationResponse> signup(
             final @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(service.signup(request));
     }
 
-    @PostMapping("/token/authenticate")
+    @Override
     public ResponseEntity<AuthenticationResponse> authenticate(
             final @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(service.authenticate(request));
     }
 
-    @PostMapping("/token/refresh")
+    @Override
     public ResponseEntity<AuthenticationResponse> refreshTokens(
             final @RequestHeader("Authorization") String authorizationHeader,
             final HttpServletResponse response) {
@@ -41,13 +38,13 @@ public class AuthenticationController {
                 authorizationHeader, response));
     }
 
-    @PostMapping("/login")
+    @Override
     public ResponseEntity<AuthenticationResponse> login(
             final @RequestBody AuthenticationRequest loginRequest) {
         return ResponseEntity.ok(service.login(loginRequest));
     }
 
-    @PostMapping("/logout")
+    @Override
     public ResponseEntity<Object> logout(
             final HttpServletRequest request,
             final HttpServletResponse response) {

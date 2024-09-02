@@ -4,11 +4,13 @@ import com.epam.esm.gym.dao.TraineeDao;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import org.hibernate.SessionFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Primary
 @Repository
 public class JDBCTraineeDao extends AbstractDao<Trainee> implements TraineeDao {
 

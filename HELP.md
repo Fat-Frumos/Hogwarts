@@ -27,20 +27,6 @@ The following guides illustrate how to use some features concretely:
 * [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
 
 
-To use the application (apart from the Registration page), both trainers and trainees need to log in with their
-credentials.
-The application features three key entities: trainers, trainees, and training sessions. It allows both trainers and
-trainees to register and update their personal details in their profiles, such as address, birthdate, and area of
-expertise. Additionally, there is an option to activate or deactivate their profiles.
-Trainees have the option to select and assign themselves one or more trainers. There is also a feature to manage
-training sessions, which will be visible to both trainers and trainees.
-For Trainee and Trainer create profile functionality username and password calculation implemented by follow rules:
-a)Username going to be calculated from Trainer/Trainee first name and last name by concatenation by using dot as a
-separator (eg. John.Smith)
-b)In the case that already exists Trainer or Trainee with the same pair of first and last name as a suffix to the
-username should be added a serial number.
-c)Password should be generated as a random 10 chars length string.
-
 ORM
 Implemented as Hibernate solution and include the follow capabilities:
 1.Create Trainer profile.
@@ -103,8 +89,8 @@ Technical Notes:
     transactionId can later be passed to downstream services)
     b. Specific rest call details (which endpoint was called, which request came and the service response - 200 or error
     and response message)
-18. Implement error handling.
-19. Document methods in RestController file(s) using Swagger 2 annotations.
+
+
 
 Service
 Solution provided as a Spring boot application and contained follow functionality:
@@ -114,24 +100,3 @@ Solution provided as a Spring boot application and contained follow functionalit
 3.Trainer Service class support possibility to create/update/select Trainer profile.
 4.Training Service class support possibility to create/select Training profile.
 
-1.Configure spring application context based on the Spring annotation or on Java based approach.
-2.Implement DAO objects for each of the domain model entities (Trainer, Trainee, Training). They should store in and
-retrieve data from a common in-memory storage - java map. Each entity should be stored under a separate namespace, so
-you could list particular entity types.
-3.Storage should be implemented as a separate spring bean. Implement the ability to initialize storage with some
-prepared data from the file during the application start (use spring bean post-processing features). Path to the
-concrete file should be set using property placeholder and external property file. In other words, Every storage (
-java.util.Map) should be implemented as a separate spring bean
-4.DAO with storage bean should be inserted into services beans using auto wiring. Services beans should be injected into
-the facade using constructor-based injections. The rest of the injections should be done in a setter-based way.
-8.All functions except Create Trainer/Trainee profile can be executed only after Trainee/Trainer authentication (on this
-step should be checked username and password matching).
-
-Security
-Spring security framework used to provide follow functionality:
-1.It configured for Authentication access for all endpoints (except Create Trainer/Trainee profile).
-3.Spring Security is configured to use Login functionality.
-5.Logout functionality implemented and configured it in Spring Security.
-6.Authorization implemented as a Bearer token for Create Profile and Login functionality
-1.During Create Trainer/Trainee profile username and password should be generated as described in previous module.
-2.All functions except Create Trainer/Trainee profile can be executed only after Trainee/Trainer authentication.

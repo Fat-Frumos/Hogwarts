@@ -1,4 +1,4 @@
-package com.epam.esm.gym.web.provider;
+package com.epam.esm.gym.web.provider.trainer;
 
 import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainer;

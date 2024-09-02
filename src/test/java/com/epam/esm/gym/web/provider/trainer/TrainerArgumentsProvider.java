@@ -1,4 +1,4 @@
-package com.epam.esm.gym.web.provider;
+package com.epam.esm.gym.web.provider.trainer;
 
 import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainer;
@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class TrainerTraineeArgumentsProvider implements ArgumentsProvider {
+public class TrainerArgumentsProvider implements ArgumentsProvider {
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
@@ -21,7 +21,7 @@ public class TrainerTraineeArgumentsProvider implements ArgumentsProvider {
                 .username("Harry.Potter")
                 .password("password123")
                 .active(true)
-                .permission(RoleType.ROLE_TRAINEE)
+                .permission(RoleType.ROLE_TRAINER)
                 .build();
 
         User hermione = User.builder()
@@ -31,15 +31,15 @@ public class TrainerTraineeArgumentsProvider implements ArgumentsProvider {
                 .username("Hermione.Granger")
                 .password("password456")
                 .active(true)
-                .permission(RoleType.ROLE_TRAINEE)
+                .permission(RoleType.ROLE_TRAINER)
                 .build();
 
         Trainer trainer1 = Trainer.builder().user(harry).build();
         Trainer trainer2 = Trainer.builder().user(hermione).build();
         return Stream.of(
-                Arguments.of("ron", List.of(trainer1, trainer2)),
-                Arguments.of("harry", List.of(trainer2)),
-                Arguments.of("hermione", List.of(trainer1))
+                Arguments.of(List.of(trainer1, trainer2), "ron"),
+                Arguments.of(List.of(trainer2), "harry"),
+                Arguments.of(List.of(trainer1), "hermione")
         );
     }
 }

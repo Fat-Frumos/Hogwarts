@@ -2,7 +2,7 @@ package com.epam.esm.gym.dao.jdbc;
 
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
-import com.epam.esm.gym.web.provider.TrainerTraineeArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.TrainerArgumentsProvider;
 import com.epam.esm.gym.web.provider.trainee.TraineeTrainerArgumentsProvider;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -97,8 +97,8 @@ class JDBCTraineeDaoTest {
     }
 
     @ParameterizedTest
-    @ArgumentsSource(TrainerTraineeArgumentsProvider.class)
-    public void testFindNotAssignedTrainers(String username, List<Trainer> expectedTrainers) {
+    @ArgumentsSource(TrainerArgumentsProvider.class)
+    public void testFindNotAssignedTrainers(List<Trainer> expectedTrainers, String username) {
         String hql = """
                     SELECT t
                     FROM Trainer t

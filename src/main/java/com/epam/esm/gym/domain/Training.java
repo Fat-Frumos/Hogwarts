@@ -1,5 +1,6 @@
 package com.epam.esm.gym.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +11,9 @@ import jakarta.persistence.ManyToOne;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
 
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,6 +50,9 @@ public class Training {
 
     @Column(nullable = false)
     private Integer trainingDuration;
+
+    @OneToMany(mappedBy = "training", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TrainingSession> trainingSessions;
 
     @Override
     public boolean equals(Object o) {

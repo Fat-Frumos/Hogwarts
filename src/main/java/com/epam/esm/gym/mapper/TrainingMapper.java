@@ -18,13 +18,6 @@ public interface TrainingMapper {
 
     Training toEntity(TrainingResponse trainingDto);
 
-    private TrainingTypeResponse toResponse(Training training) {
-        return TrainingTypeResponse.builder()
-                .trainingType(training.getType().getTrainingType())
-                .trainingTypeId(training.getType().getId())
-                .build();
-    }
-
     default List<TrainingResponse> toDtos(List<Training> trainings) {
         return trainings.stream().map(this::toDto).toList();
     }

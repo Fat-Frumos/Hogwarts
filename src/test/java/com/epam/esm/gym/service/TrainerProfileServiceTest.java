@@ -8,7 +8,7 @@ import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.mapper.TrainerMapper;
-import com.epam.esm.gym.web.provider.TrainerRequestArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.TrainerRequestArgumentsProvider;
 import com.epam.esm.gym.web.provider.trainee.TraineeTrainerNameArgumentsProvider;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;

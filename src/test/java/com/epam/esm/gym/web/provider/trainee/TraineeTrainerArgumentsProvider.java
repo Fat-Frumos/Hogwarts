@@ -1,5 +1,6 @@
 package com.epam.esm.gym.web.provider.trainee;
 
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.User;
@@ -21,7 +22,7 @@ public class TraineeTrainerArgumentsProvider implements ArgumentsProvider {
                 .username("Harry.Potter")
                 .password("password123")
                 .active(true)
-//                .permission(RoleType.TRAINEE)
+                .permission(RoleType.ROLE_TRAINEE)
                 .build();
 
         Trainee trainee1 = Trainee.builder()
@@ -39,7 +40,7 @@ public class TraineeTrainerArgumentsProvider implements ArgumentsProvider {
                 .username("Hermione.Granger")
                 .password("password456")
                 .active(true)
-//                .permission(RoleType.TRAINEE)
+                .permission(RoleType.ROLE_TRAINEE)
                 .build();
 
         Trainee trainee2 = Trainee.builder()
@@ -57,7 +58,7 @@ public class TraineeTrainerArgumentsProvider implements ArgumentsProvider {
                 .username("Ron.Weasley")
                 .password("password789")
                 .active(true)
-//                .permission(RoleType.TRAINEE)
+                .permission(RoleType.ROLE_TRAINEE)
                 .build();
 
         Trainee trainee3 = Trainee.builder()

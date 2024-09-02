@@ -5,12 +5,14 @@ import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingSession;
 import com.epam.esm.gym.domain.TrainingType;
 import org.hibernate.SessionFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Primary
 @Repository
 public class JDBCTrainingDao extends AbstractDao<Training> implements TrainingDao {
     public JDBCTrainingDao(SessionFactory sessionFactory) {
