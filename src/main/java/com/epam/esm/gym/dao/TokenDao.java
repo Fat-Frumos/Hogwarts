@@ -1,15 +1,39 @@
 package com.epam.esm.gym.dao;
 
 import com.epam.esm.gym.domain.Token;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface TokenDao extends JpaRepository<Token, Integer> {
-    @Query(value = "select t from Token t inner join User u on t.user.id = u.id where u.id = :id and (t.expired = false or t.revoked = false)")
+/**
+ * Data Access Object (DAO) interface for managing {@link Token} entities.
+ *
+ * <p>This interface extends the generic {@link Dao} interface to provide additional methods specific
+ * to {@link Token} operations. It includes methods to find all valid access tokens by user ID, find a
+ * token by its JWT, and save a list of tokens.</p>
+ */
+public interface TokenDao extends Dao<Token> {
+
+    /**
+     * Finds all valid access tokens associated with a specific user ID.
+     *
+     * @param id the user ID
+     * @return a list of valid {@link Token} objects
+     */
     List<Token> findAllValidAccessTokenByUserId(Integer id);
 
+    /**
+     * Finds a {@link Token} by its access token (JWT).
+     *
+     * @param jwt the access token (JWT)
+     * @return an {@link Optional} containing the {@link Token} if found, otherwise empty
+     */
     Optional<Token> findByAccessToken(String jwt);
+
+    /**
+     * Saves a list of {@link Token} objects.
+     *
+     * @param tokens the list of {@link Token} objects to save
+     */
+    void saveAll(List<Token> tokens);
 }

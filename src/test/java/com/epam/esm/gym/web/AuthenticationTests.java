@@ -58,13 +58,13 @@ class AuthenticationTests extends ControllerTest {
     @DisplayName("Successful Login")
     @WithMockUser(roles = "TRAINEE")
     @ArgumentsSource(AuthenticateArgumentsProvider.class)
-    void testLogin(String username, String password, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
-        when(userService.authenticate(username, password)).thenReturn(expectedResponse);
+    void testLogin(String username, String password, ResponseEntity<MessageResponse> response) throws Exception {
+        when(userService.authenticate(username, password)).thenReturn(response);
         mockMvc.perform(get("/api/login")
                         .param("username", username)
                         .param("password", password))
-                .andExpect(status().is(expectedResponse.getStatusCode().value()))
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
+                .andExpect(status().is(response.getStatusCode().value()))
+                .andExpect(content().json(objectMapper.writeValueAsString(response.getBody())));
     }
 
     @ParameterizedTest

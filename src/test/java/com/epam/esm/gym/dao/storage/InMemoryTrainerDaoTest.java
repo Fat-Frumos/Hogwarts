@@ -64,10 +64,10 @@ class InMemoryTrainerDaoTest {
 
     @ParameterizedTest
     @ArgumentsSource(TrainerArgumentsProvider.class)
-    void delete(List<Trainer> expectedTrainers, String username) {
-        Trainer trainer = expectedTrainers.get(0);
-        inMemoryTrainerDao.save(trainer);
-        inMemoryTrainerDao.delete(trainer);
+    void delete(List<Trainer> trainers, String username) {
+        Trainer hermione = trainers.get(0);
+        inMemoryTrainerDao.save(hermione);
+        inMemoryTrainerDao.delete(hermione);
         Optional<Trainer> foundTrainer = inMemoryTrainerDao.findByUsername(username);
         assertFalse(foundTrainer.isPresent());
     }
@@ -137,14 +137,16 @@ class InMemoryTrainerDaoTest {
     @Test
     void testActivateTrainerNotFound() {
         when(trainerStorage.get("Hermione.Granger")).thenReturn(null);
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> trainerDao.activateTrainer("Hermione.Granger", false));
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+                () -> trainerDao.activateTrainer("Hermione.Granger", false));
         assertEquals("No trainer found with username: Hermione.Granger", exception.getMessage());
     }
 
     @Test
     void testAssignTraineeToNonExistingTrainer() {
         when(trainerStorage.get("Hermione.Granger")).thenReturn(null);
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> trainerDao.assignTraineeToTrainer("Hermione.Granger", "trainee"));
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+                () -> trainerDao.assignTraineeToTrainer("Hermione.Granger", "trainee"));
         assertEquals("No trainer found with username: Hermione.Granger", exception.getMessage());
     }
 
@@ -152,7 +154,8 @@ class InMemoryTrainerDaoTest {
     void testAssignNonExistingTraineeToTrainer() {
         when(trainerStorage.get("Hermione.Granger")).thenReturn(trainer);
         when(traineeStorage.get("trainee")).thenReturn(null);
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> trainerDao.assignTraineeToTrainer("Hermione.Granger", "trainee"));
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+                () -> trainerDao.assignTraineeToTrainer("Hermione.Granger", "trainee"));
         assertEquals("No trainee found with username: trainee", exception.getMessage());
     }
 }

@@ -18,6 +18,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Entity representing a type of training.
+ *
+ * <p>This class defines the different types of training based on specialization. Each training type has a set of
+ * associated trainings and trainers. The specialization is represented by an enumeration.</p>
+ */
 @Entity
 @Getter
 @Builder
@@ -37,15 +43,23 @@ public class TrainingType {
     @OneToMany(mappedBy = "type")
     private Set<Training> trainings = new HashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "specialization")
     private Set<Trainer> trainers = new HashSet<>();
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TrainingType that = (TrainingType) o;
-        return Objects.equals(id, that.id) && trainingType == that.trainingType && Objects.equals(trainings, that.trainings) && Objects.equals(trainers, that.trainers);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        TrainingType that = (TrainingType) obj;
+        return Objects.equals(id, that.id)
+                && trainingType == that.trainingType
+                && Objects.equals(trainings, that.trainings)
+                && Objects.equals(trainers, that.trainers);
     }
 
     @Override

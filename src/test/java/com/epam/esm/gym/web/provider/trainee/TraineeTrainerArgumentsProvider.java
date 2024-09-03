@@ -12,6 +12,20 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios involving relationships between trainees and trainers.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply input data specifically for
+ * test cases that involve interactions or relationships between trainees and trainers. It helps
+ * in verifying the behavior of the system when dealing with such relationships.</p>
+ *
+ * <p>The provided arguments cover various scenarios, including valid and invalid associations
+ * between trainees and trainers, ensuring that the system handles these relationships correctly.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TraineeTrainerArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {

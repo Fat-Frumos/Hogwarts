@@ -1,35 +1,88 @@
 package com.epam.esm.gym.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
-import org.springdoc.core.models.GroupedOpenApi;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Configuration for application metrics.
+ *
+ * <p>This class contains the configuration for setting up and managing
+ * application metrics using the Actuator framework. It includes settings
+ * for various metrics endpoints and reporting configurations.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 @Configuration
-public class SwaggerConfig implements WebMvcConfigurer {
+public class SwaggerConfig {
 
+    /**
+     * Creates a default OpenAPI configuration for the application.
+     *
+     * <p>This method configures the OpenAPI documentation for the backend with security requirements and information.
+     * It sets up the security scheme for bearer authentication, including JWT,
+     * and provides basic information such as the title, description, version, and contact details for the API.
+     * The security scheme is specified as "Bearer Authentication" which is used to authenticate API requests.
+     * This configuration is typically used to generate and display API documentation.</p>
+     *
+     * @return an {@link OpenAPI} instance configured with security requirements and API information
+     */
     @Bean
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("Trainee and Trainer Management API")
-                        .version("1.0.0")
-                        .description("API documentation for managing trainees and trainers.")
-                        .termsOfService("https://example.com/terms")
-                        .license(new License()
-                                .name("Apache 2.0")
-                                .url("https://www.apache.org/licenses/LICENSE-2.0"))
-                );
+    public OpenAPI openAPI() {
+        return new OpenAPI().addSecurityItem(new SecurityRequirement().
+                        addList("Bearer Authentication"))
+                .components(new Components().addSecuritySchemes
+                        ("Bearer Authentication", createAPIKeyScheme()))
+                .info(new Info().title("Gym")
+                        .description("The official backend OpenAPI Spec.")
+                        .version("1.0").contact(new Contact().name("Paul Poliak")));
     }
 
+    /**
+     * Customizes the OpenAPI configuration for bearer authentication.
+     *
+     * <p>This method defines an alternative OpenAPI configuration focusing on the "bearerAuth" security scheme.
+     * It configures the OpenAPI to use bearer authentication with JWT and specifies the scheme details.
+     * This customized configuration is useful for scenarios where different or additional security requirements
+     * are needed. It overrides default settings to accommodate specific security needs or requirements.</p>
+     *
+     * @return an {@link OpenAPI} instance customized with bearer authentication scheme details
+     */
     @Bean
-    public GroupedOpenApi publicApi() {
-        return GroupedOpenApi.builder()
-                .group("public")
-                .pathsToMatch("/api/**")
-                .build();
+    public OpenAPI customizeOpenAPI() {
+        final String securitySchemeName = "bearerAuth";
+        return new OpenAPI()
+                .addSecurityItem(new SecurityRequirement()
+                        .addList(securitySchemeName))
+                .components(new Components()
+                        .addSecuritySchemes(securitySchemeName, new SecurityScheme()
+                                .name(securitySchemeName)
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")));
+    }
+
+    /**
+     * Creates a security scheme for bearer authentication using JWT.
+     *
+     * <p>This method configures a {@link SecurityScheme} for HTTP bearer authentication with JWT format.
+     * It sets the scheme type to HTTP and specifies the authentication method as "bearer" with JWT.
+     * This configuration is used to define how security is handled in the OpenAPI specification,
+     * ensuring that the API documentation includes the correct authentication requirements.
+     * The resulting {@link SecurityScheme} can be used to secure API endpoints.</p>
+     *
+     * @return a {@link SecurityScheme} instance configured for bearer authentication with JWT
+     */
+    private SecurityScheme createAPIKeyScheme() {
+        return new SecurityScheme().type(SecurityScheme.Type.HTTP)
+                .bearerFormat("JWT")
+                .scheme("bearer");
     }
 }

@@ -2,6 +2,7 @@ package com.epam.esm.gym.security;
 
 import com.epam.esm.gym.dao.TokenDao;
 import com.epam.esm.gym.domain.Token;
+import com.epam.esm.gym.service.profile.TokenProfileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,13 +18,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JDBCTokenServiceTest {
+class TokenProfileServiceTest {
 
     @Mock
     private TokenDao dao;
 
     @InjectMocks
-    private JDBCTokenService tokenService;
+    private TokenProfileService tokenService;
     private Token token;
     private List<Token> tokens;
 

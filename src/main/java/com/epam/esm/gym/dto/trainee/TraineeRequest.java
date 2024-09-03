@@ -12,6 +12,12 @@ import lombok.ToString;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * Data Transfer Object for representing a training session response.
+ *
+ * <p>This DTO includes details about a training session such as the trainer's username,
+ * training name, type, duration, and date.</p>
+ */
 @Getter
 @Setter
 @Builder
@@ -30,11 +36,19 @@ public class TraineeRequest {
     private Boolean active;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TraineeRequest that = (TraineeRequest) o;
-        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(dateOfBirth, that.dateOfBirth) && Objects.equals(address, that.address) && Objects.equals(active, that.active);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        TraineeRequest that = (TraineeRequest) obj;
+        return Objects.equals(firstName, that.firstName)
+                && Objects.equals(lastName, that.lastName)
+                && Objects.equals(dateOfBirth, that.dateOfBirth)
+                && Objects.equals(address, that.address)
+                && Objects.equals(active, that.active);
     }
 
     @Override

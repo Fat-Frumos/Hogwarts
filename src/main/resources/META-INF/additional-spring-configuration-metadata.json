@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "strategy.dao.type",
+      "type": "java.lang.String",
+      "description": "Description for strategy.dao.type."
+  }
+] }

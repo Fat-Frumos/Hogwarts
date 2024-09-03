@@ -5,28 +5,24 @@ import com.epam.esm.gym.web.provider.trainee.TraineeTrainerArgumentsProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
 class InMemoryTraineeDaoTest {
 
-    @Autowired
     private InMemoryTraineeDao inMemoryTraineeDao;
 
-    @Autowired
-    private StorageInitializer storageInitializer;
 
     @BeforeEach
     void setUp() {
-        inMemoryTraineeDao = new InMemoryTraineeDao(storageInitializer);
+        inMemoryTraineeDao = new InMemoryTraineeDao(new StorageInitializer(
+                new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>()));
     }
 
     @ParameterizedTest

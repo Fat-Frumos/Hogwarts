@@ -1,42 +1,52 @@
 package com.epam.esm.gym.security;
 
-import com.epam.esm.gym.security.handler.BruteForceAuthenticationFailureHandler;
-import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.core.AuthenticationException;
 
-import java.io.IOException;
-import java.util.Objects;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
-class BruteForceAuthenticationFailureHandlerTest {
+class BruteForceProtectionServiceTest {
 
-    @InjectMocks
-    private BruteForceAuthenticationFailureHandler handler;
-
-    @Mock
-    private BruteForceProtectionService protectionService;
+    private final BruteForceProtectionService bruteForceProtectionService = new BruteForceProtectionService();
+    private static final String username = "username";
+    private static final long LOCK_TIME_DURATION = 0;
 
     @Test
-    public void testOnAuthenticationFailure() throws IOException {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        AuthenticationException exception = mock(AuthenticationException.class);
-        request.setParameter("username", "testUser");
-        handler.onAuthenticationFailure(request, response, exception);
-        verify(protectionService).registerFailedAttempt("testUser");
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-        assertTrue(Objects.requireNonNull(response.getErrorMessage()).contains("Authentication Failed"));
+    void testRegisterFailedAttempt() {
+        String username = "user1";
+
+        bruteForceProtectionService.registerFailedAttempt(username);
+        bruteForceProtectionService.registerFailedAttempt(username);
+        bruteForceProtectionService.registerFailedAttempt(username);
+        assertTrue(bruteForceProtectionService.isLocked(username));
+    }
+
+    @Test
+    void testIsLockedNotLocked() {
+        String username = "user2";
+        assertFalse(bruteForceProtectionService.isLocked(username));
+    }
+
+    @Test
+    void testIsLockedAfterLockDuration() throws InterruptedException {
+
+        bruteForceProtectionService.registerFailedAttempt(username);
+        bruteForceProtectionService.registerFailedAttempt(username);
+        bruteForceProtectionService.registerFailedAttempt(username);
+
+        Thread.sleep(LOCK_TIME_DURATION + 1000);
+
+        assertTrue(bruteForceProtectionService.isLocked(username));
+    }
+
+    @Test
+    void testResetAttempts() {
+        String username = "user4";
+        bruteForceProtectionService.registerFailedAttempt(username);
+        bruteForceProtectionService.registerFailedAttempt(username);
+        bruteForceProtectionService.registerFailedAttempt(username);
+        assertTrue(bruteForceProtectionService.isLocked(username));
+        bruteForceProtectionService.resetAttempts(username);
+        assertFalse(bruteForceProtectionService.isLocked(username));
     }
 }

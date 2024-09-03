@@ -1,60 +1,770 @@
 {
   "users": [
-    {"id": 1, "first_name": "Ginevra", "last_name": "Granger", "username": "Ginevra.Granger", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 2, "permission": "ROLE_TRAINER"},
-    {"id": 2, "first_name": "Theodore", "last_name": "Nott", "username": "Theodore.Nott", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 2, "permission": "ROLE_TRAINER"},
-    {"id": 3, "first_name": "Daphne", "last_name": "Greengrass", "username": "Daphne.Greengrass", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 2, "permission": "ROLE_TRAINER"},
-    {"id": 4, "first_name": "Pansy", "last_name": "Parkinson", "username": "Pansy.Parkinson", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 5, "first_name": "Tracey", "last_name": "Davis", "username": "Tracey.Davis", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 6, "first_name": "Millicent", "last_name": "Bulstrode", "username": "Millicent.Bulstrode", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 7, "first_name": "Gregory", "last_name": "Goyle", "username": "Gregory.Goyle", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 8, "first_name": "Vincent", "last_name": "Crabbe", "username": "Vincent.Crabbe", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 9, "first_name": "Padma", "last_name": "Patil", "username": "Padma.Patil", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 10, "first_name": "Parvati", "last_name": "Patil", "username": "Parvati.Patil", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 11, "first_name": "Harry", "last_name": "Potter", "username": "Harry.Potter", "password": "$2a$10$AMs1YehIdq.7OBLM09E4ZuzUYvvB.VsvQVX6hfBxZN1N9qOPOAERe", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 12, "first_name": "Hermione", "last_name": "Granger", "username": "Hermione.Granger", "password": "$2a$10$0Vn9yPlu7/QJAzaC/xX/h.i6KmuKdpA9bcMtmvHYTE6fZmXbL.dJ6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 13, "first_name": "Ron", "last_name": "Weasley", "username": "Ron.Weasley", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 14, "first_name": "Luna", "last_name": "Lovegood", "username": "Luna.Lovegood", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 15, "first_name": "Ginny", "last_name": "Weasley", "username": "Ginny.Weasley", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 1, "permission": "ROLE_TRAINEE"},
-    {"id": 16, "first_name": "Albus", "last_name": "Dumbledore", "username": "Albus.Dumbledore", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 2, "permission": "ROLE_TRAINER"},
-    {"id": 17, "first_name": "Severus", "last_name": "Snape", "username": "Severus.Snape", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 2, "permission": "ROLE_TRAINER"},
-    {"id": 18, "first_name": "Minerva", "last_name": "McGonagall", "username": "Minerva.McGonagall", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 2, "permission": "ROLE_TRAINER"},
-    {"id": 19, "first_name": "Rubeus", "last_name": "Hagrid", "username": "Rubeus.Hagrid", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 2, "permission": "ROLE_TRAINER"},
-    {"id": 20, "first_name": "Sybill", "last_name": "Trelawney", "username": "Sybill.Trelawney", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true, "role_id": 2, "permission": "ROLE_TRAINER"}
+    {
+      "id": 1,
+      "first_name": "Ron",
+      "last_name": "Weasley",
+      "username": "Ron.Weasley",
+      "password": "$2a$10$B0pkIojrIcYZYLp4nKqnFOOQV.AOTEtwyYQ6XebikM6MmSIM7DMiC",
+      "is_active": true,
+      "permission": "ROLE_TRAINEE"
+    },
+    {
+      "id": 2,
+      "first_name": "Hermione",
+      "last_name": "Granger",
+      "username": "Hermione.Granger",
+      "password": "$2a$10$Xv/D7PbO8gTeRU3/BMPZL.k7DWZ9s1PeEnkdMAOmd6uFljAzUlPfC",
+      "is_active": true,
+      "permission": "ROLE_TRAINEE"
+    },
+    {
+      "id": 3,
+      "first_name": "Harry",
+      "last_name": "Potter",
+      "username": "Harry.Potter",
+      "password": "$2a$10$6iRu5UqSFG8GstxV5BLwA.ek6w/eayJX7i9F9eL7Y5zLCbhtgGT5.",
+      "is_active": true,
+      "permission": "ROLE_TRAINEE"
+    },
+    {
+      "id": 4,
+      "first_name": "Draco",
+      "last_name": "Malfoy",
+      "username": "Draco.Malfoy",
+      "password": "$2a$10$FnT7Vd0eAb6.fIc0PAWoReRDe0lcA1A93g0I0tSz8U6i7/JskXxGy",
+      "is_active": true,
+      "permission": "ROLE_TRAINEE"
+    },
+    {
+      "id": 5,
+      "first_name": "Neville",
+      "last_name": "Longbottom",
+      "username": "Neville.Longbottom",
+      "password": "$2a$10$RGxXrpIaO88Ob1Qw1LrWbOBj/NHGe8z7MFtdkJ5H5BSy2UiwEk/Xe",
+      "is_active": true,
+      "permission": "ROLE_TRAINEE"
+    },
+    {
+      "id": 6,
+      "first_name": "Ginny",
+      "last_name": "Weasley",
+      "username": "Ginny.Weasley",
+      "password": "$2a$10$9HNg9NYRaIH9EnX3Osyi6oP8ZgVcU3OxySOnLm76H4O9fX8FQqT1S",
+      "is_active": true,
+      "permission": "ROLE_TRAINEE"
+    },
+    {
+      "id": 7,
+      "first_name": "Luna",
+      "last_name": "Lovegood",
+      "username": "Luna.Lovegood",
+      "password": "$2a$10$IZyP7.1hLRwwpWz5w66eKue8HnnGhCklTi/J53FRjN4MgpjOoeI36",
+      "is_active": true,
+      "permission": "ROLE_TRAINEE"
+    },
+    {
+      "id": 8,
+      "first_name": "Padma",
+      "last_name": "Patil",
+      "username": "Padma.Patil",
+      "password": "$2a$10$8eGoIwGCBlG2OlfPo7ZidO/kRkFkaT1aDkxR5cOVRp2O1gI9jOaQ.",
+      "is_active": true,
+      "permission": "ROLE_TRAINEE"
+    },
+    {
+      "id": 9,
+      "first_name": "Parvati",
+      "last_name": "Patil",
+      "username": "Parvati.Patil",
+      "password": "$2a$10$6xWVSMJw6D3RIleM8vgJ8eJNCnTL3VkmhUzM/Zjol4OgrS4KNel1a",
+      "is_active": true,
+      "permission": "ROLE_TRAINEE"
+    },
+    {
+      "id": 10,
+      "first_name": "Seamus",
+      "last_name": "Finnigan",
+      "username": "Seamus.Finnigan",
+      "password": "$2a$10$z7sPjffHf1uJjA/k1J8uYeDkX7CcvBptmW.T2xFwKefO8ldHEcG6O",
+      "is_active": true,
+      "permission": "ROLE_TRAINEE"
+    },
+    {
+      "id": 11,
+      "first_name": "Albus",
+      "last_name": "Dumbledore",
+      "username": "Albus.Dumbledore",
+      "password": "$2a$10$g7d6t0zOn/.6aHehOC9TSOg6czH/TLS/Q.VhbZWZAEkkgP98zU3m2",
+      "is_active": true,
+      "permission": "ROLE_TRAINER"
+    },
+    {
+      "id": 12,
+      "first_name": "Minerva",
+      "last_name": "McGonagall",
+      "username": "Minerva.McGonagall",
+      "password": "$2a$10$vwZ8wFzWhcCocV6X9wb.H6L/W2FJTT4y5oz7EYVFSO1zD//51rJiG",
+      "is_active": true,
+      "permission": "ROLE_TRAINER"
+    },
+    {
+      "id": 13,
+      "first_name": "Sybill",
+      "last_name": "Trelawney",
+      "username": "Sybill.Trelawney",
+      "password": "$2a$10$RvDQYw7V0i8.6UQQgJydE.sCFQ7Lo8sXbd/udzw9z1c5SY7FXkP2a",
+      "is_active": true,
+      "permission": "ROLE_TRAINER"
+    },
+    {
+      "id": 14,
+      "first_name": "Rubeus",
+      "last_name": "Hagrid",
+      "username": "Rubeus.Hagrid",
+      "password": "$2a$10$6u1guH3K9phR/kIMoKiG8.S5F1n6bQ6Og2lIjEx1T4JPJdYjFxOZ2",
+      "is_active": true,
+      "permission": "ROLE_TRAINER"
+    },
+    {
+      "id": 15,
+      "first_name": "Gilderoy",
+      "last_name": "Lockhart",
+      "username": "Gilderoy.Lockhart",
+      "password": "$2a$10$uPZo7zM0Y9zO1TnZLPEF6OnJvi/fjWr26XoYxWfHtpLbyEBL9v.ae",
+      "is_active": true,
+      "permission": "ROLE_TRAINER"
+    },
+    {
+      "id": 16,
+      "first_name": "Pomona",
+      "last_name": "Sprout",
+      "username": "Pomona.Sprout",
+      "password": "$2a$10$K6Jx1KlTrq.xN6fjrC2cB.kEbPvQFD7BpzXZrb.8FBgPZRm8p/xoe",
+      "is_active": true,
+      "permission": "ROLE_TRAINER"
+    },
+    {
+      "id": 17,
+      "first_name": "Filius",
+      "last_name": "Flitwick",
+      "username": "Filius.Flitwick",
+      "password": "$2a$10$9M2UovUO8fRmKlt3Bc6EKOpnqGQTlYjzvHkfbKqWmDufkVDv66DF.",
+      "is_active": true,
+      "permission": "ROLE_TRAINER"
+    },
+    {
+      "id": 18,
+      "first_name": "Horace",
+      "last_name": "Slughorn",
+      "username": "Horace.Slughorn",
+      "password": "$2a$10$Jp4UAKkEK4ZLtPIg9zXrU.xIQk/fZbhc4bsDFxl0LOM1gK8eRgjv.",
+      "is_active": true,
+      "permission": "ROLE_TRAINER"
+    },
+    {
+      "id": 19,
+      "first_name": "Rita",
+      "last_name": "Skeeter",
+      "username": "Rita.Skeeter",
+      "password": "$2a$10$Uy5u2Q8DwymNKzM0Q8bljOxTk5ZwhpI90OFbIuZ/eBGNFAgZp1I4y",
+      "is_active": true,
+      "permission": "ROLE_TRAINER"
+    },
+    {
+      "id": 20,
+      "first_name": "Kingsley",
+      "last_name": "Shacklebolt",
+      "username": "Kingsley.Shacklebolt",
+      "password": "$2a$10$flZb8MJgf14F5R5aql.qs.QzFh6ZBXV/M1QhbPiy6QwQh8zGeG4Gm",
+      "is_active": true,
+      "permission": "ROLE_TRAINER"
+    }
   ],
   "trainees": [
-    {"id": 1, "first_name": "Pansy", "last_name": "Parkinson", "username": "Pansy.Parkinson", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 2, "first_name": "Tracey", "last_name": "Davis", "username": "Tracey.Davis", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 3, "first_name": "Millicent", "last_name": "Bulstrode", "username": "Millicent.Bulstrode", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 4, "first_name": "Gregory", "last_name": "Goyle", "username": "Gregory.Goyle", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 5, "first_name": "Vincent", "last_name": "Crabbe", "username": "Vincent.Crabbe", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 6, "first_name": "Padma", "last_name": "Patil", "username": "Padma.Patil", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 7, "first_name": "Parvati", "last_name": "Patil", "username": "Parvati.Patil", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 8, "first_name": "Harry", "last_name": "Potter", "username": "Harry.Potter", "password": "$2a$10$AMs1YehIdq.7OBLM09E4ZuzUYvvB.VsvQVX6hfBxZN1N9qOPOAERe", "is_active": true},
-    {"id": 9, "first_name": "Hermione", "last_name": "Granger", "username": "Hermione.Granger", "password": "$2a$10$0Vn9yPlu7/QJAzaC/xX/h.i6KmuKdpA9bcMtmvHYTE6fZmXbL.dJ6", "is_active": true},
-    {"id": 10, "first_name": "Ron", "last_name": "Weasley", "username": "Ron.Weasley", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 11, "first_name": "Luna", "last_name": "Lovegood", "username": "Luna.Lovegood", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 12, "first_name": "Ginny", "last_name": "Weasley", "username": "Ginny.Weasley", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true}
+    {
+      "id": 1,
+      "dateOfBirth": "2000-01-01",
+      "address": "Hogwarts",
+      "user": {
+        "id": 1,
+        "first_name": "Ron",
+        "last_name": "Weasley",
+        "username": "Ron.Weasley",
+        "password": "$2a$10$B0pkIojrIcYZYLp4nKqnFOOQV.AOTEtwyYQ6XebikM6MmSIM7DMiC",
+        "is_active": true,
+        "permission": "ROLE_TRAINEE"
+      },
+      "trainings": [],
+      "trainers": []
+    },
+    {
+      "id": 2,
+      "dateOfBirth": "1999-09-19",
+      "address": "Hogwarts",
+      "user": {
+        "id": 2,
+        "first_name": "Hermione",
+        "last_name": "Granger",
+        "username": "Hermione.Granger",
+        "password": "$2a$10$Xv/D7PbO8gTeRU3/BMPZL.k7DWZ9s1PeEnkdMAOmd6uFljAzUlPfC",
+        "is_active": true,
+        "permission": "ROLE_TRAINEE"
+      },
+      "trainings": [],
+      "trainers": []
+    },
+    {
+      "id": 3,
+      "dateOfBirth": "2000-07-31",
+      "address": "Hogwarts",
+      "user": {
+        "id": 3,
+        "first_name": "Harry",
+        "last_name": "Potter",
+        "username": "Harry.Potter",
+        "password": "$2a$10$6iRu5UqSFG8GstxV5BLwA.ek6w/eayJX7i9F9eL7Y5zLCbhtgGT5.",
+        "is_active": true,
+        "permission": "ROLE_TRAINEE"
+      },
+      "trainings": [],
+      "trainers": []
+    },
+    {
+      "id": 4,
+      "dateOfBirth": "2001-05-05",
+      "address": "Hogwarts",
+      "user": {
+        "id": 4,
+        "first_name": "Draco",
+        "last_name": "Malfoy",
+        "username": "Draco.Malfoy",
+        "password": "$2a$10$FnT7Vd0eAb6.fIc0PAWoReRDe0lcA1A93g0I0tSz8U6i7/JskXxGy",
+        "is_active": true,
+        "permission": "ROLE_TRAINEE"
+      },
+      "trainings": [],
+      "trainers": []
+    },
+    {
+      "id": 5,
+      "dateOfBirth": "1999-10-30",
+      "address": "Hogwarts",
+      "user": {
+        "id": 5,
+        "first_name": "Neville",
+        "last_name": "Longbottom",
+        "username": "Neville.Longbottom",
+        "password": "$2a$10$RGxXrpIaO88Ob1Qw1LrWbOBj/NHGe8z7MFtdkJ5H5BSy2UiwEk/Xe",
+        "is_active": true,
+        "permission": "ROLE_TRAINEE"
+      },
+      "trainings": [],
+      "trainers": []
+    },
+    {
+      "id": 6,
+      "dateOfBirth": "2000-06-18",
+      "address": "Hogwarts",
+      "user": {
+        "id": 6,
+        "first_name": "Ginny",
+        "last_name": "Weasley",
+        "username": "Ginny.Weasley",
+        "password": "$2a$10$9HNg9NYRaIH9EnX3Osyi6oP8ZgVcU3OxySOnLm76H4O9fX8FQqT1S",
+        "is_active": true,
+        "permission": "ROLE_TRAINEE"
+      },
+      "trainings": [],
+      "trainers": []
+    },
+    {
+      "id": 7,
+      "dateOfBirth": "1999-05-14",
+      "address": "Hogwarts",
+      "user": {
+        "id": 7,
+        "first_name": "Luna",
+        "last_name": "Lovegood",
+        "username": "Luna.Lovegood",
+        "password": "$2a$10$IZyP7.1hLRwwpWz5w66eKue8HnnGhCklTi/J53FRjN4MgpjOoeI36",
+        "is_active": true,
+        "permission": "ROLE_TRAINEE"
+      },
+      "trainings": [],
+      "trainers": []
+    },
+    {
+      "id": 8,
+      "dateOfBirth": "1999-10-02",
+      "address": "Hogwarts",
+      "user": {
+        "id": 8,
+        "first_name": "Padma",
+        "last_name": "Patil",
+        "username": "Padma.Patil",
+        "password": "$2a$10$8eGoIwGCBlG2OlfPo7ZidO/kRkFkaT1aDkxR5cOVRp2O1gI9jOaQ.",
+        "is_active": true,
+        "permission": "ROLE_TRAINEE"
+      },
+      "trainings": [],
+      "trainers": []
+    },
+    {
+      "id": 9,
+      "dateOfBirth": "1999-08-17",
+      "address": "Hogwarts",
+      "user": {
+        "id": 9,
+        "first_name": "Parvati",
+        "last_name": "Patil",
+        "username": "Parvati.Patil",
+        "password": "$2a$10$6xWVSMJw6D3RIleM8vgJ8eJNCnTL3VkmhUzM/Zjol4OgrS4KNel1a",
+        "is_active": true,
+        "permission": "ROLE_TRAINEE"
+      },
+      "trainings": [],
+      "trainers": []
+    },
+    {
+      "id": 10,
+      "dateOfBirth": "1999-11-30",
+      "address": "Hogwarts",
+      "user": {
+        "id": 10,
+        "first_name": "Seamus",
+        "last_name": "Finnigan",
+        "username": "Seamus.Finnigan",
+        "password": "$2a$10$z7sPjffHf1uJjA/k1J8uYeDkX7CcvBptmW.T2xFwKefO8ldHEcG6O",
+        "is_active": true,
+        "permission": "ROLE_TRAINEE"
+      },
+      "trainings": [],
+      "trainers": []
+    }
   ],
   "trainers": [
-    {"id": 1, "first_name": "Ginevra", "last_name": "Granger", "username": "Ginevra.Granger", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 2, "first_name": "Theodore", "last_name": "Nott", "username": "Theodore.Nott", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 3, "first_name": "Daphne", "last_name": "Greengrass", "username": "Daphne.Greengrass", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 4, "first_name": "Albus", "last_name": "Dumbledore", "username": "Albus.Dumbledore", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 5, "first_name": "Severus", "last_name": "Snape", "username": "Severus.Snape", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 6, "first_name": "Minerva", "last_name": "McGonagall", "username": "Minerva.McGonagall", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 7, "first_name": "Rubeus", "last_name": "Hagrid", "username": "Rubeus.Hagrid", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true},
-    {"id": 8, "first_name": "Sybill", "last_name": "Trelawney", "username": "Sybill.Trelawney", "password": "$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6", "is_active": true}
+    {
+      "id": 11,
+      "specialization": {
+        "id": 1,
+        "trainingType": "POTIONS"
+      },
+      "user": {
+        "id": 11,
+        "first_name": "Albus",
+        "last_name": "Dumbledore",
+        "username": "Albus.Dumbledore",
+        "password": "$2a$10$g7d6t0zOn/.6aHehOC9TSOg6czH/TLS/Q.VhbZWZAEkkgP98zU3m2",
+        "is_active": true,
+        "permission": "ROLE_TRAINER"
+      },
+      "trainings": [],
+      "trainees": []
+    },
+    {
+      "id": 12,
+      "specialization": {
+        "id": 2,
+        "trainingType": "TRANSFIGURATION"
+      },
+      "user": {
+        "id": 12,
+        "first_name": "Minerva",
+        "last_name": "McGonagall",
+        "username": "Minerva.McGonagall",
+        "password": "$2a$10$vwZ8wFzWhcCocV6X9wb.H6L/W2FJTT4y5oz7EYVFSO1zD//51rJiG",
+        "is_active": true,
+        "permission": "ROLE_TRAINER"
+      },
+      "trainings": [],
+      "trainees": []
+    },
+    {
+      "id": 13,
+      "specialization": {
+        "id": 3,
+        "trainingType": "DIVINATION"
+      },
+      "user": {
+        "id": 13,
+        "first_name": "Sybill",
+        "last_name": "Trelawney",
+        "username": "Sybill.Trelawney",
+        "password": "$2a$10$u2u9G6Ra/ZCTU8JYvgBzueUbQfErE8gfEd6ZmrEPW3R3EZr64jD",
+        "is_active": true,
+        "permission": "ROLE_TRAINER"
+      },
+      "trainings": [],
+      "trainees": []
+    },
+    {
+      "id": 14,
+      "specialization": {
+        "id": 4,
+        "trainingType": "HERBOLOGY"
+      },
+      "user": {
+        "id": 14,
+        "first_name": "Rubeus",
+        "last_name": "Hagrid",
+        "username": "Rubeus.Hagrid",
+        "password": "$2a$10$6u1guH3K9phR/kIMoKiG8.S5F1n6bQ6Og2lIjEx1T4JPJdYjFxOZ2",
+        "is_active": true,
+        "permission": "ROLE_TRAINER"
+      },
+      "trainings": [],
+      "trainees": []
+    },
+    {
+      "id": 15,
+      "specialization": {
+        "id": 5,
+        "trainingType": "DEFENSE"
+      },
+      "user": {
+        "id": 15,
+        "first_name": "Gilderoy",
+        "last_name": "Lockhart",
+        "username": "Gilderoy.Lockhart",
+        "password": "$2a$10$uPZo7zM0Y9zO1TnZLPEF6OnJvi/fjWr26XoYxWfHtpLbyEBL9v.ae",
+        "is_active": true,
+        "permission": "ROLE_TRAINER"
+      },
+      "trainings": [],
+      "trainees": []
+    },
+    {
+      "id": 16,
+      "specialization": {
+        "id": 6,
+        "trainingType": "FLEXIBILITY"
+      },
+      "user": {
+        "id": 16,
+        "first_name": "Pomona",
+        "last_name": "Sprout",
+        "username": "Pomona.Sprout",
+        "password": "$2a$10$K6Jx1KlTrq.xN6fjrC2cB.kEbPvQFD7BpzXZrb.8FBgPZRm8p/xoe",
+        "is_active": true,
+        "permission": "ROLE_TRAINER"
+      },
+      "trainings": [],
+      "trainees": []
+    },
+    {
+      "id": 17,
+      "specialization": {
+        "id": 7,
+        "trainingType": "STRENGTH"
+      },
+      "user": {
+        "id": 17,
+        "first_name": "Filius",
+        "last_name": "Flitwick",
+        "username": "Filius.Flitwick",
+        "password": "$2a$10$9M2UovUO8fRmKlt3Bc6EKOpnqGQTlYjzvHkfbKqWmDufkVDv66DF.",
+        "is_active": true,
+        "permission": "ROLE_TRAINER"
+      },
+      "trainings": [],
+      "trainees": []
+    },
+    {
+      "id": 18,
+      "specialization": {
+        "id": 8,
+        "trainingType": "COORDINATION"
+      },
+      "user": {
+        "id": 18,
+        "first_name": "Horace",
+        "last_name": "Slughorn",
+        "username": "Horace.Slughorn",
+        "password": "$2a$10$Jp4UAKkEK4ZLtPIg9zXrU.xIQk/fZbhc4bsDFxl0LOM1gK8eRgjv.",
+        "is_active": true,
+        "permission": "ROLE_TRAINER"
+      },
+      "trainings": [],
+      "trainees": []
+    },
+    {
+      "id": 19,
+      "specialization": {
+        "id": 9,
+        "trainingType": "CARE"
+      },
+      "user": {
+        "id": 19,
+        "first_name": "Rita",
+        "last_name": "Skeeter",
+        "username": "Rita.Skeeter",
+        "password": "$2a$10$Uy5u2Q8DwymNKzM0Q8bljOxTk5ZwhpI90OFbIuZ/eBGNFAgZp1I4y",
+        "is_active": true,
+        "permission": "ROLE_TRAINER"
+      },
+      "trainings": [],
+      "trainees": []
+    },
+    {
+      "id": 20,
+      "specialization": {
+        "id": 10,
+        "trainingType": "BALANCE"
+      },
+      "user": {
+        "id": 20,
+        "first_name": "Kingsley",
+        "last_name": "Shacklebolt",
+        "username": "Kingsley.Shacklebolt",
+        "password": "$2a$10$flZb8MJgf14F5R5aql.qs.QzFh6ZBXV/M1QhbPiy6QwQh8zGeG4Gm",
+        "is_active": true,
+        "permission": "ROLE_TRAINER"
+      },
+      "trainings": [],
+      "trainees": []
+    }
   ],
   "trainings": [
-    {"id": 1, "trainee_id": 1, "trainer_id": 1, "start_date": "2024-01-15", "end_date": "2024-02-15", "status": "completed"},
-    {"id": 2, "trainee_id": 2, "trainer_id": 2, "start_date": "2024-02-01", "end_date": "2024-03-01", "status": "ongoing"},
-    {"id": 3, "trainee_id": 3, "trainer_id": 3, "start_date": "2024-03-10", "end_date": "2024-04-10", "status": "pending"},
-    {"id": 4, "trainee_id": 4, "trainer_id": 4, "start_date": "2024-04-05", "end_date": "2024-05-05", "status": "completed"},
-    {"id": 5, "trainee_id": 5, "trainer_id": 5, "start_date": "2024-05-20", "end_date": "2024-06-20", "status": "ongoing"},
-    {"id": 6, "trainee_id": 6, "trainer_id": 6, "start_date": "2024-06-15", "end_date": "2024-07-15", "status": "completed"},
-    {"id": 7, "trainee_id": 7, "trainer_id": 7, "start_date": "2024-07-01", "end_date": "2024-08-01", "status": "completed"},
-    {"id": 8, "trainee_id": 8, "trainer_id": 8, "start_date": "2024-08-10", "end_date": "2024-09-10", "status": "pending"},
-    {"id": 9, "trainee_id": 9, "trainer_id": 1, "start_date": "2024-09-01", "end_date": "2024-10-01", "status": "ongoing"},
-    {"id": 10, "trainee_id": 10, "trainer_id": 2, "start_date": "2024-10-15", "end_date": "2024-11-15", "status": "pending"}
+    {
+      "id": 1,
+      "trainee": {
+        "user": {
+          "id": 1,
+          "first_name": "Ron",
+          "last_name": "Weasley"
+        }
+      },
+      "trainer": {
+        "user": {
+          "id": 11,
+          "first_name": "Albus",
+          "last_name": "Dumbledore"
+        }
+      },
+      "trainingName": "Potion Brewing",
+      "type": {
+        "id": 1,
+        "trainingType": "POTIONS"
+      },
+      "trainingDate": "2024-01-15",
+      "trainingDuration": 25
+    },
+    {
+      "id": 2,
+      "trainee": {
+        "user": {
+          "id": 2,
+          "first_name": "Hermione",
+          "last_name": "Granger"
+        }
+      },
+      "trainer": {
+        "user": {
+          "id": 12,
+          "first_name": "Minerva",
+          "last_name": "McGonagall"
+        }
+      },
+      "trainingName": "Transfiguration Mastery",
+      "type": {
+        "id": 2,
+        "trainingType": "TRANSFIGURATION"
+      },
+      "trainingDate": "2024-01-20",
+      "trainingDuration": 30
+    },
+    {
+      "id": 3,
+      "trainee": {
+        "user": {
+          "id": 3,
+          "first_name": "Harry",
+          "last_name": "Potter"
+        }
+      },
+      "trainer": {
+        "user": {
+          "id": 13,
+          "first_name": "Sybill",
+          "last_name": "Trelawney"
+        }
+      },
+      "trainingName": "Divination Basics",
+      "type": {
+        "id": 3,
+        "trainingType": "DIVINATION"
+      },
+      "trainingDate": "2024-02-01",
+      "trainingDuration": 22
+    },
+    {
+      "id": 4,
+      "trainee": {
+        "user": {
+          "id": 4,
+          "first_name": "Draco",
+          "last_name": "Malfoy"
+        }
+      },
+      "trainer": {
+        "user": {
+          "id": 14,
+          "first_name": "Rubeus",
+          "last_name": "Hagrid"
+        }
+      },
+      "trainingName": "Herbology Introduction",
+      "type": {
+        "id": 4,
+        "trainingType": "HERBOLOGY"
+      },
+      "trainingDate": "2024-02-10",
+      "trainingDuration": 28
+    },
+    {
+      "id": 5,
+      "trainee": {
+        "user": {
+          "id": 5,
+          "first_name": "Neville",
+          "last_name": "Longbottom"
+        }
+      },
+      "trainer": {
+        "user": {
+          "id": 15,
+          "first_name": "Gilderoy",
+          "last_name": "Lockhart"
+        }
+      },
+      "trainingName": "Defense Against the Dark Arts",
+      "type": {
+        "id": 5,
+        "trainingType": "DEFENSE"
+      },
+      "trainingDate": "2024-03-01",
+      "trainingDuration": 20
+    },
+    {
+      "id": 6,
+      "trainee": {
+        "user": {
+          "id": 6,
+          "first_name": "Ginny",
+          "last_name": "Weasley"
+        }
+      },
+      "trainer": {
+        "user": {
+          "id": 16,
+          "first_name": "Pomona",
+          "last_name": "Sprout"
+        }
+      },
+      "trainingName": "Potions Advanced",
+      "type": {
+        "id": 6,
+        "trainingType": "POTIONS"
+      },
+      "trainingDate": "2024-03-10",
+      "trainingDuration": 27
+    },
+    {
+      "id": 7,
+      "trainee": {
+        "user": {
+          "id": 7,
+          "first_name": "Luna",
+          "last_name": "Lovegood"
+        }
+      },
+      "trainer": {
+        "user": {
+          "id": 17,
+          "first_name": "Filius",
+          "last_name": "Flitwick"
+        }
+      },
+      "trainingName": "Charms 101",
+      "type": {
+        "id": 7,
+        "trainingType": "DEFENSE"
+      },
+      "trainingDate": "2024-03-15",
+      "trainingDuration": 30
+    },
+    {
+      "id": 8,
+      "trainee": {
+        "user": {
+          "id": 8,
+          "first_name": "Padma",
+          "last_name": "Patil"
+        }
+      },
+      "trainer": {
+        "user": {
+          "id": 18,
+          "first_name": "Horace",
+          "last_name": "Slughorn"
+        }
+      },
+      "trainingName": "Potion Brewing Skills",
+      "type": {
+        "id": 8,
+        "trainingType": "POTIONS"
+      },
+      "trainingDate": "2024-04-01",
+      "trainingDuration": 23
+    },
+    {
+      "id": 9,
+      "trainee": {
+        "user": {
+          "id": 9,
+          "first_name": "Parvati",
+          "last_name": "Patil"
+        }
+      },
+      "trainer": {
+        "user": {
+          "id": 19,
+          "first_name": "Rita",
+          "last_name": "Skeeter"
+        }
+      },
+      "trainingName": "Advanced Divination",
+      "type": {
+        "id": 9,
+        "trainingType": "DIVINATION"
+      },
+      "trainingDate": "2024-04-10",
+      "trainingDuration": 26
+    },
+    {
+      "id": 10,
+      "trainee": {
+        "user": {
+          "id": 10,
+          "first_name": "Seamus",
+          "last_name": "Finnigan"
+        }
+      },
+      "trainer": {
+        "user": {
+          "id": 20,
+          "first_name": "Kingsley",
+          "last_name": "Shacklebolt"
+        }
+      },
+      "trainingName": "Strength Training",
+      "type": {
+        "id": 10,
+        "trainingType": "STRENGTH"
+      },
+      "trainingDate": "2024-05-01",
+      "trainingDuration": 30
+    }
   ]
 }

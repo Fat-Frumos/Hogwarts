@@ -15,13 +15,47 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Mapper interface for converting between various DTOs and domain models related to trainees, trainers, and training.
+ *
+ * <p>This interface provides methods to map between entities and data transfer objects (DTOs),
+ * {@link TraineeProfile}, {@link TrainingResponse}, and {@link TrainerProfile}. It uses the {@link UserMapper} and
+ * {@link TrainerMapper} components for mappings related to users and trainers.</p>
+ */
 @Mapper(componentModel = "spring", uses = {UserMapper.class, TrainerMapper.class})
 public interface TraineeMapper {
 
-    Trainee toEntity(TraineeProfile traineeProfile);
+    /**
+     * Converts a {@link User} object to a {@link ProfileResponse}.
+     *
+     * <p>This method converts a {@link User} entity to a {@link ProfileResponse} DTO.
+     * It validates that the user and required fields are not null before creating the response object.</p>
+     *
+     * @param user the user to convert
+     * @return the converted {@link ProfileResponse}
+     * @throws IllegalArgumentException if user, username, or password is null
+     */
+    default ProfileResponse toProfile(User user) {
+        if (user == null || user.getUsername() == null || user.getPassword() == null) {
+            throw new IllegalArgumentException("User, username, or password cannot be null");
+        }
+        return ProfileResponse.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .build();
+    }
 
-    ProfileResponse toProfile(User user);
-
+    /**
+     * Updates a {@link Trainee} entity with values from a {@link TraineeRequest}.
+     *
+     * <p>This method updates the fields of an existing {@link Trainee}
+     * entity based on the provided {@link TraineeRequest}.
+     * It selectively updates fields if the corresponding request values are not null.</p>
+     *
+     * @param request the request containing update values
+     * @param trainee the trainee to update
+     * @return the updated {@link Trainee}
+     */
     default Trainee update(TraineeRequest request, Trainee trainee) {
         if (request == null || trainee == null) {
             return trainee;
@@ -56,6 +90,15 @@ public interface TraineeMapper {
         return trainee;
     }
 
+    /**
+     * Converts a {@link Trainee} entity to a {@link TraineeProfile}.
+     *
+     * <p>This method transforms a {@link Trainee} entity into a {@link TraineeProfile} DTO,
+     * including nested conversions for associated trainers and user details.</p>
+     *
+     * @param trainee the trainee to convert
+     * @return the converted {@link TraineeProfile}
+     */
     default TraineeProfile toTraineeProfile(Trainee trainee) {
         return TraineeProfile.builder()
                 .firstName(trainee.getUser().getFirstName())
@@ -70,6 +113,15 @@ public interface TraineeMapper {
                 .build();
     }
 
+    /**
+     * Converts a {@link Training} entity to a {@link TrainingResponse}.
+     *
+     * <p>This method maps a {@link Training} entity to a {@link TrainingResponse} DTO,
+     * including details such as trainer name, training type, and duration.</p>
+     *
+     * @param training the training to convert
+     * @return the converted {@link TrainingResponse}
+     */
     default TrainingResponse toResponse(Training training) {
         return TrainingResponse.builder()
                 .trainerName(training.getTrainer().getUser().getUsername())
@@ -80,6 +132,15 @@ public interface TraineeMapper {
                 .build();
     }
 
+    /**
+     * Converts a list of {@link TrainerProfile} to a set of {@link Trainer} entities.
+     *
+     * <p>This method creates {@link Trainer} entities from a list of {@link TrainerProfile} DTOs,
+     * setting properties based on the profile information.</p>
+     *
+     * @param trainers the list of trainer profiles
+     * @return the set of {@link Trainer} entities
+     */
     default Set<Trainer> toTrainers(List<TrainerProfile> trainers) {
         return trainers.stream()
                 .map(trainerProfile -> Trainer.builder()
@@ -90,15 +151,33 @@ public interface TraineeMapper {
                 .collect(Collectors.toSet());
     }
 
-    default User toUser(TrainerProfile trainerProfile) {
+    /**
+     * Converts a {@link TrainerProfile} to a {@link User} entity.
+     *
+     * <p>This method creates a {@link User} entity from a {@link TrainerProfile} DTO,
+     * setting user-specific details.</p>
+     *
+     * @param profile the trainer profile to convert
+     * @return the converted {@link User}
+     */
+    default User toUser(TrainerProfile profile) {
         return User.builder()
-                .username(trainerProfile.getUsername())
-                .firstName(trainerProfile.getFirstName())
-                .lastName(trainerProfile.getLastName())
-                .active(trainerProfile.isActive())
+                .username(profile.getUsername())
+                .firstName(profile.getFirstName())
+                .lastName(profile.getLastName())
+                .active(profile.isActive())
                 .build();
     }
 
+    /**
+     * Converts a {@link Trainer} entity to a {@link TrainerProfile} DTO.
+     *
+     * <p>This method transforms a {@link Trainer} entity into a {@link TrainerProfile} DTO,
+     * including nested conversions for associated trainees.</p>
+     *
+     * @param trainer the trainer to convert
+     * @return the converted {@link TrainerProfile}
+     */
     default TrainerProfile toTrainerProfile(Trainer trainer) {
         return TrainerProfile.builder()
                 .username(trainer.getUser().getUsername())
@@ -110,5 +189,22 @@ public interface TraineeMapper {
                         .map(this::toTraineeProfile)
                         .toList())
                 .build();
+    }
+
+    /**
+     * Converts a {@link User} and {@link TraineeRequest} to a {@link Trainee} entity.
+     *
+     * <p>This method constructs a {@link Trainee} entity using the provided {@link User} and {@link TraineeRequest}
+     * DTO, setting properties accordingly.</p>
+     *
+     * @param user the user to associate with the trainee
+     * @param dto  the request containing trainee details
+     * @return the converted {@link Trainee}
+     */
+    default Trainee toTrainee(User user, TraineeRequest dto) {
+        return Trainee.builder()
+                .dateOfBirth(dto.getDateOfBirth())
+                .address(dto.getAddress())
+                .user(user).build();
     }
 }

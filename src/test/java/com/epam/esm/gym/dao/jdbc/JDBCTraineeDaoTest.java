@@ -2,8 +2,8 @@ package com.epam.esm.gym.dao.jdbc;
 
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
-import com.epam.esm.gym.web.provider.trainer.TrainerArgumentsProvider;
 import com.epam.esm.gym.web.provider.trainee.TraineeTrainerArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.TrainerArgumentsProvider;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -22,6 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Unit test class for {@link JDBCTraineeDao}.
+ *
+ * <p>This class uses Mockito to test the methods in the {@link JDBCTraineeDao} class. It verifies the
+ * correctness of CRUD operations and query methods by mocking the {@link Session} and {@link Query}
+ * objects provided by Hibernate.</p>
+ *
+ * @version 1.0.0
+ * @since 1.0
+ */
 @ExtendWith(MockitoExtension.class)
 class JDBCTraineeDaoTest {
 
@@ -40,12 +50,22 @@ class JDBCTraineeDaoTest {
     @InjectMocks
     private JDBCTraineeDao jdbcTraineeDao;
 
+    /**
+     * Initializes the mocks and sets up the {@link Session} mock to return a mocked {@link Session} instance.
+     */
     @BeforeEach
     public void setUp() {
         when(sessionFactory.getCurrentSession()).thenReturn(session);
     }
 
-
+    /**
+     * Tests the {@link JDBCTraineeDao#findByUsername(String)} method.
+     *
+     * <p>This method tests that the DAO correctly retrieves a {@link Trainee} by username. It mocks the
+     * query execution and verifies that the returned trainee matches the expected result.</p>
+     *
+     * @param trainee the {@link Trainee} object to use in the test.
+     */
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
     void testFindByUsername(Trainee trainee) {
@@ -64,6 +84,15 @@ class JDBCTraineeDaoTest {
         assertEquals(expectedTrainee, actualTrainee);
     }
 
+    /**
+     * Tests the {@link JDBCTraineeDao#findAll()} method.
+     *
+     * <p>This method verifies that the DAO correctly retrieves all {@link Trainee} instances. It mocks
+     * the query execution to return a list of trainees and asserts that the returned list matches the
+     * expected result.</p>
+     *
+     * @param trainee the {@link Trainee} object to include in the list for testing.
+     */
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
     void testFindAll(Trainee trainee) {
@@ -74,6 +103,15 @@ class JDBCTraineeDaoTest {
         assertEquals(expectedList, result);
     }
 
+    /**
+     * Tests the {@link JDBCTraineeDao#save(Trainee)} method.
+     *
+     * <p>This method verifies that the DAO correctly saves a {@link Trainee} instance by calling the
+     * {@link Session#persist(Object)} method. It uses Mockito to verify the interaction with the
+     * persistence context.</p>
+     *
+     * @param trainee the {@link Trainee} object to save.
+     */
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
     void testSave(Trainee trainee) {
@@ -81,6 +119,14 @@ class JDBCTraineeDaoTest {
         verify(session).persist(trainee);
     }
 
+    /**
+     * Tests the {@link JDBCTraineeDao#update(Trainee)} method.
+     *
+     * <p>This method verifies that the DAO correctly updates a {@link Trainee} instance. It mocks the
+     * {@link Session#merge(Object)} method and checks that the updated trainee is as expected.</p>
+     *
+     * @param trainee the {@link Trainee} object to update.
+     */
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
     void testUpdate(Trainee trainee) {
@@ -89,6 +135,15 @@ class JDBCTraineeDaoTest {
         assertEquals(trainee, updatedTrainee);
     }
 
+    /**
+     * Tests the {@link JDBCTraineeDao#delete(Trainee)} method.
+     *
+     * <p>This method verifies that the DAO correctly deletes a {@link Trainee} instance by calling the
+     * {@link Session#remove(Object)} method. It uses Mockito to verify the interaction with the
+     * persistence context.</p>
+     *
+     * @param trainee the {@link Trainee} object to delete.
+     */
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
     void testDelete(Trainee trainee) {
@@ -96,6 +151,16 @@ class JDBCTraineeDaoTest {
         verify(session).remove(trainee);
     }
 
+    /**
+     * Tests the {@link JDBCTraineeDao#findNotAssignedTrainers(String)} method.
+     *
+     * <p>This method verifies that the DAO correctly retrieves trainers not assigned to a specific trainee.
+     * It mocks the query execution and checks that the returned list of trainers matches the expected
+     * result.</p>
+     *
+     * @param expectedTrainers a list of {@link Trainer} objects expected to be returned.
+     * @param username         the username of the trainee whose assigned trainers are excluded.
+     */
     @ParameterizedTest
     @ArgumentsSource(TrainerArgumentsProvider.class)
     void testFindNotAssignedTrainers(List<Trainer> expectedTrainers, String username) {

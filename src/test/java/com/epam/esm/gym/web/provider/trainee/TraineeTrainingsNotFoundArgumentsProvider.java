@@ -11,6 +11,18 @@ import java.util.stream.Stream;
 
 import static java.time.LocalDate.parse;
 
+/**
+ * Provides arguments for testing scenarios where no trainings are found for a trainee.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply test data for scenarios where
+ * a request to find trainings associated with a specific trainee yields no results.
+ * It is used to verify that the system correctly handles and responds to situations
+ * where a trainee has no associated trainings.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TraineeTrainingsNotFoundArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {

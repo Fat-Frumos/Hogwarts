@@ -1,5 +1,10 @@
 package com.epam.esm.gym.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,6 +24,18 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a training event in the application.
+ *
+ * <p>This class includes details such as training name, date, duration, and type.
+ * It manages the relationships between training sessions and participants, ensuring
+ * accurate scheduling and tracking of events.</p>
+ *
+ * <p>Duration is validated to ensure it falls within specified limits.</p>
+ *
+ * @author Pavlo Poliak
+ * @since 1.0
+ */
 @Entity
 @Getter
 @Builder
@@ -45,6 +62,9 @@ public class Training {
     @JoinColumn(name = "training_type_id", nullable = false)
     private TrainingType type;
 
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
     @Column(nullable = false)
     private LocalDate trainingDate;
 
@@ -55,11 +75,21 @@ public class Training {
     private Set<TrainingSession> trainingSessions;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Training training = (Training) o;
-        return Objects.equals(id, training.id) && Objects.equals(trainee, training.trainee) && Objects.equals(trainer, training.trainer) && Objects.equals(trainingName, training.trainingName) && Objects.equals(type, training.type) && Objects.equals(trainingDate, training.trainingDate) && Objects.equals(trainingDuration, training.trainingDuration);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Training training = (Training) obj;
+        return Objects.equals(id, training.id)
+                && Objects.equals(trainee, training.trainee)
+                && Objects.equals(trainer, training.trainer)
+                && Objects.equals(trainingName, training.trainingName)
+                && Objects.equals(type, training.type)
+                && Objects.equals(trainingDate, training.trainingDate)
+                && Objects.equals(trainingDuration, training.trainingDuration);
     }
 
     @Override

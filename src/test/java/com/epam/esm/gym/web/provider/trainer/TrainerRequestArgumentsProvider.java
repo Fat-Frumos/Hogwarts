@@ -12,6 +12,23 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios related to trainer requests.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply different sets of input data
+ * for test cases involving requests related to trainers. The provided arguments simulate various
+ * scenarios of creating, updating, or querying trainer information, helping to validate the
+ * correctness of the corresponding request handling functionalities.</p>
+ *
+ * <p>Each set of arguments can represent different states or attributes of the trainer being
+ * handled, such as valid and invalid requests, different fields, and values. This is useful
+ * for ensuring the robustness and reliability of the system's ability to process trainer-related
+ * requests correctly.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TrainerRequestArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {

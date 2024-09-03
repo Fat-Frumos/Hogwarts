@@ -11,6 +11,17 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for test cases involving scenarios where a trainee's registration is missing.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply test data for scenarios where
+ * a trainee's registration details are either incomplete or missing. This helps in testing how the
+ * system handles cases where expected registration information is not available.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TraineeMissingRegistrationArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
@@ -21,7 +32,8 @@ public class TraineeMissingRegistrationArgumentsProvider implements ArgumentsPro
                                 .dateOfBirth(LocalDate.parse("1980-07-31"))
                                 .address("Hogwarts")
                                 .build(),
-                        ResponseEntity.badRequest().body(new MessageResponse("FirstName is required", HttpStatus.BAD_REQUEST.value())),
+                        ResponseEntity.badRequest().body(new MessageResponse(
+                                "Required request parameter 'firstName' is not present")),
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
@@ -29,7 +41,9 @@ public class TraineeMissingRegistrationArgumentsProvider implements ArgumentsPro
                                 .dateOfBirth(LocalDate.parse("1980-07-31"))
                                 .address("Hogwarts")
                                 .build(),
-                        ResponseEntity.badRequest().body(new MessageResponse("FirstName is required, LastName is required", HttpStatus.BAD_REQUEST.value())),
+                        ResponseEntity.badRequest().body(new MessageResponse(
+                                "Required request parameter 'firstName' is not present, " +
+                                        "Required request parameter 'lastName' is not present")),
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
@@ -37,22 +51,27 @@ public class TraineeMissingRegistrationArgumentsProvider implements ArgumentsPro
                                 .lastName("Potter")
                                 .dateOfBirth(LocalDate.parse("1980-07-31"))
                                 .build(),
-                        ResponseEntity.badRequest().body(new MessageResponse("FirstName is required", HttpStatus.BAD_REQUEST.value())),
+                        ResponseEntity.badRequest().body(new MessageResponse(
+                                "Required request parameter 'firstName' is not present")),
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
                         TraineeRequest.builder().build(),
-                        ResponseEntity.badRequest().body(new MessageResponse("FirstName is required, LastName is required", HttpStatus.BAD_REQUEST.value())),
+                        ResponseEntity.badRequest().body(new MessageResponse(
+                                "Required request parameter 'firstName' is not present, " +
+                                        "Required request parameter 'lastName' is not present")),
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
                         TraineeRequest.builder().lastName("Potter").build(),
-                        ResponseEntity.badRequest().body(new MessageResponse("FirstName is required", HttpStatus.BAD_REQUEST.value())),
+                        ResponseEntity.badRequest().body(new MessageResponse(
+                                "Required request parameter 'firstName' is not present")),
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
                         TraineeRequest.builder().firstName("Harry").build(),
-                        ResponseEntity.badRequest().body(new MessageResponse("LastName is required", HttpStatus.BAD_REQUEST.value())),
+                        ResponseEntity.badRequest().body(new MessageResponse(
+                                "Required request parameter 'lastName' is not present")),
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
@@ -60,7 +79,8 @@ public class TraineeMissingRegistrationArgumentsProvider implements ArgumentsPro
                                 .firstName("Harry")
                                 .address("Hogwarts")
                                 .build(),
-                        ResponseEntity.badRequest().body(new MessageResponse("LastName is required", HttpStatus.BAD_REQUEST.value())),
+                        ResponseEntity.badRequest().body(new MessageResponse(
+                                "Required request parameter 'lastName' is not present")),
                         HttpStatus.BAD_REQUEST
                 ));
     }

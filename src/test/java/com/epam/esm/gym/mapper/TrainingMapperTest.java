@@ -15,6 +15,22 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ * Unit tests for the {@link TrainingMapper} class.
+ *
+ * <p>This class tests the functionality of the {@link TrainingMapper}, which is responsible
+ * for mapping between {@link Training} entities and their corresponding DTOs.
+ * The tests ensure that the mapping logic is correctly implemented and that the
+ * resulting DTOs or entities accurately reflect the data from the source.</p>
+ *
+ * <p>Tests cover various aspects of mapping, including the conversion of fields between
+ * entities and DTOs, handling of nested objects, and any custom mapping logic that may
+ * be implemented in the {@link TrainingMapper}.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 class TrainingMapperTest {
 
     private final TrainingMapper trainingMapper = Mappers.getMapper(TrainingMapper.class);

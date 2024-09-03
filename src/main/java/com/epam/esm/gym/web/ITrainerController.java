@@ -11,23 +11,38 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@RequestMapping("/api/trainers")
+/**
+ * Interface for the Trainer API, defining operations related to trainer profiles and assignments.
+ *
+ * <p>This interface declares various endpoints for managing trainers, including retrieving profiles,
+ * creating, updating, and deleting trainer profiles, as well as assigning trainees to trainers. It
+ * also includes operations for getting lists of trainers and their trainings. The API is designed to be
+ * used by ADMIN and TRAINER roles with specific access controls in place.</p>
+ *
+ * <p>Each method is annotated with {@link Operation} to provide detailed documentation for Swagger/OpenAPI
+ * integration, specifying summary, description, and possible responses for the API operations.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 @Tag(name = "Trainer API", description = "Operations related to Trainer profiles and assignments")
 public interface ITrainerController {
 
-    @GetMapping
+    /**
+     * Retrieves a list of all trainers.
+     *
+     * <p>This endpoint is accessible by users with roles ADMIN or TRAINER. It returns a list of all trainer
+     * profiles available in the system.</p>
+     *
+     * @return A {@link ResponseEntity} containing a list of {@link TrainerProfile}.
+     */
     @Operation(
             summary = "Get All Trainers",
             description = "Retrieve a list of all trainers. Accessible by users with role ADMIN or TRAINER.",
@@ -39,7 +54,15 @@ public interface ITrainerController {
     )
     ResponseEntity<List<TrainerProfile>> getAllTrainers();
 
-    @PostMapping("/register")
+    /**
+     * Creates a new trainer profile.
+     *
+     * <p>This endpoint allows ADMIN users to create a new trainer profile. The request body must be valid
+     * as per the {@link TrainerRequest} constraints.</p>
+     *
+     * @param request A {@link TrainerRequest} object containing trainer details.
+     * @return A {@link ResponseEntity} with {@link ProfileResponse} indicating the result of the creation.
+     */
     @Operation(
             summary = "Create Trainer Profile",
             description = "Create a new trainer profile. Accessible only by ADMIN.",
@@ -52,8 +75,15 @@ public interface ITrainerController {
     )
     ResponseEntity<ProfileResponse> registerTrainerProfile(@Valid @RequestBody TrainerRequest request);
 
-
-    @PostMapping("/assign")
+    /**
+     * Assigns a trainee to the currently authenticated trainer.
+     *
+     * <p>This endpoint is accessible only by TRAINER roles. The trainer is assumed to be the currently
+     * authenticated user who will be assigned to the specified trainee.</p>
+     *
+     * @param traineeUsername The username of the trainee to be assigned.
+     * @return A {@link ResponseEntity} with a success message if the assignment was successful.
+     */
     @Operation(
             summary = "Assign Trainee to Trainer",
             description = "Assign a trainee to the trainer who is currently authenticated. Accessible only by TRAINER.",
@@ -67,8 +97,15 @@ public interface ITrainerController {
     )
     ResponseEntity<String> assignTraineeToTrainer(@RequestParam String traineeUsername);
 
-
-    @DeleteMapping("/{username}")
+    /**
+     * Deletes a trainer profile by username.
+     *
+     * <p>This endpoint is accessible only by ADMIN roles. It removes the trainer profile associated with
+     * the specified username from the system.</p>
+     *
+     * @param username The username of the trainer to be deleted.
+     * @return A {@link ResponseEntity} with a success message if the deletion was successful.
+     */
     @Operation(
             summary = "Delete Trainer",
             description = "Delete a trainer profile by username. Accessible only by ADMIN.",
@@ -81,7 +118,15 @@ public interface ITrainerController {
     )
     ResponseEntity<String> deleteTrainer(@PathVariable String username);
 
-    @GetMapping("/{username}")
+    /**
+     * Retrieves a trainer profile by username.
+     *
+     * <p>This endpoint is accessible by users with roles ADMIN or TRAINER. It returns the profile of
+     * the trainer identified by the specified username.</p>
+     *
+     * @param username The username of the trainer whose profile is to be retrieved.
+     * @return A {@link ResponseEntity} containing the {@link TrainerProfile} if found.
+     */
     @Operation(
             summary = "Get Trainer Profile",
             description = "Retrieve a trainer profile by username. Accessible by users with role ADMIN or TRAINER.",
@@ -94,10 +139,19 @@ public interface ITrainerController {
     )
     ResponseEntity<TrainerProfile> getTrainerProfile(@PathVariable String username);
 
-    @PutMapping("/{username}")
+    /**
+     * Updates an existing trainer profile by username.
+     *
+     * <p>This endpoint allows ADMIN or the trainer themselves to update the profile. The request body
+     * must be valid as per the {@link TrainerUpdateRequest} constraints.</p>
+     *
+     * @param username The username of the trainer to be updated.
+     * @param request  A {@link TrainerUpdateRequest} object containing updated trainer details.
+     * @return A {@link ResponseEntity} containing the updated {@link TrainerProfile}.
+     */
     @Operation(
             summary = "Update Trainer Profile",
-            description = "Update an existing trainer profile by username. Accessible by ADMIN or the trainer themselves.",
+            description = "Update an existing trainer profile by username. Accessible by ADMIN or the TRAINER.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Trainer profile updated successfully"),
                     @ApiResponse(responseCode = "400", description = "Bad request due to validation error"),
@@ -107,28 +161,49 @@ public interface ITrainerController {
                     @ApiResponse(responseCode = "405", description = "Method not allowed")
             }
     )
-    ResponseEntity<TrainerProfile> updateTrainerProfile(@PathVariable String username, @Valid @RequestBody TrainerUpdateRequest request);
+    ResponseEntity<TrainerProfile> updateTrainerProfile(
+            @PathVariable String username, @Valid @RequestBody TrainerUpdateRequest request);
 
-    @GetMapping("/{username}/trainings")
+    /**
+     * Retrieves a list of trainings associated with a trainer by username.
+     *
+     * <p>This endpoint is accessible by users with roles ADMIN or TRAINER. It returns a list of training
+     * sessions associated with the trainer identified by the specified username.</p>
+     *
+     * @param username The username of the trainer whose trainings are to be retrieved.
+     * @param request  A {@link TrainingProfile} object containing filtering details for the request.
+     * @return A {@link ResponseEntity} containing a list of {@link TrainingResponse}.
+     */
     @Operation(
             summary = "Get Trainer Trainings List",
-            description = "Retrieve a list of trainings associated with a trainer by username. Accessible by users with role ADMIN or TRAINER.",
+            description = "Retrieve a list of trainings associated with a trainer by username. " +
+                    "Accessible by users with role ADMIN or TRAINER.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "List of trainer's trainings retrieved successfully"),
+                    @ApiResponse(responseCode = "200", description = "List of trainer's trainings find successfully"),
                     @ApiResponse(responseCode = "400", description = "Bad request due to validation error"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access"),
                     @ApiResponse(responseCode = "403", description = "Forbidden access"),
                     @ApiResponse(responseCode = "404", description = "Trainer or training not found")
             }
     )
-    ResponseEntity<List<TrainingResponse>> getTrainerTrainings(@PathVariable String username, @Valid @RequestBody TrainingProfile request);
+    ResponseEntity<List<TrainingResponse>> getTrainerTrainings(
+            @PathVariable String username, @Valid @RequestBody TrainingProfile request);
 
-    @PatchMapping("/{username}/activate")
+    /**
+     * Activates or deactivates a trainer profile.
+     *
+     * <p>This endpoint is accessible only by ADMIN roles. It allows activation or deactivation of the trainer
+     * profile identified by the specified username based on the provided status.</p>
+     *
+     * @param username The username of the trainer whose profile is to be activated or deactivated.
+     * @param active   A boolean indicating whether to activate (true) or deactivate (false) the trainer profile.
+     * @return A {@link ResponseEntity} with no content if the operation was successful.
+     */
     @Operation(
             summary = "Activate/Deactivate Trainer",
             description = "Activate or deactivate a trainer profile. Accessible only by ADMIN.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Trainer profile activation/deactivation successful"),
+                    @ApiResponse(responseCode = "200", description = "Trainer profile activation successful"),
                     @ApiResponse(responseCode = "400", description = "Bad request due to validation error"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access"),
                     @ApiResponse(responseCode = "403", description = "Forbidden access"),
@@ -138,12 +213,20 @@ public interface ITrainerController {
     ResponseEntity<Void> activateTrainer(
             @PathVariable String username, @RequestParam Boolean active);
 
-    @GetMapping("/{username}/unassigned")
+    /**
+     * Retrieves a list of active trainers who are not assigned to any trainees.
+     *
+     * <p>This endpoint is accessible only by ADMIN roles. It returns a list of active trainers who are not
+     * currently assigned to any trainees.</p>
+     *
+     * @param username The username of the requesting user, typically used for authentication/authorization checks.
+     * @return A {@link ResponseEntity} containing a list of {@link TrainerProfile}.
+     */
     @Operation(
             summary = "Get Not Assigned Active Trainers",
-            description = "Retrieve a list of active trainers who are not assigned to any trainees. Accessible only by ADMIN.",
+            description = "Retrieve a list of active trainers who are not assigned to any trainees.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "List of unassigned active trainers retrieved successfully"),
+                    @ApiResponse(responseCode = "200", description = "Unassigned active trainers get successfully"),
                     @ApiResponse(responseCode = "400", description = "Bad request due to validation error"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access"),
                     @ApiResponse(responseCode = "403", description = "Forbidden access")

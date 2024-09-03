@@ -1,5 +1,6 @@
 package com.epam.esm.gym.web.provider.trainee;
 
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
@@ -13,6 +14,17 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios involving trainee data.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply test data related to trainees.
+ * It is used to verify that the system correctly processes various trainee scenarios, including
+ * the creation, modification, and retrieval of trainee information.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TraineeArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
@@ -23,7 +35,7 @@ public class TraineeArgumentsProvider implements ArgumentsProvider {
                 .username("Harry.Potter")
                 .password("password123")
                 .active(true)
-//                .permission(RoleType.TRAINER)
+                .permission(RoleType.ROLE_TRAINEE)
                 .build();
 
         Trainee trainee = Trainee.builder()

@@ -15,6 +15,21 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing trainee registration scenarios.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply various sets of input data
+ * for test cases related to registering trainees. It covers different scenarios to
+ * validate the system's response to valid and invalid registration requests for trainees.</p>
+ *
+ * <p>The provided arguments include different combinations of valid and invalid registration
+ * details to ensure comprehensive testing of the registration functionality, including edge
+ * cases and error handling.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TraineeRegistrationArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
@@ -59,7 +74,7 @@ public class TraineeRegistrationArgumentsProvider implements ArgumentsProvider {
     private ProfileResponse getProfileResponse() {
         return ProfileResponse.builder()
                 .username("Harry.Potter")
-                .password("generated_password")
+                .password("password123")
                 .build();
     }
 }

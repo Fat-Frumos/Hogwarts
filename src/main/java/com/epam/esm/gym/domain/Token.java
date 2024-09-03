@@ -21,6 +21,12 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Entity representing an authentication token.
+ *
+ * <p>This class defines the structure of a token used for authentication, including its type, value, and validity.
+ * It includes fields for the token type, access token, expiration details, and association with a {@link User}.</p>
+ */
 @Setter
 @Getter
 @Entity
@@ -48,15 +54,36 @@ public class Token implements Serializable {
     private User user;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Token token = (Token) o;
-        return revoked == token.revoked && expired == token.expired && Objects.equals(id, token.id) && tokenType == token.tokenType && Objects.equals(accessToken, token.accessToken) && Objects.equals(accessTokenTTL, token.accessTokenTTL);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Token token = (Token) obj;
+        return revoked == token.revoked && expired == token.expired
+                && Objects.equals(id, token.id) && tokenType == token.tokenType
+                && Objects.equals(accessToken, token.accessToken)
+                && Objects.equals(accessTokenTTL, token.accessTokenTTL);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, tokenType, accessToken, accessTokenTTL, revoked, expired);
     }
+
+    /**
+     * Enumeration representing the type of authentication token.
+     *
+     * <p>This enum defines the various types of tokens that can be used in the authentication process.</p>
+     */
+    public enum TokenType {
+
+        /**
+         * Represents a Bearer token type, commonly used in HTTP authentication headers.
+         */
+        BEARER
+    }
+
 }

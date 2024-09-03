@@ -11,6 +11,22 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios involving response entities of trainee profiles
+ * and their associated trainers.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply input data specifically for
+ * test cases that involve the response entities of trainee profiles and their associated
+ * trainers. It helps ensure that the system correctly handles and returns data for such cases.</p>
+ *
+ * <p>The provided arguments include various combinations of trainee profiles and their
+ * associated trainers, facilitating comprehensive testing of the response handling for these
+ * profiles and relationships.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TraineeTrainersResponseEntityProfileArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {

@@ -9,6 +9,17 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios where there are active trainers that are not assigned.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply test data for scenarios where
+ * active trainers are present but have not been assigned to any trainees.
+ * It is used to verify that the system correctly identifies and processes active, unassigned trainers.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class NotAssignedActiveTrainersArgumentsProvider implements ArgumentsProvider {
 
     @Override

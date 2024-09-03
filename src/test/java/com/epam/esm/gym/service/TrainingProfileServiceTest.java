@@ -10,6 +10,7 @@ import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.dto.training.TrainingTypeResponse;
 import com.epam.esm.gym.mapper.TrainingMapper;
+import com.epam.esm.gym.service.profile.TrainingProfileService;
 import com.epam.esm.gym.web.provider.trainee.TraineeTrainingArgumentsProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,13 +62,15 @@ class TrainingProfileServiceTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainingArgumentsProvider.class)
-    void testGetTrainerTrainingsByName(Map<String, String> params, Trainee trainee, Training training, TrainingResponse response) {
-        String username = "Severus.Snape";
-        when(dao.findTrainingsByTrainerUsername(username)).thenReturn(List.of(training));
+    void testGetTrainerTrainingsByName(
+            Map<String, String> params, Trainee trainee,
+            Training training, TrainingResponse response) {
+        String name = "Severus.Snape";
+        when(dao.findTrainingsByTrainerUsername(name)).thenReturn(List.of(training));
         when(mapper.toDtos(List.of(training))).thenReturn(List.of(response));
-        ResponseEntity<List<TrainingResponse>> result = service.getTrainerTrainingsByName(username, new TrainingProfile());
+        ResponseEntity<List<TrainingResponse>> result = service.getTrainerTrainingsByName(name, new TrainingProfile());
         assertEquals(ResponseEntity.ok(List.of(response)), result);
-        verify(dao).findTrainingsByTrainerUsername(username);
+        verify(dao).findTrainingsByTrainerUsername(name);
         verify(mapper).toDtos(List.of(training));
     }
 

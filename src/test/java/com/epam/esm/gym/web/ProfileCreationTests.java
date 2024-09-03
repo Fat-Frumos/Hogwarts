@@ -56,9 +56,12 @@ class ProfileCreationTests {
         when(trainerService.registerTrainer(any(TrainerRequest.class)))
                 .thenReturn(ResponseEntity.ok(new ProfileResponse(firstName + "." + lastName, "Specialization123")));
 
-        Trainer trainer = new Trainer(1L, new User(), new TrainingType(), new HashSet<>(), new HashSet<>(), new HashSet<>());
+        Trainer trainer = new Trainer(1L, new User(), new TrainingType(),
+                new HashSet<>(), new HashSet<>(), new HashSet<>());
         when(trainerDao.save(any(Trainer.class))).thenReturn(trainer);
-        String requestBody = String.format(readPayloadJson("src/test/resources/validTraineeProfiles.json"), firstName, lastName, specialization);
+        String requestBody = String.format(
+                readPayloadJson("src/test/resources/validTraineeProfiles.json"),
+                firstName, lastName, specialization);
         mockMvc.perform(post("/api/trainers/register").contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -78,7 +81,8 @@ class ProfileCreationTests {
                             : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 });
 
-        Trainer trainer = new Trainer(1L, new User(), new TrainingType(), new HashSet<>(), new HashSet<>(), new HashSet<>());
+        Trainer trainer = new Trainer(1L, new User(), new TrainingType(),
+                new HashSet<>(), new HashSet<>(), new HashSet<>());
         when(trainerDao.save(any(Trainer.class))).thenReturn(trainer);
 
         String requestBody = String.format(readPayloadJson("src/test/resources/validTraineeProfiles.json"),

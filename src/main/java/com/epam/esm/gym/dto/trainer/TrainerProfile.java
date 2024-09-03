@@ -12,6 +12,12 @@ import lombok.ToString;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Data Transfer Object for representing a trainer profile.
+ *
+ * <p>This DTO includes the trainer's username, first and last name,
+ * specialization, active status, and associated trainees.</p>
+ */
 @Getter
 @Setter
 @Builder
@@ -27,11 +33,20 @@ public class TrainerProfile {
     private List<TraineeProfile> trainees;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TrainerProfile profile = (TrainerProfile) o;
-        return active == profile.active && Objects.equals(username, profile.username) && Objects.equals(firstName, profile.firstName) && Objects.equals(lastName, profile.lastName) && Objects.equals(specialization, profile.specialization) && Objects.equals(trainees, profile.trainees);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        TrainerProfile profile = (TrainerProfile) obj;
+        return active == profile.active
+                && Objects.equals(username, profile.username)
+                && Objects.equals(firstName, profile.firstName)
+                && Objects.equals(lastName, profile.lastName)
+                && Objects.equals(specialization, profile.specialization)
+                && Objects.equals(trainees, profile.trainees);
     }
 
     @Override

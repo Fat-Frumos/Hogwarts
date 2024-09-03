@@ -7,10 +7,12 @@ import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
+import com.epam.esm.gym.exception.UserNotFoundException;
 import com.epam.esm.gym.mapper.TrainerMapper;
+import com.epam.esm.gym.service.profile.TrainerProfileService;
+import com.epam.esm.gym.service.profile.UserProfileService;
 import com.epam.esm.gym.web.provider.trainer.TrainerRequestArgumentsProvider;
 import com.epam.esm.gym.web.provider.trainee.TraineeTrainerNameArgumentsProvider;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -53,7 +55,9 @@ class TrainerProfileServiceTest {
 
     @ParameterizedTest
     @ArgumentsSource(TrainerRequestArgumentsProvider.class)
-    void testRegisterTrainer(Trainer trainer, TrainerProfile profile, TrainerRequest request, ProfileResponse response) {
+    void testRegisterTrainer(
+            Trainer trainer, TrainerProfile profile,
+            TrainerRequest request, ProfileResponse response) {
         when(userService.saveTrainer(request)).thenReturn(profile);
         when(mapper.toEntity(profile)).thenReturn(trainer);
         when(dao.save(trainer)).thenReturn(trainer);
@@ -131,7 +135,7 @@ class TrainerProfileServiceTest {
     void testGetTrainerThrowsEntityNotFoundException(Trainer trainer) {
         String username = trainer.getUser().getUsername();
         when(dao.findByUsername(username)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> service.getTrainer(username));
+        assertThrows(UserNotFoundException.class, () -> service.getTrainer(username));
     }
 
     @ParameterizedTest

@@ -7,22 +7,56 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+/**
+ * Configuration properties for JWT (JSON Web Token) settings.
+ * <p>
+ * This class encapsulates the configuration properties related to JWT, including
+ * the issuer, secret key, and token expiration durations for access and refresh tokens.
+ * It is typically used to manage and access JWT configurations from application properties.
+ * </p>
+ */
 @Getter
 @Setter
 @Component
 @ConfigurationProperties("jwt")
 public class JwtProperties {
+    /**
+     * The issuer of the JWT, typically used to identify the origin of the token.
+     * This value is used when generating the token to set the "iss" claim.
+     */
     private String issuer;
+
+    /**
+     * The secret key used for signing and verifying the JWT.
+     * This key must be kept secure and private to prevent unauthorized access to the tokens.
+     */
     private String secret;
+
+    /**
+     * The expiration duration for the access token, in milliseconds.
+     * This value defines how long the access token remains valid after issuance.
+     */
     private long access;
+
+    /**
+     * The expiration duration for the refresh token, in milliseconds.
+     * This value defines the lifespan of the refresh token, which is used to obtain a new access token.
+     */
     private long refresh;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        JwtProperties that = (JwtProperties) o;
-        return access == that.access && refresh == that.refresh && Objects.equals(issuer, that.issuer) && Objects.equals(secret, that.secret);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        JwtProperties that = (JwtProperties) obj;
+        return access == that.access
+                && refresh == that.refresh
+                && Objects.equals(issuer, that.issuer)
+                && Objects.equals(secret, that.secret);
     }
 
     @Override

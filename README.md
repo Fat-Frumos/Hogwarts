@@ -2,6 +2,8 @@
 
 [![Java CI with Maven](https://github.com/Fat-Frumos/XStack/actions/workflows/maven.yml/badge.svg)](https://github.com/Fat-Frumos/XStack/actions/workflows/maven.yml)
 
+http://localhost:8080/swagger-ui/index.html#/
+
 ### General description
 
 The main goal of this project is to develop a gym application. To use the application (apart from the Registration

@@ -8,6 +8,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a training profile containing details about a specific training session.
+ *
+ * <p>This class encapsulates information about a training session,
+ * including the period, trainer, and type of training.</p>
+ */
 @Getter
 @Builder
 @NoArgsConstructor
@@ -19,11 +25,18 @@ public class TrainingProfile {
     private String trainingType;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TrainingProfile profile = (TrainingProfile) o;
-        return Objects.equals(periodFrom, profile.periodFrom) && Objects.equals(periodTo, profile.periodTo) && Objects.equals(trainerName, profile.trainerName) && Objects.equals(trainingType, profile.trainingType);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        TrainingProfile profile = (TrainingProfile) obj;
+        return Objects.equals(periodFrom, profile.periodFrom)
+                && Objects.equals(periodTo, profile.periodTo)
+                && Objects.equals(trainerName, profile.trainerName)
+                && Objects.equals(trainingType, profile.trainingType);
     }
 
     @Override

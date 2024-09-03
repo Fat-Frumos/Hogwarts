@@ -1,0 +1,907 @@
+{
+	"info": {
+		"_postman_id": "b0765bac-8b38-46ca-aa47-94f22ed28d49",
+		"name": "Gym Spring Collection",
+		"description": "Collection to test Gym application microservices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10796869"
+	},
+	"item": [
+		{
+			"name": "Authentication API",
+			"item": [
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"firstName\": \"Hermione\", \"lastName\": \"Granger\", \"username\": \"hermione.granger@hogwarts.edu\", \"password\": \"password123\", \"isActive\": true}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/signup",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AuthLogin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"hermione.granger@hogwarts.edu\", \"password\": \"password123\"}"
+						},
+						"url": {
+							"raw": "{{url}}/api/auth/login?username=Ron.Weasley.3&password=XPsKCN8Hjd",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "Ron.Weasley.3"
+								},
+								{
+									"key": "password",
+									"value": "XPsKCN8Hjd"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"hermione.granger@hogwarts.edu\", \"password\": \"password123\"}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/token/authenticate",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"auth",
+								"token",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Tokens",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <refresh_token>"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/auth/token/refresh",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"auth",
+								"token",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <access_token>"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/auth/logout",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User API",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"luna.lovegood@hogwarts.edu\", \"firstName\": \"Luna\", \"lastName\": \"Lovegood\", \"password\": \"password123\", \"isActive\": true}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Username",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/luna.lovegood@hogwarts.edu",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"users",
+								"luna.lovegood@hogwarts.edu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"firstName\": \"Luna\", \"lastName\": \"Lovegood\"}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users/luna.lovegood@hogwarts.edu",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"users",
+								"luna.lovegood@hogwarts.edu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/luna.lovegood@hogwarts.edu",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"users",
+								"luna.lovegood@hogwarts.edu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Trainee API",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields - message and statusCode\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.message).to.exist;\r",
+									"    pm.expect(responseData.statusCode).to.exist;\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Message is a non-empty string\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"  \r",
+									"  pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Message should not be empty\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"password\": \"Password123\",\"username\": \"Harry.Potter\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/login?username=Ron.Weasley.3&password=XPsKCN8Hjd",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "Ron.Weasley.3"
+								},
+								{
+									"key": "password",
+									"value": "XPsKCN8Hjd"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Trainee",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"firstName\": \"Ron\", \"lastName\": \"Weasley\"}"
+						},
+						"url": {
+							"raw": "{{url}}/api/trainees/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainees",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trainee Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainees/ron.weasley@hogwarts.edu",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainees",
+								"ron.weasley@hogwarts.edu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Trainee Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"firstName\": \"Ronald\", \"lastName\": \"Weasley\"}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/trainees/ron.weasley@hogwarts.edu",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainees",
+								"ron.weasley@hogwarts.edu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Trainee Profile",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainees/ron.weasley@hogwarts.edu",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainees",
+								"ron.weasley@hogwarts.edu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Trainees",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainees",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainees"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Trainer API",
+			"item": [
+				{
+					"name": "Register Trainer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"severus.snape@hogwarts.edu\", \"firstName\": \"Severus\", \"lastName\": \"Snape\", \"password\": \"password123\", \"isActive\": true}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/trainers/register",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trainer Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainers/severus.snape@hogwarts.edu",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"severus.snape@hogwarts.edu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Trainer Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"firstName\": \"Severus\", \"lastName\": \"Snape\"}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/trainers/severus.snape@hogwarts.edu",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"severus.snape@hogwarts.edu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Trainer",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainers/severus.snape@hogwarts.edu",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"severus.snape@hogwarts.edu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Trainers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainers",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Training API",
+			"item": [
+				{
+					"name": "Add Training",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"title\": \"Potions Mastery\", \"description\": \"Advanced potions techniques.\", \"trainerUsername\": \"severus.snape@hogwarts.edu\", \"schedule\": \"2024-09-01T10:00:00Z\"}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/trainings/add",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Training By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainings/1",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Training",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"title\": \"Advanced Potions Mastery\", \"description\": \"In-depth potions techniques.\", \"schedule\": \"2024-09-01T11:00:00Z\"}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/trainings/1",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Training",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainings/1",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Trainings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainings",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainings"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Training Type API",
+			"item": [
+				{
+					"name": "Add Training Type",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"Potions\", \"description\": \"Training sessions related to potion-making.\"}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/trainings/types",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Training Type By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainings/types/1",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"types",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Training Type",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"Advanced Potions\", \"description\": \"In-depth potion-making sessions.\"}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/trainings/types/1",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"types",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Training Type",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainings/types/1",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"types",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Training Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/trainings/types",
+							"protocol": "https",
+							"host": [
+								"hogwart-gym",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"types"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

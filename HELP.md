@@ -46,7 +46,6 @@ Implemented as Hibernate solution and include the follow capabilities:
 15.Get Trainer Trainings List by trainer username and criteria.
 16.Add training.
 17.Get not assigned on specific trainee active trainers list.
-18.Update Tranee's trainers list
 1.During Create Trainer/Trainee profile username and password are generated as described in previous module.
 2.All functions except Create Trainer/Trainee profile can be executed only after Trainee/Trainer authentication (on this
 step should be checked username and password matching)
@@ -63,7 +62,6 @@ step should be checked username and password matching)
 13.Each table has its own PK.
 14.Transaction management implemented.
 15.Hibernate configured for work with DBMS that was chosen.
-16.contains proper logging.
 
 Technical Notes:
 

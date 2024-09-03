@@ -19,10 +19,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Unit tests for the {@link TraineeMapper} class.
+ *
+ * <p>This class is responsible for verifying the functionality of the {@link TraineeMapper},
+ * which is used to map between {@link Trainee} entities and their corresponding DTOs.
+ * The tests ensure that the mapping logic correctly converts entities to DTOs and vice versa,
+ * maintaining data integrity and proper field mapping.</p>
+ *
+ * <p>Tests include verification of field mappings, handling of nested objects, and
+ * confirmation that custom mapping logic is executed as expected. This class ensures
+ * that the mapper functions correctly across different scenarios and data sets.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 class TraineeMapperTest {
 
     private final TraineeMapper traineeMapper = Mappers.getMapper(TraineeMapper.class);
-
 
     @Test
     void testToTraineeProfile() {

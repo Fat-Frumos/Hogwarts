@@ -10,6 +10,17 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios involving trainer data.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply test data related to trainers.
+ * It is used to verify that the system correctly handles various trainer data scenarios, including
+ * the creation, modification, and retrieval of trainer information.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TrainerArgumentsProvider implements ArgumentsProvider {
 
     @Override

@@ -1,5 +1,11 @@
 package com.epam.esm.gym.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityResult;
@@ -19,15 +25,27 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Represents a trainee participating in training sessions.
+ *
+ * <p>This class holds information about the trainee, including their user
+ * profile, assigned sessions, and performance data. It is used to manage
+ * trainee-specific details within the training application.</p>
+ *
+ * @author Pavlo Poliak
+ * @since 1.0
+ */
 @Entity
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "trainee")
@@ -45,12 +63,16 @@ public class Trainee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
     @Column(name = "address")
     private String address;
 
+    @JsonProperty("user")
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -66,12 +88,34 @@ public class Trainee {
     )
     private Set<Trainer> trainers;
 
+    /**
+     * Retrieves the username of the current user.
+     *
+     * <p>This method returns the username from the underlying {@link User} object.
+     * It is used to fetch the unique identifier of the user for authentication and
+     * authorization processes.</p>
+     *
+     * @return the username of the current user
+     */
+    public String getUsername() {
+        return user.getUsername();
+    }
+
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Trainee trainee = (Trainee) o;
-        return Objects.equals(id, trainee.id) && Objects.equals(dateOfBirth, trainee.dateOfBirth) && Objects.equals(address, trainee.address) && Objects.equals(user, trainee.user) && Objects.equals(trainings, trainee.trainings) && Objects.equals(trainers, trainee.trainers);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Trainee trainee = (Trainee) obj;
+        return Objects.equals(id, trainee.id)
+                && Objects.equals(dateOfBirth, trainee.dateOfBirth)
+                && Objects.equals(address, trainee.address)
+                && Objects.equals(user, trainee.user)
+                && Objects.equals(trainings, trainee.trainings)
+                && Objects.equals(trainers, trainee.trainers);
     }
 
     @Override

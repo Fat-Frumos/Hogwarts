@@ -10,6 +10,25 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+/**
+ * Base class for integration tests of Spring Boot controllers.
+ *
+ * <p>This abstract class sets up the test environment for controllers by configuring
+ * {@link MockMvc} to perform HTTP requests and validate responses. It is intended to be
+ * extended by specific controller test classes to leverage the pre-configured {@link MockMvc}
+ * instance for end-to-end testing of controller endpoints.</p>
+ *
+ * <p>The class uses {@link SpringBootTest} to load the full application context and
+ * {@link AutoConfigureMockMvc} to configure and inject a {@link MockMvc} instance. This allows
+ * for testing of controllers in an environment that closely resembles production.</p>
+ *
+ * <p>It provides a common setup for controller tests, including loading the Spring context
+ * and configuring mock HTTP requests and responses.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 public abstract class ControllerTest {
@@ -23,6 +42,6 @@ public abstract class ControllerTest {
     @MockBean
     protected TrainerService trainerService;
     @MockBean
-    protected TraineeService traineeService;
+    protected TraineeService service;
     protected final String password = "Password123";
 }

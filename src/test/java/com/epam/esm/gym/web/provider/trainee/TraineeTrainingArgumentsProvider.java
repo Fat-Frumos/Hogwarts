@@ -16,6 +16,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios involving trainees and their associated training sessions.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply input data specifically for
+ * test cases that focus on trainee-training relationships. It helps verify the system's
+ * behavior when dealing with various training sessions associated with trainees.</p>
+ *
+ * <p>The provided arguments include different combinations of trainees and their corresponding
+ * training sessions, ensuring thorough testing of how the system handles these relationships.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TraineeTrainingArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {

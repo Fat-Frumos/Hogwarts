@@ -22,10 +22,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Integration tests for the {@link TrainingController} class.
+ *
+ * <p>This class tests the endpoints of the {@link TrainingController} to ensure that they are working
+ * correctly and returning the expected results. It uses {@link org.springframework.test.web.servlet.MockMvc}
+ * to perform requests and assert responses, ensuring that the training-related API operations.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TrainingControllerTest extends ControllerTest {
 
-    private final String BASE_URL = "/api/trainings";
-
+    private static final String base_url = "/api/trainings";
     public static Map<String, Object> training;
     public static List<TrainingTypeResponse> trainingTypes;
 
@@ -49,7 +59,7 @@ public class TrainingControllerTest extends ControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void testAddTraining() throws Exception {
-        mockMvc.perform(post(BASE_URL + "/add")
+        mockMvc.perform(post(base_url + "/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(training)))
                 .andExpect(status().isCreated());
@@ -60,7 +70,7 @@ public class TrainingControllerTest extends ControllerTest {
     void testGetTrainingTypes() throws Exception {
         when(trainingService.getTrainingTypes()).thenReturn(trainingTypes);
 
-        String result = mockMvc.perform(get(BASE_URL + "/types"))
+        String result = mockMvc.perform(get(base_url + "/types"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()

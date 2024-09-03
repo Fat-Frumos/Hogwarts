@@ -7,13 +7,11 @@ import com.epam.esm.gym.dto.profile.MessageResponse;
 import com.epam.esm.gym.dto.profile.UserProfile;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
-import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.mapper.UserMapper;
+import com.epam.esm.gym.service.profile.UserProfileService;
 import com.epam.esm.gym.web.provider.AuthenticationArgumentsProvider;
 import com.epam.esm.gym.web.provider.UserArgumentsProvider;
 import com.epam.esm.gym.web.provider.trainee.TraineeProfileArgumentsProvider;
-import com.epam.esm.gym.web.provider.trainer.TrainerProfileArgumentsProvider;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
@@ -31,12 +29,27 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Unit tests for {@link UserProfileService}.
+ *
+ * <p>This class contains test cases for the {@link UserProfileService} service layer. The tests ensure
+ * that the service behaves correctly under various scenarios by using Mockito to mock dependencies and
+ * verify interactions. Each test method sets up mocks and asserts expected outcomes to validate the
+ * correctness of the service's methods.</p>
+ *
+ * <p>The class uses JUnit 5 and Mockito to create a controlled testing environment. Mocks are injected
+ * into the {@link UserProfileService} instance to isolate the service's behavior from external dependencies
+ * and to focus on testing the service logic.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 @ExtendWith(MockitoExtension.class)
 public class UserProfileServiceTest {
     @InjectMocks
@@ -50,39 +63,38 @@ public class UserProfileServiceTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
-    void saveTrainee(String expectedUsername, ResponseEntity<TraineeProfile> expectedResponse, TraineeRequest request) {
-        User mockUser = User.builder().password("Password123").username(expectedUsername).build();
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(userMapper.toUser(eq(request.getFirstName()), eq(request.getLastName()), eq(expectedUsername), anyString())).thenReturn(mockUser);
-        when(userDao.save(mockUser)).thenReturn(mockUser);
-        when(userMapper.toTraineeProfile(mockUser)).thenReturn(expectedResponse.getBody());
-        TraineeProfile result = userProfileService.saveTrainee(request);
-        assertNotNull(result);
-        assertEquals(expectedResponse.getBody(), result);
-        verify(userDao).save(mockUser);
-        verify(userMapper).toTraineeProfile(mockUser);
-    }
+    void saveTrainee(String expectedUsername,
+                     ResponseEntity<TraineeProfile> expectedResponse,
+                     TraineeRequest request) {
+        String encodedPassword = "encodedPassword";
 
-    @ParameterizedTest
-    @ArgumentsSource(TrainerProfileArgumentsProvider.class)
-    void saveTrainer(String expectedUsername, TrainerProfile expectedResponse, TrainerRequest request) {
-        User user = User.builder()
-                .id(1)
-                .firstName("Harry")
-                .lastName("Potter")
-                .username("Harry.Potter")
-                .password("password123")
-                .active(true)
-                .permission(RoleType.ROLE_TRAINER)
-                .build();
-        when(userMapper.toUser(eq(request.getFirstName()), eq(request.getLastName()), eq(expectedUsername), anyString())).thenReturn(user);
-        when(userDao.save(user)).thenReturn(user);
-        when(userMapper.toTrainerProfile(user)).thenReturn(expectedResponse);
-        TrainerProfile result = userProfileService.saveTrainer(request);
-        assertNotNull(result);
-        assertEquals(expectedResponse, result);
+        User user = new User();
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setUsername(expectedUsername);
+        user.setPassword(encodedPassword);
+        user.setPermission(RoleType.ROLE_TRAINEE);
+
+        User savedUser = new User();
+        savedUser.setId(1);
+        savedUser.setFirstName(request.getFirstName());
+        savedUser.setLastName(request.getLastName());
+        savedUser.setUsername(expectedUsername);
+        savedUser.setPassword(encodedPassword);
+        savedUser.setPermission(RoleType.ROLE_TRAINEE);
+
+        when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
+        when(userMapper.toUser(request.getFirstName(), request.getLastName(),
+                expectedUsername, encodedPassword, RoleType.ROLE_TRAINEE)).thenReturn(user);
+        when(userDao.save(user)).thenReturn(savedUser);
+
+        User result = userProfileService.saveTraineeUser(request);
+
+        assertEquals(savedUser, result);
+        verify(passwordEncoder).encode(anyString());
+        verify(userMapper).toUser(request.getFirstName(), request.getLastName(),
+                expectedUsername, encodedPassword, RoleType.ROLE_TRAINEE);
         verify(userDao).save(user);
-        verify(userMapper).toTrainerProfile(user);
     }
 
     @ParameterizedTest

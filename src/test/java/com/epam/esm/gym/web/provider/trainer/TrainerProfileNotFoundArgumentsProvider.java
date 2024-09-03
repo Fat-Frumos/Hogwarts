@@ -11,6 +11,22 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios where trainer profiles are not found.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply various sets of input data
+ * for test cases that involve scenarios where a trainer profile is not found. These scenarios
+ * help validate the system's behavior when attempting to access or operate on trainer profiles
+ * that do not exist or are unavailable.</p>
+ *
+ * <p>The provided arguments simulate different conditions under which a trainer profile might
+ * be missing, enabling comprehensive testing of error handling and response mechanisms for
+ * such cases.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TrainerProfileNotFoundArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
@@ -21,9 +37,7 @@ public class TrainerProfileNotFoundArgumentsProvider implements ArgumentsProvide
                 .build();
 
         MessageResponse response = MessageResponse.builder()
-                .message("Trainer not found")
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .build();
+                .message("Trainer not found").build();
 
         return Stream.of(
                 Arguments.of(request, ResponseEntity.status(HttpStatus.NOT_FOUND).body(response))

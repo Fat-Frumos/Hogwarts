@@ -11,6 +11,17 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios related to registering trainers.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply test data for scenarios where
+ * trainers are being registered. It is used to verify that the system correctly processes
+ * registration requests for trainers and handles various edge cases or validation scenarios.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class RegisterTrainerArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {

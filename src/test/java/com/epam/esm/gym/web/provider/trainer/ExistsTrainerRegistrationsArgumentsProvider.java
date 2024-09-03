@@ -10,6 +10,17 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios where trainer registrations exist.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply test data for scenarios where
+ * trainer registrations are present. It is used to verify that the system correctly
+ * processes and responds when there are existing registrations for trainers.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class ExistsTrainerRegistrationsArgumentsProvider implements ArgumentsProvider {
 
     @Override

@@ -11,6 +11,21 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Provides arguments for testing scenarios involving trainee training responses.
+ *
+ * <p>This class implements {@link ArgumentsProvider} to supply input data specifically for
+ * test cases that focus on responses related to trainees and their training sessions.
+ * It ensures that the system correctly processes and returns responses for various
+ * trainee-training interactions.</p>
+ *
+ * <p>The provided arguments include various combinations of trainee training responses,
+ * facilitating comprehensive testing of how the system handles these responses.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 public class TraineeTrainingResponseArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {

@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -34,15 +33,32 @@ import java.util.Objects;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Unit tests for the {@link TraineeController} class.
+ *
+ * <p>This class extends {@link ControllerTest} and provides specific test cases for the
+ * {@link TraineeController} to ensure that its endpoints are functioning as expected. It uses
+ * Mockito for mocking dependencies and Spring's MockMvc to perform and validate HTTP requests.</p>
+ *
+ * <p>Tests cover various scenarios for the TraineeController's endpoints including creating,
+ * retrieving, and updating trainees. Each test method is designed to verify that the controller
+ * interacts with the service layer correctly and handles requests and responses as intended.</p>
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
+ */
 class TraineeControllerTest extends ControllerTest {
 
-    private final String BASE_URL = "/api/trainees";
+    private static final String base_url = "/api/trainees";
     private static final String username = "Harry.Potter";
     private Map<String, String> params;
 
@@ -58,12 +74,14 @@ class TraineeControllerTest extends ControllerTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeMissingRegistrationArgumentsProvider.class)
-    void testTraineeRegistrationMissingRequiredFields(TraineeRequest traineeRequest, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
+    void testTraineeRegistrationMissingRequiredFields(
+            TraineeRequest traineeRequest, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/trainees/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(traineeRequest)));
         resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()));
-        String actualMessage = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(), MessageResponse.class).getMessage();
+        String content = resultActions.andReturn().getResponse().getContentAsString();
+        String actualMessage = objectMapper.readValue(content, MessageResponse.class).getMessage();
         Arrays.stream(Objects.requireNonNull(expectedResponse.getBody()).getMessage().split(", "))
                 .forEach(expectedMessage -> assertThat(actualMessage).contains(expectedMessage));
     }
@@ -71,7 +89,7 @@ class TraineeControllerTest extends ControllerTest {
     @ParameterizedTest
     @ArgumentsSource(TraineeRegistrationArgumentsProvider.class)
     void testRegisterTrainee(TraineeRequest request, ResponseEntity<ProfileResponse> response) throws Exception {
-        when(traineeService.register(request)).thenReturn(response);
+        when(service.register(request)).thenReturn(response);
         String result = mockMvc.perform(MockMvcRequestBuilders.post("/api/trainees/register")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -85,8 +103,9 @@ class TraineeControllerTest extends ControllerTest {
     @ParameterizedTest
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
-    void testGetTraineeProfile(String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
-        when(traineeService.getTraineeProfileByName(username)).thenReturn(expectedResponse);
+    void testGetTraineeProfile(
+            String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
+        when(service.getTraineeProfileByName(username)).thenReturn(expectedResponse);
 
         String result = mockMvc.perform(get("/api/trainees/{username}", username)
                         .accept(MediaType.APPLICATION_JSON))
@@ -98,14 +117,15 @@ class TraineeControllerTest extends ControllerTest {
         Assertions.assertThat(actualProfile)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponse.getBody());
-        verify(traineeService).getTraineeProfileByName(username);
+        verify(service).getTraineeProfileByName(username);
     }
 
     @ParameterizedTest
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(NotFoundTraineeProfileArgumentsProvider.class)
-    void testGetNotFoundTraineeProfile(String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
-        when(traineeService.getTraineeProfileByName(username)).thenReturn(expectedResponse);
+    void testGetNotFoundTraineeProfile(
+            String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
+        when(service.getTraineeProfileByName(username)).thenReturn(expectedResponse);
         mockMvc.perform(get("/api/trainees/{username}", username))
                 .andExpect(status().isNotFound());
     }
@@ -113,9 +133,11 @@ class TraineeControllerTest extends ControllerTest {
     @ParameterizedTest
     @WithMockUser(roles = "ADMIN")
     @ArgumentsSource(TraineeTrainersResponseEntityProfileArgumentsProvider.class)
-    void testUpdateTraineeTrainers(String username, List<String> trainersUsernames, ResponseEntity<List<TrainerProfile>> expectedResponse) throws Exception {
-        when(traineeService.updateTraineeTrainersByName(username, trainersUsernames)).thenReturn(expectedResponse);
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/api/trainees/{username}/trainers", username)
+    void testUpdateTraineeTrainers(
+            String username, List<String> trainersUsernames,
+            ResponseEntity<List<TrainerProfile>> expectedResponse) throws Exception {
+        when(service.updateTraineeTrainersByName(username, trainersUsernames)).thenReturn(expectedResponse);
+        ResultActions resultActions = mockMvc.perform(put("/api/trainees/{username}/trainers", username)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(trainersUsernames)));
         resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()));
@@ -126,10 +148,12 @@ class TraineeControllerTest extends ControllerTest {
     @ParameterizedTest
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TraineeTrainingResponseArgumentsProvider.class)
-    void testGetTraineeTrainings(String username, TrainingProfile request, ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
-        when(traineeService.getTraineeTrainingsByName(username, params)).thenReturn(expectedResponse);
+    void testGetTraineeTrainings(
+            String username, TrainingProfile request,
+            ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
+        when(service.getTraineeTrainingsByName(username, params)).thenReturn(expectedResponse);
 
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainees/{username}/trainings", username)
+        ResultActions resultActions = mockMvc.perform(get("/api/trainees/{username}/trainings", username)
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("periodFrom", request.getPeriodFrom() != null ? request.getPeriodFrom().toString() : "")
                 .param("periodTo", request.getPeriodTo() != null ? request.getPeriodTo().toString() : "")
@@ -145,7 +169,7 @@ class TraineeControllerTest extends ControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void testDeleteTraineeProfile() throws Exception {
-        mockMvc.perform(delete(BASE_URL + "/" + username))
+        mockMvc.perform(delete(base_url + "/" + username))
                 .andExpect(status().is2xxSuccessful());
     }
 
@@ -153,51 +177,56 @@ class TraineeControllerTest extends ControllerTest {
     @WithMockUser(roles = "TRAINER")
     void testActivateDeactivateTrainee() throws Exception {
         Boolean active = true;
-        mockMvc.perform(patch(BASE_URL + "/" + username + "/activate")
+        mockMvc.perform(patch(base_url + "/" + username + "/activate")
                         .param("active", active.toString()))
                 .andExpect(status().isOk());
-        verify(traineeService).activateDeactivateProfile(username, active);
+        verify(service).activateDeactivateProfile(username, active);
     }
 
     @ParameterizedTest
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TraineeTrainingsNotFoundArgumentsProvider.class)
-    void testTraineeTrainingsNotFound(String username, ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
-        when(traineeService.getTraineeProfileByName(username)).thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/trainees/{username}/trainings", username));
-        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()));
+    void testTraineeTrainingsNotFound(
+            String username, ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
+        when(service.getTraineeProfileByName(username)).thenReturn(ResponseEntity.status(NOT_FOUND).build());
+        mockMvc.perform(get("/api/trainees/{username}/trainings", username))
+                .andExpect(status().is(expectedResponse.getStatusCode().value()));
     }
 
     @ParameterizedTest
     @WithMockUser(roles = "ADMIN")
     @ArgumentsSource(TraineeTrainingsNotFoundArgumentsProvider.class)
     void testTraineeProfileNotFound(String username) throws Exception {
-        when(traineeService.getTraineeProfileByName(username)).thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        when(service.getTraineeProfileByName(username)).thenReturn(ResponseEntity.status(NOT_FOUND).build());
         mockMvc.perform(get("/api/trainees/{username}", username)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
     }
 
     @ParameterizedTest
     @WithMockUser(roles = "ADMIN")
     @ArgumentsSource(TraineeTrainingsNotFoundArgumentsProvider.class)
     void testTraineeProfileNotFoundWhenDelete(String username) throws Exception {
-        when(traineeService.deleteTrainee(username)).thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/api/trainees/{username}", username));
+        when(service.deleteTrainee(username)).thenReturn(ResponseEntity.status(NOT_FOUND).build());
+        ResultActions resultActions = mockMvc.perform(delete("/api/trainees/{username}", username));
         resultActions.andExpect(status().isNotFound());
     }
 
     @ParameterizedTest
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
-    void testUpdateTraineeProfile(String username, ResponseEntity<TraineeProfile> expectedResponse, TraineeRequest request) throws Exception {
-        when(traineeService.updateTrainee(username, request)).thenReturn(expectedResponse);
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/api/trainees/{username}", username)
+    void testUpdateTraineeProfile(
+            String username, ResponseEntity<TraineeProfile> response, TraineeRequest request) throws Exception {
+        when(service.updateTrainee(username, request)).thenReturn(response);
+
+        ResultActions resultActions = mockMvc.perform(put("/api/trainees/{username}", username)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
-        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()));
+
+        resultActions.andExpect(status().is(response.getStatusCode().value()));
+
         String responseContent = resultActions.andReturn().getResponse().getContentAsString();
-        String expectedContent = objectMapper.writeValueAsString(expectedResponse.getBody());
+        String expectedContent = objectMapper.writeValueAsString(response.getBody());
+
         assertThat(responseContent).isEqualTo(expectedContent);
     }
 }

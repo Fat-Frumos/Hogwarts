@@ -8,6 +8,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
+/**
+ * Represents the response containing details about a training type.
+ *
+ * <p>This class provides the necessary details regarding a type of training, including the specialization it represents
+ * and its unique identifier.</p>
+ */
 @Getter
 @Builder
 @NoArgsConstructor
@@ -17,10 +23,14 @@ public class TrainingTypeResponse {
     private Long trainingTypeId;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TrainingTypeResponse that = (TrainingTypeResponse) o;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        TrainingTypeResponse that = (TrainingTypeResponse) obj;
         return trainingType == that.trainingType && Objects.equals(trainingTypeId, that.trainingTypeId);
     }
 
