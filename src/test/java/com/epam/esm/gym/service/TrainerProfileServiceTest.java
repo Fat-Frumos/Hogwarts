@@ -1,7 +1,10 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dao.TrainerDao;
+import com.epam.esm.gym.dao.jpa.TrainingTypeRepository;
+import com.epam.esm.gym.domain.Specialization;
 import com.epam.esm.gym.domain.Trainer;
+import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
@@ -47,6 +50,8 @@ class TrainerProfileServiceTest {
     private UserProfileService userService;
 
     @Mock
+    private TrainingTypeRepository trainingTypeDao;
+    @Mock
     private TrainerMapper mapper;
 
     @Mock
@@ -60,26 +65,31 @@ class TrainerProfileServiceTest {
     void testRegisterTrainer(
             Trainer trainer, TrainerProfile profile,
             TrainerRequest request, ProfileResponse expectedResponse) {
-        User mockUser = trainer.getUser();
+
         String rawPassword = "rawPassword";
         String encodedPassword = "encodedPassword";
+        Specialization specialization = Specialization.DEFAULT;
+        TrainingType trainingType = TrainingType.builder().specialization(specialization).build();
+        User mockUser = trainer.getUser();
 
-        when(userService.createTrainerUser(request)).thenReturn(mockUser);
         when(userService.generateRandomPassword()).thenReturn(rawPassword);
         when(userService.encodePassword(rawPassword)).thenReturn(encodedPassword);
-        when(mapper.toTrainer(mockUser, request)).thenReturn(trainer);
-        when(dao.save(trainer)).thenReturn(trainer);
+        when(userService.createTrainerUser(request, encodedPassword)).thenReturn(mockUser);
+        when(userService.saveUser(mockUser)).thenReturn(mockUser);
+        when(trainingTypeDao.findBySpecialization(specialization)).thenReturn(Optional.of(trainingType));
+        when(mapper.toTrainer(mockUser, trainingType)).thenReturn(trainer);
         when(mapper.toProfileDto(mockUser.getUsername(), rawPassword)).thenReturn(expectedResponse);
 
         ResponseEntity<ProfileResponse> response = service.registerTrainer(request);
+
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(expectedResponse, response.getBody());
-
-        verify(userService).createTrainerUser(request);
         verify(userService).generateRandomPassword();
         verify(userService).encodePassword(rawPassword);
-        verify(mapper).toTrainer(mockUser, request);
-        verify(dao).save(trainer);
+        verify(userService).createTrainerUser(request, encodedPassword);
+        verify(userService).saveUser(mockUser);
+        verify(trainingTypeDao).findBySpecialization(specialization);
+        verify(mapper).toTrainer(mockUser, trainingType);
         verify(mapper).toProfileDto(mockUser.getUsername(), rawPassword);
     }
 

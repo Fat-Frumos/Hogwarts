@@ -59,9 +59,9 @@ public class UserProfileService implements UserService {
      */
     @Override
     @Transactional
-    public User createTraineeUser(TraineeRequest dto) {
+    public User createTraineeUser(TraineeRequest dto, String password) {
         String username = generateUsername(dto.getFirstName(), dto.getLastName());
-        return mapper.toUser(dto.getFirstName(), dto.getLastName(), username, RoleType.ROLE_TRAINEE);
+        return mapper.toUser(dto.getFirstName(), dto.getLastName(), username, password, RoleType.ROLE_TRAINEE);
     }
 
     /**
@@ -74,9 +74,9 @@ public class UserProfileService implements UserService {
      */
     @Override
     @Transactional
-    public User createTrainerUser(TrainerRequest dto) {
+    public User createTrainerUser(TrainerRequest dto, String password) {
         String username = generateUsername(dto.getFirstName(), dto.getLastName());
-        return mapper.toUser(dto.getFirstName(), dto.getLastName(), username, RoleType.ROLE_TRAINER);
+        return mapper.toUser(dto.getFirstName(), dto.getLastName(), username, password, RoleType.ROLE_TRAINER);
     }
 
     /**

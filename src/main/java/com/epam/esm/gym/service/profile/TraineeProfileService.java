@@ -1,7 +1,6 @@
 package com.epam.esm.gym.service.profile;
 
 import com.epam.esm.gym.dao.TraineeDao;
-import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
@@ -69,11 +68,9 @@ public class TraineeProfileService implements TraineeService {
      */
     @Override
     public ResponseEntity<ProfileResponse> register(TraineeRequest dto) {
-        User user = userService.createTraineeUser(dto);
         String rawPassword = userService.generateRandomPassword();
         String password = userService.encodePassword(rawPassword);
-        user.setPassword(password);
-        user.setPermission(RoleType.ROLE_TRAINEE);
+        User user = userService.createTraineeUser(dto, password);
         User savedUser = userService.saveUser(user);
         log.info("Created User: {}", savedUser);
         Trainee trainee = mapper.toTrainee(savedUser, dto);

@@ -1,8 +1,10 @@
 package com.epam.esm.gym.service.profile;
 
 import com.epam.esm.gym.dao.TrainerDao;
-import com.epam.esm.gym.domain.RoleType;
+import com.epam.esm.gym.dao.jpa.TrainingTypeRepository;
+import com.epam.esm.gym.domain.Specialization;
 import com.epam.esm.gym.domain.Trainer;
+import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
@@ -42,6 +44,7 @@ public class TrainerProfileService implements TrainerService {
     private final UserProfileService userService;
     private final TrainerMapper mapper;
     private final TrainerDao dao;
+    private final TrainingTypeRepository trainingTypeDao;
 
     /**
      * {@inheritDoc}
@@ -49,17 +52,23 @@ public class TrainerProfileService implements TrainerService {
      */
     @Override
     public ResponseEntity<ProfileResponse> registerTrainer(TrainerRequest dto) {
-        User user = userService.createTrainerUser(dto);
         String rawPassword = userService.generateRandomPassword();
         String password = userService.encodePassword(rawPassword);
-        user.setPassword(password);
-        user.setPermission(RoleType.ROLE_TRAINER);
-        Trainer trainer = mapper.toTrainer(user, dto);
-        Trainer saved = dao.save(trainer);
-        log.info("Saved user: {}", saved);
+        User user = userService.createTrainerUser(dto, password);
+        log.info("Saved {}", user);
+        user = userService.saveUser(user);
+        Specialization specialization = Specialization.fromString(dto.getSpecialization());
+        TrainingType trainingType = trainingTypeDao
+                .findBySpecialization(specialization)
+                .orElseGet(() -> trainingTypeDao.save(TrainingType.builder()
+                        .specialization(specialization)
+                        .build()));
+        Trainer trainer = mapper.toTrainer(user, trainingType);
+        log.info("Saved {}", trainer);
         ProfileResponse response = mapper.toProfileDto(trainer.getUsername(), rawPassword);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 
     /**
      * {@inheritDoc}

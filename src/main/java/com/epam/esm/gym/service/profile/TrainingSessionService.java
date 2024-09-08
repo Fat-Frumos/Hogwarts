@@ -1,7 +1,7 @@
 package com.epam.esm.gym.service.profile;
 
 import com.epam.esm.gym.dao.TrainerDao;
-import com.epam.esm.gym.dao.jpa.JpaTrainingSessionRepository;
+import com.epam.esm.gym.dao.jpa.TrainingSessionRepository;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.service.SessionService;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class TrainingSessionService implements SessionService {
 
-    private final JpaTrainingSessionRepository dao;
+    private final TrainingSessionRepository dao;
     private final TrainerDao trainerDao;
 
     /**

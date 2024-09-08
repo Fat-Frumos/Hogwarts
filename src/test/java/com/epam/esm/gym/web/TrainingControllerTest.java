@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.epam.esm.gym.domain.Specialization.DEFENSE;
-import static com.epam.esm.gym.domain.Specialization.POTIONS;
+import static com.epam.esm.gym.domain.Specialization.POISON;
 import static com.epam.esm.gym.domain.Specialization.TRANSFIGURATION;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,7 +42,7 @@ public class TrainingControllerTest extends ControllerTest {
     @BeforeAll
     static void beforeAll() {
         trainingTypes = List.of(
-                new TrainingTypeDto(POTIONS, 1L),
+                new TrainingTypeDto(POISON, 1L),
                 new TrainingTypeDto(DEFENSE, 2L),
                 new TrainingTypeDto(TRANSFIGURATION, 3L)
         );
@@ -50,8 +50,8 @@ public class TrainingControllerTest extends ControllerTest {
         training = new HashMap<>();
         training.put("traineeUsername", "Parry.Potter");
         training.put("trainerUsername", "Severus.Snape");
-        training.put("trainingName", "Potions Mastery");
-        training.put("trainingType", "Potions");
+        training.put("trainingName", "Poisons Mastery");
+        training.put("trainingType", "POISON");
         training.put("trainingDate", "2024-08-01");
         training.put("trainingDuration", 2);
     }

@@ -53,11 +53,13 @@ public interface UserMapper {
             String firstName,
             String lastName,
             String username,
+            String password,
             RoleType role) {
         return User.builder()
                 .firstName(firstName)
                 .lastName(lastName)
                 .permission(role)
+                .password(password)
                 .username(username)
                 .active(true)
                 .build();

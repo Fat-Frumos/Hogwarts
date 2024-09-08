@@ -1,6 +1,5 @@
 package com.epam.esm.gym.mapper;
 
-import com.epam.esm.gym.domain.Specialization;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
@@ -130,14 +129,11 @@ public interface TrainerMapper {
      * enum value derived from the request.</p>
      *
      * @param user the {@link User} entity to be associated with the trainer.
-     * @param dto  the {@link TrainerRequest} containing the details needed to create the trainer.
      * @return a {@link Trainer} entity with the specified user and specialization.
      */
-    default Trainer toTrainer(User user, TrainerRequest dto) {
+    default Trainer toTrainer(User user, TrainingType trainingType) {
         return Trainer.builder()
-                .specialization(TrainingType.builder()
-                        .specialization(Specialization.valueOf(dto.getSpecialization()))
-                        .build())
+                .specialization(trainingType)
                 .user(user).build();
     }
 }

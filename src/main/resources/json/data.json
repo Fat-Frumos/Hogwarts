@@ -348,7 +348,7 @@
       "id": 11,
       "specialization": {
         "id": 1,
-        "specialization": "POTIONS"
+        "specialization": "POISON"
       },
       "user": {
         "id": 11,
@@ -542,10 +542,10 @@
           "last_name": "Dumbledore"
         }
       },
-      "trainingName": "Potion Brewing",
+      "trainingName": "Poison Brewing",
       "type": {
         "id": 1,
-        "specialization": "POTIONS"
+        "specialization": "POISON"
       },
       "trainingDate": "2024-01-15",
       "trainingDuration": 25
@@ -662,10 +662,10 @@
           "last_name": "Sprout"
         }
       },
-      "trainingName": "Potions Advanced",
+      "trainingName": "Poisons Advanced",
       "type": {
         "id": 6,
-        "specialization": "POTIONS"
+        "specialization": "POISON"
       },
       "trainingDate": "2024-03-10",
       "trainingDuration": 27
@@ -710,10 +710,10 @@
           "last_name": "Slughorn"
         }
       },
-      "trainingName": "Potion Brewing Skills",
+      "trainingName": "Poison Brewing Skills",
       "type": {
         "id": 8,
-        "specialization": "POTIONS"
+        "specialization": "POISON"
       },
       "trainingDate": "2024-04-01",
       "trainingDuration": 23

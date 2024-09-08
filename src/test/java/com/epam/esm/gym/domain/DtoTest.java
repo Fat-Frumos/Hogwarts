@@ -1,4 +1,4 @@
-package com.epam.esm.gym.dto.auth;
+package com.epam.esm.gym.domain;
 
 import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Specialization;
@@ -6,6 +6,9 @@ import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingSession;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.auth.MessageResponse;
+import com.epam.esm.gym.dto.auth.RegisterRequest;
+import com.epam.esm.gym.dto.auth.UserPrincipal;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
@@ -212,7 +215,7 @@ class DtoTest {
                 "DefenseAgainstTheDarkArts", "2024-09-03", 90);
         TrainingRequest request3 = new TrainingRequest(
                 "HermioneGranger", "SeverusSnape",
-                "Potions", "2024-09-04", 120);
+                "POISON", "2024-09-04", 120);
 
         assertEquals(request1, request2);
         assertNotEquals(request1, request3);
@@ -234,7 +237,7 @@ class DtoTest {
                 "Albus Dumbledore", "DefenseAgainstTheDarkArts", "Magic",
                 90, LocalDate.of(2024, 9, 3));
         TrainingResponse response3 = new TrainingResponse(
-                "Severus Snape", "Potions", "Magic",
+                "Severus Snape", "POISON", "Magic",
                 120, LocalDate.of(2024, 9, 4));
 
         assertEquals(response1, response2);
@@ -252,7 +255,7 @@ class DtoTest {
     void testTrainingTypeResponse() {
         TrainingTypeDto type1 = new TrainingTypeDto(Specialization.CARDIO, 1L);
         TrainingTypeDto type2 = new TrainingTypeDto(Specialization.CARDIO, 1L);
-        TrainingTypeDto type3 = new TrainingTypeDto(Specialization.POTIONS, 2L);
+        TrainingTypeDto type3 = new TrainingTypeDto(Specialization.POISON, 2L);
 
         assertEquals(type1, type2);
         assertNotEquals(type1, type3);

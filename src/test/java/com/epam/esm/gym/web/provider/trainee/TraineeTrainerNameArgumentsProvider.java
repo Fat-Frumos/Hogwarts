@@ -26,7 +26,7 @@ public class TraineeTrainerNameArgumentsProvider implements ArgumentsProvider {
         return Stream.of(
                 Arguments.of("Albus Dumbledore", "Harry.Potter", "Defense Against the Dark Arts"),
                 Arguments.of("Remus.Lupin", "Hermione.Granger", "Care of Magical Creatures"),
-                Arguments.of("Severus.Snape", "Draco.Malfoy", "Potions")
+                Arguments.of("Severus.Snape", "Draco.Malfoy", "POISON")
         );
     }
 }

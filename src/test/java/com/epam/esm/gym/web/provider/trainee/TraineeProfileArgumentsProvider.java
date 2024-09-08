@@ -36,8 +36,8 @@ public class TraineeProfileArgumentsProvider implements ArgumentsProvider {
                 .specialization(Specialization.HERBOLOGY)
                 .build();
 
-        TrainingType potions = TrainingType.builder()
-                .specialization(Specialization.POTIONS)
+        TrainingType posions = TrainingType.builder()
+                .specialization(Specialization.POISON)
                 .build();
 
         List<SlimTrainerProfile> trainers = List.of(
@@ -51,7 +51,7 @@ public class TraineeProfileArgumentsProvider implements ArgumentsProvider {
                         .username("Severus.Snape")
                         .firstName("Severus")
                         .lastName("Snape")
-                        .specialization(potions)
+                        .specialization(posions)
                         .build()
         );
 

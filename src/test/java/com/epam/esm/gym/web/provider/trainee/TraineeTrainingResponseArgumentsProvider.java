@@ -39,7 +39,7 @@ public class TraineeTrainingResponseArgumentsProvider implements ArgumentsProvid
                         .build(),
                 TrainingResponse.builder()
                         .trainerName("Severus Snape")
-                        .trainingName("Potions Mastery")
+                        .trainingName("Poisons Mastery")
                         .trainingType("TRANSFIGURATION")
                         .trainingDuration(90)
                         .trainingDate(LocalDate.of(2024, 1, 15))

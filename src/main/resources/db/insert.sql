@@ -73,7 +73,7 @@ VALUES ('CARDIO'),
        ('BALANCE'),
        ('COORDINATION'),
        ('CARE'),
-       ('POTIONS'),
+       ('POISON'),
        ('DEFENSE'),
        ('QUIDDITCH'),
        ('HERBOLOGY'),
@@ -82,7 +82,7 @@ VALUES ('CARDIO'),
 
 
 INSERT INTO "trainer" (training_type_id, user_id)
-VALUES ((SELECT id FROM "training_type" WHERE training_type_name = 'POTIONS'),
+VALUES ((SELECT id FROM "training_type" WHERE training_type_name = 'POISONS'),
         (SELECT id FROM "users" WHERE username = 'Severus.Snape')),
        ((SELECT id FROM "training_type" WHERE training_type_name = 'CARE'),
         (SELECT id FROM "users" WHERE username = 'Rubeus.Hagrid')),
@@ -127,8 +127,8 @@ VALUES ('1980-07-31', '4 Privet Drive, Little Whinging', (SELECT id FROM "users"
 INSERT INTO "training" (trainee_id, trainer_id, training_name, training_type_id, training_date, training_duration)
 VALUES ((SELECT id FROM "trainee" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Harry.Potter')),
         (SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Severus.Snape')),
-        'Potions 101',
-        (SELECT id FROM "training_type" WHERE training_type_name = 'POTIONS'),
+        'Poisons 101',
+        (SELECT id FROM "training_type" WHERE training_type_name = 'POISONS'),
         '2024-09-01',
         120),
 

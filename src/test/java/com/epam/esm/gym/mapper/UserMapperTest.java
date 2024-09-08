@@ -46,11 +46,13 @@ class UserMapperTest {
     void testToUserValidInput() {
         String firstName = "Hermione";
         String lastName = "Granger";
+        String password = "password";
         String username = "Hermione.Granger";
         RoleType role = RoleType.ROLE_ADMIN;
-        User user = userProfileMapper.toUser(firstName, lastName, username, role);
+        User user = userProfileMapper.toUser(firstName, lastName, username, password, role);
         assertNotNull(user);
         assertEquals(firstName, user.getFirstName());
+        assertEquals(password, user.getPassword());
         assertEquals(lastName, user.getLastName());
         assertEquals(username, user.getUsername());
         assertEquals(role, user.getPermission());
@@ -58,8 +60,8 @@ class UserMapperTest {
     }
 
     @Test
-    void testToUser_NullInput() {
-        User user = userProfileMapper.toUser(null, null, null, null);
+    void testToUserNullInput() {
+        User user = userProfileMapper.toUser(null, null, null, null, null);
         assertNotNull(user);
         assertNull(user.getFirstName());
         assertNull(user.getLastName());

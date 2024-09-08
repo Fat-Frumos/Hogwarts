@@ -37,7 +37,7 @@ public interface UserService {
      * @param dto the {@link TrainerRequest} containing the details of the trainer to be saved
      * @return the {@link TrainerProfile} representing the saved trainer
      */
-    User createTrainerUser(TrainerRequest dto);
+    User createTrainerUser(TrainerRequest dto, String password);
 
     /**
      * Updates an existing user profile with new information.
@@ -139,7 +139,7 @@ public interface UserService {
      * @param request the {@link TraineeRequest} containing the details of the trainee user to be saved
      * @return the {@link User} representing the saved trainee
      */
-    User createTraineeUser(TraineeRequest request);
+    User createTraineeUser(TraineeRequest request, String password);
 
     /**
      * Retrieves a user profile based on the username.

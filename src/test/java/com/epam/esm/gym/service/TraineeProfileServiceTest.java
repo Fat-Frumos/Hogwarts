@@ -62,32 +62,35 @@ class TraineeProfileServiceTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeRegistrationArgumentsProvider.class)
-    void register(
-            TraineeRequest request, ResponseEntity<ProfileResponse> expectedResponse, Trainee trainee) {
-        User user = trainee.getUser();
+    void register(TraineeRequest request,
+                  ResponseEntity<ProfileResponse> expectedResponse,
+                  Trainee trainee) {
+
         String rawPassword = "rawPassword";
         String encodedPassword = "encodedPassword";
-        when(userService.createTraineeUser(request)).thenReturn(user);
+        User mockUser = trainee.getUser();
+        ProfileResponse expectedProfileResponse = expectedResponse.getBody();
+
         when(userService.generateRandomPassword()).thenReturn(rawPassword);
         when(userService.encodePassword(rawPassword)).thenReturn(encodedPassword);
-        when(userService.saveUser(user)).thenReturn(user);
-        when(mapper.toTrainee(user, request)).thenReturn(trainee);
+        when(userService.createTraineeUser(request, encodedPassword)).thenReturn(mockUser);
+        when(userService.saveUser(mockUser)).thenReturn(mockUser);
+        when(mapper.toTrainee(mockUser, request)).thenReturn(trainee);
         when(dao.save(trainee)).thenReturn(trainee);
-        when(mapper.toProfile(user.getUsername(), rawPassword)).thenReturn(expectedResponse.getBody());
+        when(mapper.toProfile(mockUser.getUsername(), rawPassword)).thenReturn(expectedProfileResponse);
 
         ResponseEntity<ProfileResponse> response = service.register(request);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(expectedResponse.getBody(), response.getBody());
-        verify(userService).createTraineeUser(request);
+        assertEquals(expectedProfileResponse, response.getBody());
         verify(userService).generateRandomPassword();
         verify(userService).encodePassword(rawPassword);
-        verify(userService).saveUser(user);
-        verify(mapper).toTrainee(user, request);
+        verify(userService).createTraineeUser(request, encodedPassword);
+        verify(userService).saveUser(mockUser);
+        verify(mapper).toTrainee(mockUser, request);
         verify(dao).save(trainee);
-        verify(mapper).toProfile(user.getUsername(), rawPassword);
+        verify(mapper).toProfile(mockUser.getUsername(), rawPassword);
     }
-
 
     @ParameterizedTest
     @ArgumentsSource(TraineeArgumentsProvider.class)
@@ -239,7 +242,6 @@ class TraineeProfileServiceTest {
         when(dao.findNotAssignedTrainers(username)).thenReturn(trainers);
         when(mapper.toTrainerProfile(any())).thenReturn(new TrainerProfile());
         ResponseEntity<List<SlimTrainerProfile>> response = service.getNotAssignedTrainers(username);
-
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(trainerProfiles, response.getBody());
     }
@@ -252,7 +254,7 @@ class TraineeProfileServiceTest {
         String encodedPassword = "encodedPassword";
         User user = User.builder()
                 .username("hermione.granger")
-                .password(rawPassword)
+                .password(encodedPassword)
                 .build();
         Trainee trainee = Trainee.builder()
                 .user(user)
@@ -261,9 +263,10 @@ class TraineeProfileServiceTest {
                 .username("hermione.granger")
                 .password(rawPassword)
                 .build();
-        when(userService.createTraineeUser(request)).thenReturn(user);
+
         when(userService.generateRandomPassword()).thenReturn(rawPassword);
         when(userService.encodePassword(rawPassword)).thenReturn(encodedPassword);
+        when(userService.createTraineeUser(request, encodedPassword)).thenReturn(user);
         when(userService.saveUser(user)).thenReturn(user);
         when(mapper.toTrainee(user, request)).thenReturn(trainee);
         when(dao.save(trainee)).thenReturn(trainee);
@@ -272,9 +275,10 @@ class TraineeProfileServiceTest {
 
         assertEquals(HttpStatus.CREATED, result.getStatusCode());
         assertEquals(response, result.getBody());
-        verify(userService).createTraineeUser(request);
+
         verify(userService).generateRandomPassword();
         verify(userService).encodePassword(rawPassword);
+        verify(userService).createTraineeUser(request, encodedPassword);
         verify(userService).saveUser(user);
         verify(mapper).toTrainee(user, request);
         verify(dao).save(trainee);

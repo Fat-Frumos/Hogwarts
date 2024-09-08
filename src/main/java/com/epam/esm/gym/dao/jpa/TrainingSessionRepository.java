@@ -10,9 +10,13 @@ import java.util.List;
 /**
  * Repository interface for managing {@link TrainingSession} entities.
  * Provides methods to perform CRUD operations and custom queries on training sessions.
+ *
+ * @author Pavlo Poliak
+ * @version 1.0.0
+ * @since 1.0
  */
 @Repository
-public interface JpaTrainingSessionRepository extends JpaRepository<TrainingSession, Long> {
+public interface TrainingSessionRepository extends JpaRepository<TrainingSession, Long> {
 
     /**
      * Fetches all training sessions occurring within the specified start and end times.

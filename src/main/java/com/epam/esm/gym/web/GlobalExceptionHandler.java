@@ -45,6 +45,23 @@ public class GlobalExceptionHandler {
     private static final String NOT_SUPPORTED_MESSAGE = "Request method '%s' not supported";
 
     /**
+     * Handles {@link IllegalArgumentException} exceptions.
+     *
+     * @param ex the {@link IllegalArgumentException} to handle
+     * @return a {@link ResponseEntity} containing a {@link MessageResponse} with the error message
+     * and HTTP status {@link HttpStatus#BAD_REQUEST}
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<MessageResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+        String exceptionMessage = ex.getMessage();
+        String message = exceptionMessage.contains("No enum constant")
+                ? String.format("Invalid value: %s",
+                exceptionMessage.substring(exceptionMessage.lastIndexOf('.') + 1))
+                : exceptionMessage;
+        return new ResponseEntity<>(new MessageResponse(message), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Handles missing request parameter exceptions by returning a bad request response
      * with a message indicating which parameter is missing. This method is triggered
      * when a required parameter is not provided in the request. It formats the message
@@ -165,7 +182,7 @@ public class GlobalExceptionHandler {
      *
      * @param ex the {@link SignatureException} thrown during JWT authentication.
      * @return a {@link ResponseEntity} containing a {@link MessageResponse} with an error message and
-     *         HTTP status {@link HttpStatus#UNAUTHORIZED}.
+     * HTTP status {@link HttpStatus#UNAUTHORIZED}.
      */
     @ExceptionHandler({InvalidJwtAuthenticationException.class, TokenNotFoundException.class})
     public ResponseEntity<MessageResponse> handleSignatureException(SignatureException ex) {
