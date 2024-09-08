@@ -22,7 +22,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationResponse {
+public class AuthenticationResponse implements BaseResponse {
     private String username;
     @JsonProperty("access_token")
     private String accessToken;

@@ -3,7 +3,7 @@ package com.epam.esm.gym.web;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.service.TraineeService;
 import jakarta.validation.Valid;
@@ -49,7 +49,7 @@ public class TraineeController implements ITraineeController {
      */
     @Override
     @GetMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_TRAINER')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_TRAINER')")
     public ResponseEntity<List<TraineeProfile>> getAllTrainees() {
         return service.findAll();
     }
@@ -82,7 +82,7 @@ public class TraineeController implements ITraineeController {
      */
     @Override
     @GetMapping("/{username}")
-    @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_TRAINER', 'ROLE_ADMIN', 'ROLE_TRAINEE')")
     public ResponseEntity<TraineeProfile> getTraineeProfile(
             @PathVariable @NotNull @Valid String username) {
         return service.getTraineeProfileByName(username);
@@ -138,7 +138,7 @@ public class TraineeController implements ITraineeController {
     @Override
     @PutMapping("/{username}/trainers")
     @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<List<TrainerProfile>> updateTraineeTrainers(
+    public ResponseEntity<List<SlimTrainerProfile>> updateTraineeTrainers(
             @PathVariable String username,
             @Valid @RequestBody List<String> trainersUsernames) {
         return service.updateTraineeTrainersByName(username, trainersUsernames);

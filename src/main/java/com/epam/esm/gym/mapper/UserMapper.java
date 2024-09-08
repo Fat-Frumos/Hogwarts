@@ -23,17 +23,19 @@ public interface UserMapper {
      * @param user the user entity to convert
      * @return the converted {@link UserProfile}
      */
-    UserProfile toDto(User user);
-
-    /**
-     * Converts a {@link User} entity to a {@link TrainerProfile} DTO.
-     *
-     * <p>This method maps the details of a {@link User} entity to a {@link TrainerProfile} DTO.</p>
-     *
-     * @param user the user entity to convert
-     * @return the converted {@link TrainerProfile}
-     */
-    TrainerProfile toTrainerProfile(User user);
+    default UserProfile toDto(User user) {
+        if (user == null) {
+            return null;
+        }
+        return UserProfile.builder()
+                .id(user.getId().longValue())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .active(user.getActive())
+                .build();
+    }
 
     /**
      * Creates a {@link User} entity from provided user data.
@@ -44,7 +46,6 @@ public interface UserMapper {
      * @param firstName the first name of the user
      * @param lastName  the last name of the user
      * @param username  the username of the user
-     * @param password  the password of the user
      * @param role      the role of the user
      * @return the created {@link User} entity
      */
@@ -52,14 +53,12 @@ public interface UserMapper {
             String firstName,
             String lastName,
             String username,
-            String password,
             RoleType role) {
         return User.builder()
                 .firstName(firstName)
                 .lastName(lastName)
                 .permission(role)
                 .username(username)
-                .password(password)
                 .active(true)
                 .build();
     }

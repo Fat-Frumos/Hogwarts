@@ -8,7 +8,7 @@ import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import com.epam.esm.gym.dto.training.TrainingTypeResponse;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import com.epam.esm.gym.mapper.TrainingMapper;
 import com.epam.esm.gym.service.profile.TrainingProfileService;
 import com.epam.esm.gym.web.provider.trainee.TraineeTrainingArgumentsProvider;
@@ -50,10 +50,10 @@ class TrainingProfileServiceTest {
     @Test
     void testGetTrainingTypes() {
         TrainingType trainingType = mock(TrainingType.class);
-        TrainingTypeResponse response = mock(TrainingTypeResponse.class);
+        TrainingTypeDto response = mock(TrainingTypeDto.class);
         when(dao.findAllTrainingTypes()).thenReturn(List.of(trainingType));
         when(mapper.toType(trainingType)).thenReturn(response);
-        List<TrainingTypeResponse> result = service.getTrainingTypes();
+        List<TrainingTypeDto> result = service.getTrainingTypes();
 
         assertEquals(List.of(response), result);
         verify(dao).findAllTrainingTypes();

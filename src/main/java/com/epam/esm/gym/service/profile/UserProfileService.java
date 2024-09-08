@@ -3,7 +3,8 @@ package com.epam.esm.gym.service.profile;
 import com.epam.esm.gym.dao.UserDao;
 import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.User;
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.UserProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -57,15 +59,9 @@ public class UserProfileService implements UserService {
      */
     @Override
     @Transactional
-    public User saveTraineeUser(TraineeRequest dto) {
+    public User createTraineeUser(TraineeRequest dto) {
         String username = generateUsername(dto.getFirstName(), dto.getLastName());
-        String rawPassword = generateRandomPassword();
-        String password = passwordEncoder.encode(rawPassword);
-        User user = mapper.toUser(dto.getFirstName(), dto.getLastName(), username, password, RoleType.ROLE_TRAINEE);
-        User save = dao.save(user);
-        log.info("Saving user: {}", save);
-        save.setPassword(rawPassword);
-        return save;
+        return mapper.toUser(dto.getFirstName(), dto.getLastName(), username, RoleType.ROLE_TRAINEE);
     }
 
     /**
@@ -78,15 +74,9 @@ public class UserProfileService implements UserService {
      */
     @Override
     @Transactional
-    public TrainerProfile saveTrainer(TrainerRequest dto) {
+    public User createTrainerUser(TrainerRequest dto) {
         String username = generateUsername(dto.getFirstName(), dto.getLastName());
-        String rawPassword = generateRandomPassword();
-        String password = passwordEncoder.encode(rawPassword);
-        User user = mapper.toUser(dto.getFirstName(), dto.getLastName(), username, password, RoleType.ROLE_TRAINER);
-        User save = dao.save(user);
-        log.info("Saved user: {}", save);
-        save.setPassword(rawPassword);
-        return mapper.toTrainerProfile(save);
+        return mapper.toUser(dto.getFirstName(), dto.getLastName(), username, RoleType.ROLE_TRAINER);
     }
 
     /**
@@ -175,7 +165,7 @@ public class UserProfileService implements UserService {
      * @return A {@link ResponseEntity} indicating the result of the password change operation.
      */
     @Override
-    public ResponseEntity<MessageResponse> changePassword(ProfileRequest request) {
+    public ResponseEntity<BaseResponse> changePassword(ProfileRequest request) {
         Optional<User> userOptional = dao.findByUsername(request.getUsername());
         if (userOptional.isEmpty()) {
             return getResponseEntity(HttpStatus.NOT_FOUND);
@@ -190,7 +180,7 @@ public class UserProfileService implements UserService {
             return getResponseEntity(HttpStatus.BAD_REQUEST);
         }
 
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setPassword(encodePassword(request.getNewPassword()));
         updateUser(user);
         return getResponseEntity(HttpStatus.ACCEPTED);
     }
@@ -205,7 +195,7 @@ public class UserProfileService implements UserService {
      * @return A {@link ResponseEntity} indicating the authentication result.
      */
     @Override
-    public ResponseEntity<MessageResponse> authenticate(String username, String password) {
+    public ResponseEntity<BaseResponse> authenticate(String username, String password) {
         Optional<User> userOptional = dao.findByUsername(username);
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         if (userOptional.isEmpty()) {
@@ -222,7 +212,7 @@ public class UserProfileService implements UserService {
      * @param status The HTTP status to be used in the response.
      * @return A {@link ResponseEntity} with a message corresponding to the HTTP status.
      */
-    private ResponseEntity<MessageResponse> getResponseEntity(HttpStatus status) {
+    private ResponseEntity<BaseResponse> getResponseEntity(HttpStatus status) {
         String message = switch (status) {
             case OK -> "Authentication successful";
             case ACCEPTED -> "Password updated successfully";
@@ -243,7 +233,8 @@ public class UserProfileService implements UserService {
      * @return True if the credentials are valid; otherwise, false.
      */
     private boolean validateUser(User user, String username, String password) {
-        return user.getPassword().equals(password) && user.getUsername().equals(username);
+        return passwordEncoder.matches(password, user.getPassword())
+                && user.getUsername().equals(username);
     }
 
     /**
@@ -256,12 +247,14 @@ public class UserProfileService implements UserService {
      */
     private String generateUsername(String firstName, String lastName) {
         String baseUsername = firstName + "." + lastName;
-        String username = baseUsername;
-        int suffix = 1;
-        while (dao.existsByUsername(username)) {
-            username = baseUsername + "." + suffix++;
-        }
-        return username;
+        List<User> existingUsernames = dao.findUsernamesByBaseName(baseUsername);
+        int suffix = existingUsernames.stream()
+                .map(username -> username.getUsername().replace(baseUsername + ".", ""))
+                .filter(s -> s.matches("\\d+"))
+                .mapToInt(Integer::parseInt)
+                .max()
+                .orElse(0) + 1;
+        return baseUsername + "." + suffix;
     }
 
     /**
@@ -269,10 +262,29 @@ public class UserProfileService implements UserService {
      *
      * @return A random password.
      */
-    private String generateRandomPassword() {
+    @Override
+    public String generateRandomPassword() {
         return IntStream.range(0, PASSWORD_LENGTH)
                 .mapToObj(i -> String.valueOf(ALPHANUMERIC_STRING.charAt(
                         random.nextInt(ALPHANUMERIC_STRING.length()))))
                 .collect(Collectors.joining());
+    }
+
+    /**
+     * {@inheritDoc}
+     * Encodes a plain-text password.
+     */
+    @Override
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
+    }
+
+    /**
+     * {@inheritDoc}
+     * Saves a {@link User} entity.
+     */
+    @Override
+    public User saveUser(User user) {
+        return dao.save(user);
     }
 }

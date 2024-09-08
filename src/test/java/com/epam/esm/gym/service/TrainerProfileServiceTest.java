@@ -2,8 +2,10 @@ package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dao.TrainerDao;
 import com.epam.esm.gym.domain.Trainer;
+import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
@@ -11,8 +13,8 @@ import com.epam.esm.gym.exception.UserNotFoundException;
 import com.epam.esm.gym.mapper.TrainerMapper;
 import com.epam.esm.gym.service.profile.TrainerProfileService;
 import com.epam.esm.gym.service.profile.UserProfileService;
-import com.epam.esm.gym.web.provider.trainer.TrainerRequestArgumentsProvider;
 import com.epam.esm.gym.web.provider.trainee.TraineeTrainerNameArgumentsProvider;
+import com.epam.esm.gym.web.provider.trainer.TrainerRequestArgumentsProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,14 +59,28 @@ class TrainerProfileServiceTest {
     @ArgumentsSource(TrainerRequestArgumentsProvider.class)
     void testRegisterTrainer(
             Trainer trainer, TrainerProfile profile,
-            TrainerRequest request, ProfileResponse response) {
-        when(userService.saveTrainer(request)).thenReturn(profile);
-        when(mapper.toEntity(profile)).thenReturn(trainer);
+            TrainerRequest request, ProfileResponse expectedResponse) {
+        User mockUser = trainer.getUser();
+        String rawPassword = "rawPassword";
+        String encodedPassword = "encodedPassword";
+
+        when(userService.createTrainerUser(request)).thenReturn(mockUser);
+        when(userService.generateRandomPassword()).thenReturn(rawPassword);
+        when(userService.encodePassword(rawPassword)).thenReturn(encodedPassword);
+        when(mapper.toTrainer(mockUser, request)).thenReturn(trainer);
         when(dao.save(trainer)).thenReturn(trainer);
-        when(mapper.toProfileDto(trainer.getUser())).thenReturn(response);
-        ResponseEntity<ProfileResponse> result = service.registerTrainer(request);
-        assertEquals(HttpStatus.CREATED, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        when(mapper.toProfileDto(mockUser.getUsername(), rawPassword)).thenReturn(expectedResponse);
+
+        ResponseEntity<ProfileResponse> response = service.registerTrainer(request);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(expectedResponse, response.getBody());
+
+        verify(userService).createTrainerUser(request);
+        verify(userService).generateRandomPassword();
+        verify(userService).encodePassword(rawPassword);
+        verify(mapper).toTrainer(mockUser, request);
+        verify(dao).save(trainer);
+        verify(mapper).toProfileDto(mockUser.getUsername(), rawPassword);
     }
 
     @Test
@@ -90,7 +106,7 @@ class TrainerProfileServiceTest {
         String username = trainer.getUser().getUsername();
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainer));
         when(mapper.toDto(trainer)).thenReturn(profile);
-        ResponseEntity<TrainerProfile> result = service.getTrainerProfileByName(username);
+        ResponseEntity<SlimTrainerProfile> result = service.getTrainerProfileByName(username);
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(profile, result.getBody());
     }
@@ -98,13 +114,20 @@ class TrainerProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(TrainerRequestArgumentsProvider.class)
     void testUpdateTrainer(Trainer trainer, TrainerProfile profile) {
-        TrainerUpdateRequest request = TrainerUpdateRequest.builder().build();
+        TrainerUpdateRequest request = TrainerUpdateRequest.builder()
+                .firstName(trainer.getUser().getFirstName())
+                .lastName(trainer.getUser().getLastName())
+                .active(trainer.getUser().getActive())
+                .build();
         when(mapper.toEntity(request)).thenReturn(trainer);
-        when(dao.update(trainer)).thenReturn(trainer);
+        when(dao.save(trainer)).thenReturn(trainer);
         when(mapper.toDto(trainer)).thenReturn(profile);
         ResponseEntity<TrainerProfile> result = service.updateTrainer(trainer.getUser().getUsername(), request);
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(profile, result.getBody());
+        verify(mapper).toEntity(request);
+        verify(dao).save(trainer);
+        verify(mapper).toDto(trainer);
     }
 
     @ParameterizedTest
@@ -114,7 +137,7 @@ class TrainerProfileServiceTest {
         List<TrainerProfile> profiles = List.of(profile);
         String username = trainer.getUser().getUsername();
         when(dao.findNotAssigned(username)).thenReturn(trainers);
-        when(mapper.toDtos(trainers)).thenReturn(profiles);
+        when(mapper.toTrainerProfiles(trainers)).thenReturn(profiles);
         ResponseEntity<List<TrainerProfile>> result = service.getNotAssigned(username);
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(profiles, result.getBody());
@@ -144,7 +167,7 @@ class TrainerProfileServiceTest {
         List<Trainer> trainers = List.of(trainer);
         List<TrainerProfile> profiles = List.of(profile);
         when(dao.findAll()).thenReturn(trainers);
-        when(mapper.toDtos(trainers)).thenReturn(profiles);
+        when(mapper.toTrainerProfiles(trainers)).thenReturn(profiles);
         ResponseEntity<List<TrainerProfile>> result = service.findAll();
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(profiles, result.getBody());
@@ -160,5 +183,4 @@ class TrainerProfileServiceTest {
         service.assignTraineeToTrainer(traineeUsername);
         verify(dao).assignTraineeToTrainer(trainerUsername, traineeUsername);
     }
-
 }

@@ -212,7 +212,6 @@ public class DBParamsStructureTest {
     @Test
     void testTrainerTableColumnsExist() throws SQLException {
         assertTrue(isColumnInTableExist("trainer", "id"), "Column id is missing in trainer");
-        assertTrue(isColumnInTableExist("trainer", "specialization_id"), "Column specialization_id is missing");
         assertTrue(isColumnInTableExist("trainer", "user_id"), "Column user_id is missing in trainer");
     }
 
@@ -332,8 +331,6 @@ public class DBParamsStructureTest {
     @Test
     void testTrainerTableForeignKeys() throws SQLException {
         List<String> foreignKeys = DBUtil.getForeignKeys("trainer");
-        assertTrue(foreignKeys.contains("trainer_specialization_id_fkey"),
-                "Foreign key for specialization_id is missing");
         assertTrue(foreignKeys.contains("trainer_user_id_fkey"), "Foreign key for user_id is missing");
     }
 

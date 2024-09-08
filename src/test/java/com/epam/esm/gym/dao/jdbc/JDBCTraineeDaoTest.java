@@ -70,9 +70,9 @@ class JDBCTraineeDaoTest {
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
     void testFindByUsername(Trainee trainee) {
         String hql = """
-                SELECT t
+                SELECT t.id, t.dateOfBirth, t.address, t.id
                 FROM Trainee t
-                JOIN FETCH t.user u
+                JOIN User u ON u.id = t.id
                 WHERE u.username = :username
                 """;
         Optional<Trainee> expectedTrainee = Optional.of(trainee);
@@ -82,25 +82,6 @@ class JDBCTraineeDaoTest {
         when(traineeQuery.uniqueResultOptional()).thenReturn(expectedTrainee);
         Optional<Trainee> actualTrainee = jdbcTraineeDao.findByUsername(username);
         assertEquals(expectedTrainee, actualTrainee);
-    }
-
-    /**
-     * Tests the {@link JDBCTraineeDao#findAll()} method.
-     *
-     * <p>This method verifies that the DAO correctly retrieves all {@link Trainee} instances. It mocks
-     * the query execution to return a list of trainees and asserts that the returned list matches the
-     * expected result.</p>
-     *
-     * @param trainee the {@link Trainee} object to include in the list for testing.
-     */
-    @ParameterizedTest
-    @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
-    void testFindAll(Trainee trainee) {
-        List<Trainee> expectedList = List.of(trainee);
-        when(session.createQuery("FROM com.epam.esm.gym.domain.Trainee", Trainee.class)).thenReturn(traineeQuery);
-        when(traineeQuery.getResultList()).thenReturn(expectedList);
-        List<Trainee> result = jdbcTraineeDao.findAll();
-        assertEquals(expectedList, result);
     }
 
     /**

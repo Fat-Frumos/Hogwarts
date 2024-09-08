@@ -1,6 +1,7 @@
 package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
@@ -129,7 +130,7 @@ public class TrainerController implements ITrainerController {
     @Override
     @GetMapping("/{username}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_TRAINER')")
-    public ResponseEntity<TrainerProfile> getTrainerProfile(
+    public ResponseEntity<SlimTrainerProfile> getTrainerProfile(
             @PathVariable String username) {
         return service.getTrainerProfileByName(username);
     }

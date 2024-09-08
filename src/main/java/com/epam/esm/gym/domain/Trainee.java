@@ -6,9 +6,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityResult;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.FieldResult;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +30,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -77,8 +80,9 @@ public class Trainee {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "trainee")
-    private Set<Training> trainings;
+    @Builder.Default
+    @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Training> trainings = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
@@ -113,13 +117,11 @@ public class Trainee {
         return Objects.equals(id, trainee.id)
                 && Objects.equals(dateOfBirth, trainee.dateOfBirth)
                 && Objects.equals(address, trainee.address)
-                && Objects.equals(user, trainee.user)
-                && Objects.equals(trainings, trainee.trainings)
-                && Objects.equals(trainers, trainee.trainers);
+                && Objects.equals(user, trainee.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, dateOfBirth, address, user, trainings, trainers);
+        return Objects.hash(id, dateOfBirth, address, user);
     }
 }

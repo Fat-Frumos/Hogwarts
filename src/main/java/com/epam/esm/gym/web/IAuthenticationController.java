@@ -2,6 +2,7 @@ package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.auth.AuthenticationRequest;
 import com.epam.esm.gym.dto.auth.AuthenticationResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.RegisterRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,7 +46,7 @@ public interface IAuthenticationController {
                     @ApiResponse(responseCode = "400", description = "Bad request due to invalid data")
             }
     )
-    ResponseEntity<AuthenticationResponse> signup(
+    ResponseEntity<BaseResponse> signupUser(
             @RequestBody RegisterRequest request);
 
     /**
@@ -68,7 +69,7 @@ public interface IAuthenticationController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access due to invalid credentials")
             }
     )
-    ResponseEntity<AuthenticationResponse> authenticate(
+    ResponseEntity<AuthenticationResponse> authenticateUser(
             @RequestBody AuthenticationRequest request);
 
     /**
@@ -93,7 +94,7 @@ public interface IAuthenticationController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access due to invalid token")
             }
     )
-    ResponseEntity<AuthenticationResponse> refreshTokens(
+    ResponseEntity<BaseResponse> refreshTokens(
             @RequestHeader("Authorization") String authorizationHeader,
             HttpServletResponse response);
 
@@ -117,7 +118,7 @@ public interface IAuthenticationController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access due to invalid credentials")
             }
     )
-    ResponseEntity<AuthenticationResponse> login(
+    ResponseEntity<BaseResponse> loginUser(
             @RequestBody AuthenticationRequest loginRequest);
 
     /**
@@ -141,5 +142,5 @@ public interface IAuthenticationController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access due to invalid session")
             }
     )
-    ResponseEntity<Object> logout(HttpServletRequest request, HttpServletResponse response);
+    ResponseEntity<BaseResponse> logout(HttpServletRequest request, HttpServletResponse response);
 }

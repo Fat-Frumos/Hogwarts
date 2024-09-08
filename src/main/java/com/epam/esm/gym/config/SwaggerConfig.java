@@ -10,14 +10,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for application metrics.
+ * Configures Swagger for API documentation in the Spring Boot application.
  *
- * <p>This class contains the configuration for setting up and managing
- * application metrics using the Actuator framework. It includes settings
- * for various metrics endpoints and reporting configurations.</p>
+ * <p>This class sets up Swagger to generate interactive API documentation
+ * based on the application's REST endpoints, allowing developers to easily
+ * understand and test API functionalities.</p>
+ *
+ * <p>Includes customization of API metadata and available endpoints.</p>
  *
  * @author Pavlo Poliak
- * @version 1.0.0
  * @since 1.0
  */
 @Configuration

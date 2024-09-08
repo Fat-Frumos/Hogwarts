@@ -1,7 +1,7 @@
 package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.training.TrainingRequest;
-import com.epam.esm.gym.dto.training.TrainingTypeResponse;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,10 +34,11 @@ public interface ITrainingController {
      *
      * <p>This endpoint returns a list of training types that are available in the system.
      * It is accessible only to users with TRAINER and ADMIN roles. The response provides a
-     * detailed list of training types, each represented by a {@link TrainingTypeResponse}.</p>
+     * detailed list of training types, each represented by a {@link com.epam.esm.gym.dto.training.TrainingTypeDto}.</p>
      *
-     * @return a {@link ResponseEntity} containing a list of {@link TrainingTypeResponse} objects.
-     * @see TrainingTypeResponse
+     * @return a {@link ResponseEntity} containing
+     * a list of {@link com.epam.esm.gym.dto.training.TrainingTypeDto} objects.
+     * @see com.epam.esm.gym.dto.training.TrainingTypeDto
      */
     @GetMapping("/types")
     @Operation(
@@ -49,7 +50,7 @@ public interface ITrainingController {
                     @ApiResponse(responseCode = "403", description = "Forbidden access")
             }
     )
-    ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes();
+    ResponseEntity<List<TrainingTypeDto>> getTrainingTypes();
 
     /**
      * Creates a new training session in the system.

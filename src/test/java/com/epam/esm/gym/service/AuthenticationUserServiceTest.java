@@ -2,10 +2,9 @@ package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dao.UserDao;
 import com.epam.esm.gym.domain.RoleType;
-import com.epam.esm.gym.domain.SecurityUser;
 import com.epam.esm.gym.domain.Token;
 import com.epam.esm.gym.domain.User;
-import com.epam.esm.gym.dto.auth.AuthenticationResponse;
+import com.epam.esm.gym.dto.auth.UserPrincipal;
 import com.epam.esm.gym.dto.auth.RegisterRequest;
 import com.epam.esm.gym.security.JwtProvider;
 import com.epam.esm.gym.service.profile.AuthenticationUserService;
@@ -27,7 +26,6 @@ import java.util.Optional;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -62,16 +60,6 @@ class AuthenticationUserServiceTest {
 
     }
 
-
-    @Test
-    void testGetAuthenticationResponse() {
-        SecurityUser securityUser = SecurityUser.builder().user(new User()).build();
-        when(provider.getExpiration()).thenReturn(System.currentTimeMillis() + 10000);
-        AuthenticationResponse response = service.getAuthenticationResponse(securityUser, "accessToken");
-        assertNotNull(response);
-        assertEquals("accessToken", response.getAccessToken());
-    }
-
     @Test
     void testLogout() throws IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -86,41 +74,42 @@ class AuthenticationUserServiceTest {
         verify(writer).write("Logout successful");
     }
 
-
     @Test
     void testGetUserWithRole() {
         RegisterRequest request = new RegisterRequest();
         request.setUsername(USERNAME);
         request.setPassword("password");
         when(encoder.encode(anyString())).thenReturn("encodedPassword");
-
-        User user = service.getUserWithRole(request, USERNAME);
-
-        assertNotNull(user);
-        assertEquals(USERNAME, user.getUsername());
-        assertEquals("encodedPassword", user.getPassword());
-        assertEquals(RoleType.ROLE_TRAINER, user.getPermission());
+        User withRole = service.getUserWithRole(request, USERNAME);
+        assertNotNull(withRole);
+        assertEquals(USERNAME, withRole.getUsername());
+        assertEquals("encodedPassword", withRole.getPassword());
+        assertEquals(RoleType.ROLE_TRAINER, withRole.getPermission());
     }
 
     @Test
     void testFindUser_Success() {
         when(userRepository.getUserBy(USERNAME)).thenReturn(user);
-        SecurityUser securityUser = service.findUser(USERNAME);
+        UserPrincipal securityUser = service.findUser(USERNAME);
         assertNotNull(securityUser);
-        assertEquals(USERNAME, securityUser.getUser().getUsername());
+        assertEquals(USERNAME, securityUser.user().getUsername());
     }
 
     @Test
     void testFindUserUserNotFound() {
         when(userRepository.getUserBy(USERNAME)).thenReturn(null);
-        SecurityUser securityUser = service.findUser(USERNAME);
-        assertNull(securityUser.getUser());
+        UserPrincipal securityUser = service.findUser(USERNAME);
+        assertNull(securityUser.user());
     }
 
     @Test
-    void testFindByUsername() {
-        when(userRepository.findByUsername("existingUser")).thenReturn(Optional.of(new User()));
-        Optional<User> user = service.findByUsername("existingUser");
-        assertTrue(user.isPresent());
+    void testFindUser() {
+        String username = "testUser";
+        User mockUser = new User();
+        when(userRepository.getUserBy(username)).thenReturn(mockUser);
+        UserPrincipal result = service.findUser(username);
+        assertNotNull(result);
+        assertEquals(mockUser, result.user());
+        verify(userRepository).getUserBy(username);
     }
 }

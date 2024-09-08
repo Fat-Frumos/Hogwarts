@@ -1,6 +1,6 @@
 package com.epam.esm.gym.service;
 
-import com.epam.esm.gym.dao.TrainingDao;
+import com.epam.esm.gym.dao.jpa.JpaTrainingSessionRepository;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.TrainingSession;
 import com.epam.esm.gym.domain.User;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 class TrainingSessionServiceTest {
 
     @Mock
-    private TrainingDao trainingRepository;
+    private JpaTrainingSessionRepository trainingRepository;
 
     @InjectMocks
     private TrainingSessionService trainingSessionService;

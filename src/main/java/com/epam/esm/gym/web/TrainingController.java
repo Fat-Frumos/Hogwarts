@@ -1,7 +1,7 @@
 package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.training.TrainingRequest;
-import com.epam.esm.gym.dto.training.TrainingTypeResponse;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import com.epam.esm.gym.service.TrainingService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -45,14 +45,14 @@ public class TrainingController implements ITrainingController {
      * {@inheritDoc}
      * Retrieves a list of all available training types.
      *
-     * @return A {@link ResponseEntity} containing a list of {@link TrainingTypeResponse}.
+     * @return A {@link ResponseEntity} containing a list of {@link com.epam.esm.gym.dto.training.TrainingTypeDto}.
      * Returns HTTP 200 if the list is successfully retrieved.
      * Includes HTTP 401 if unauthorized and HTTP 403 if access is forbidden.
      */
     @Override
     @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {
-        List<TrainingTypeResponse> types = trainingService.getTrainingTypes();
+    public ResponseEntity<List<TrainingTypeDto>> getTrainingTypes() {
+        List<TrainingTypeDto> types = trainingService.getTrainingTypes();
         return ResponseEntity.ok(types);
     }
 

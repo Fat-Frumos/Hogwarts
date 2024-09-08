@@ -3,6 +3,7 @@ package com.epam.esm.gym.service;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
@@ -74,7 +75,7 @@ public interface TrainerService {
      * @param username the username of the trainer whose profile is to be retrieved
      * @return a {@link ResponseEntity} containing the {@link TrainerProfile} of the requested trainer
      */
-    ResponseEntity<TrainerProfile> getTrainerProfileByName(String username);
+    ResponseEntity<SlimTrainerProfile> getTrainerProfileByName(String username);
 
     /**
      * Updates the profile details of an existing trainer.

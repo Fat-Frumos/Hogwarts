@@ -4,19 +4,20 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Entity representing a type of training.
@@ -36,16 +37,16 @@ public class TrainingType {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Specialization trainingType;
+    @Column(name = "training_type_name", nullable = false)
+    private Specialization specialization;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "specialization", fetch = FetchType.EAGER)
+    private Set<Trainer> trainers = new HashSet<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "type")
     private Set<Training> trainings = new HashSet<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "specialization")
-    private Set<Trainer> trainers = new HashSet<>();
 
     @Override
     public boolean equals(Object obj) {
@@ -57,13 +58,13 @@ public class TrainingType {
         }
         TrainingType that = (TrainingType) obj;
         return Objects.equals(id, that.id)
-                && trainingType == that.trainingType
+                && specialization == that.specialization
                 && Objects.equals(trainings, that.trainings)
                 && Objects.equals(trainers, that.trainers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, trainingType, trainings, trainers);
+        return Objects.hash(id, specialization, trainings, trainers);
     }
 }

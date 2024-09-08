@@ -24,19 +24,21 @@ import java.util.List;
 public abstract class AbstractDao<T> {
 
     /**
-     * The class type of the entity that this DAO handles.
-     *
-     * <p>This field is used to create and execute Hibernate queries specific to the entity
-     * type {@code T}. It allows the DAO to perform operations on the correct entity type
-     * without requiring explicit type checks or casts.</p>
-     */
-    private final Class<T> clazz;
-    /**
      * The Hibernate {@link SessionFactory} used to obtain Hibernate sessions.
      * This SessionFactory is essential for interacting with the database.
      */
     private final SessionFactory sessionFactory;
     protected static final String USERNAME = "username";
+
+    /**
+     * Retrieves all entities of type {@code T}.
+     *
+     * <p>This method queries the database for all instances of the specified entity type.
+     * It uses a dynamic Hibernate query to retrieve the entire result set.</p>
+     *
+     * @return a {@link List} containing all entities of type {@code T}.
+     */
+    abstract List<T> findAll();
 
     /**
      * Retrieves the current Hibernate session.
@@ -49,21 +51,6 @@ public abstract class AbstractDao<T> {
      */
     protected Session getSession() {
         return sessionFactory.getCurrentSession();
-    }
-
-    /**
-     * Retrieves all entities of type {@code T}.
-     *
-     * <p>This method queries the database for all instances of the specified entity type.
-     * It uses a dynamic Hibernate query to retrieve the entire result set.</p>
-     *
-     * @return a {@link List} containing all entities of type {@code T}.
-     */
-    @Transactional(readOnly = true)
-    public List<T> findAll() {
-        return getSession()
-                .createQuery("FROM " + clazz.getName(), clazz)
-                .getResultList();
     }
 
     /**

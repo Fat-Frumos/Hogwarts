@@ -7,8 +7,8 @@ import com.epam.esm.gym.domain.TrainingType;
 import org.hibernate.SessionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +42,7 @@ public class JDBCTrainingDao extends AbstractDao<Training> implements TrainingDa
      * @param sessionFactory the {@link SessionFactory} used for obtaining Hibernate sessions.
      */
     public JDBCTrainingDao(SessionFactory sessionFactory) {
-        super(Training.class, sessionFactory);
+        super(sessionFactory);
     }
 
     /**
@@ -112,23 +112,12 @@ public class JDBCTrainingDao extends AbstractDao<Training> implements TrainingDa
                 .getResultList();
     }
 
-    /**
-     * Finds {@link TrainingSession} entities with start times between the specified dates.
-     *
-     * <p>This method retrieves all {@link TrainingSession} entities where the start time falls within
-     * the specified date and time range. The method uses Hibernate HQL to filter sessions based on
-     * the provided start and end times, returning a list of sessions that match the criteria.</p>
-     *
-     * @param startDateTime the start of the time range.
-     * @param endDateTime   the end of the time range.
-     * @return a {@link List} of {@link TrainingSession} entities within the specified time range.
-     */
     @Override
-    public List<TrainingSession> findByStartTimeBetween(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        String hql = "SELECT t FROM TrainingSession t WHERE t.startTime BETWEEN :startDateTime AND :endDateTime";
-        return getSession().createQuery(hql, TrainingSession.class)
-                .setParameter("startDateTime", startDateTime)
-                .setParameter("endDateTime", endDateTime)
+    @Transactional(readOnly = true)
+    public List<Training> findAll() {
+        String hql = "FROM Training";
+        return getSession()
+                .createQuery(hql, Training.class)
                 .getResultList();
     }
 }

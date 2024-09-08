@@ -6,8 +6,8 @@ import com.epam.esm.gym.service.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Implementation of {@link TokenService} that uses JDBC for token management.
@@ -28,10 +28,10 @@ public class TokenProfileService implements TokenService {
      * Finds all valid access tokens associated with a specific user ID.
      *
      * @param id the user ID for which to find valid access tokens
-     * @return a list of valid tokens associated with the specified user ID
+     * @return a set of valid tokens associated with the specified user ID
      */
     @Override
-    public List<Token> findAllValidAccessTokenByUserId(Integer id) {
+    public Set<Token> findAllValidAccessTokenByUserId(Integer id) {
         return dao.findAllValidAccessTokenByUserId(id);
     }
 
@@ -42,7 +42,7 @@ public class TokenProfileService implements TokenService {
      * @param tokens the list of tokens to be saved
      */
     @Override
-    public void saveAll(List<Token> tokens) {
+    public void saveAll(Set<Token> tokens) {
         dao.saveAll(tokens);
     }
 

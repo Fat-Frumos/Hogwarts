@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -35,6 +37,13 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@NamedEntityGraph(
+        name = "Trainer.trainees.specialization",
+        attributeNodes = {
+                @NamedAttributeNode("trainees"),
+                @NamedAttributeNode("specialization")
+        }
+)
 @Table(name = "trainer")
 public class Trainer {
     @Id
@@ -42,7 +51,7 @@ public class Trainer {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @ManyToOne

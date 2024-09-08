@@ -48,7 +48,6 @@ class ExternalServiceHealthIndicator implements HealthIndicator {
      * with details about which services are unavailable.
      * @implSpec This method relies on {@code checkPrometheusMetrics()} and {@code checkInfoEndpoint()}
      * to determine the availability of the respective services.
-     * @author Pavlo Poliak
      * @see #checkPrometheusMetrics()
      * @see #checkInfoEndpoint()
      * @see org.springframework.boot.actuate.health.Health
@@ -86,7 +85,6 @@ class ExternalServiceHealthIndicator implements HealthIndicator {
      * @return {@code true} if the Prometheus metrics endpoint responds successfully;
      * {@code false} if it is unreachable or if an exception occurs.
      * This method is used internally by {@code health()} to determine Prometheus availability.
-     * @author Pavlo Poliak
      * @see org.springframework.http.ResponseEntity
      * @since 1.0
      */
@@ -115,7 +113,6 @@ class ExternalServiceHealthIndicator implements HealthIndicator {
      * is unreachable or if an exception occurs.
      * This method is used internally by {@code health()} to determine the
      * availability of the Info endpoint.
-     * @author Pavlo Poliak
      * @see org.springframework.http.ResponseEntity
      * @since 1.0
      */

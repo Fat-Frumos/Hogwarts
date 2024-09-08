@@ -7,13 +7,16 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Configures metrics for monitoring application performance.
- * This class sets up the necessary configurations for collecting and exposing
+ *
+ * <p>This class sets up the necessary configurations for collecting and exposing
  * application metrics. It may include settings for integrating with monitoring
  * tools, such as Prometheus or other observability platforms, to track key
- * performance indicators.
- * Metrics collected can help in understanding application behavior, performance
- * bottlenecks, and resource utilization.
- * The configuration is applied globally within the Spring Boot application.
+ * performance indicators.</p>
+ *
+ * <p>Metrics collected can help in understanding application behavior, performance
+ * bottlenecks, and resource utilization.</p>
+ *
+ * <p>The configuration is applied globally within the Spring Boot application.</p>
  *
  * @author Pavlo Poliak
  * @see org.springframework.context.annotation.Configuration
@@ -46,6 +49,9 @@ public class MetricsConfig {
      * {@code custom_metric_one}, is initialized with a static value of 42. The counter metric,
      * {@code custom_metric_two}, is incremented upon initialization, which can be used to track
      * specific events or occurrences in the application.</p>
+     *
+     * <p>The use of the {@link MeterRegistry} allows for seamless integration with various monitoring
+     * systems, providing real-time insights into application performance and behavior.</p>
      * This method relies on {@link MeterRegistry} for metric registration and management.
      *
      * @see io.micrometer.core.instrument.MeterRegistry

@@ -37,7 +37,7 @@ public class TrainerProfileArgumentsProvider implements ArgumentsProvider {
                 .build();
 
         TrainingType transfiguration = TrainingType.builder()
-                .trainingType(Specialization.TRANSFIGURATION)
+                .specialization(Specialization.TRANSFIGURATION)
                 .build();
 
         TrainerProfile profile = TrainerProfile.builder()

@@ -3,7 +3,7 @@ package com.epam.esm.gym.service;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import com.epam.esm.gym.dto.training.TrainingTypeResponse;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -25,14 +25,14 @@ public interface TrainingService {
      * Retrieves all available training types.
      * <p>
      * This method queries the system to retrieve a comprehensive list of all training types currently available.
-     * Each type is represented as a {@link TrainingTypeResponse} object, which includes relevant details
-     * about the training type. This information is useful for displaying a list of options to users, such as
-     * in dropdown menus or selection lists. The list returned may be used to filter or categorize training sessions.
+     * Each type is represented as a {@link com.epam.esm.gym.dto.training.TrainingTypeDto} object, which includes
+     * relevant details about the training type. This information is useful for displaying a list of options to users,
+     * such as in dropdown menus. The list returned may be used to filter or categorize training sessions.
      * </p>
      *
-     * @return a list of {@link TrainingTypeResponse} representing all available training types
+     * @return a list of {@link com.epam.esm.gym.dto.training.TrainingTypeDto} representing all available training types
      */
-    List<TrainingTypeResponse> getTrainingTypes();
+    List<TrainingTypeDto> getTrainingTypes();
 
     /**
      * Retrieves a list of trainings associated with a specific trainer.

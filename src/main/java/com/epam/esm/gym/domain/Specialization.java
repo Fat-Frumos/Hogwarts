@@ -17,5 +17,6 @@ public enum Specialization {
     DEFENSE,
     HERBOLOGY,
     DIVINATION,
-    TRANSFIGURATION
+    TRANSFIGURATION,
+    QUIDDITCH
 }

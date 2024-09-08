@@ -32,7 +32,7 @@ public class UpdateTrainerArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
         TrainingType transfiguration = TrainingType.builder()
-                .trainingType(Specialization.TRANSFIGURATION)
+                .specialization(Specialization.TRANSFIGURATION)
                 .build();
 
         TrainerUpdateRequest updateRequest = TrainerUpdateRequest.builder()

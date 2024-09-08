@@ -1,6 +1,6 @@
 package com.epam.esm.gym.web.provider;
 
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;

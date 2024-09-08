@@ -5,6 +5,7 @@ import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import org.springframework.http.ResponseEntity;
@@ -127,7 +128,7 @@ public interface TraineeService {
      * @param trainersUsernames the list of usernames of the trainers to be assigned
      * @return a {@link ResponseEntity} containing the updated list of {@link TrainerProfile}
      */
-    ResponseEntity<List<TrainerProfile>> updateTraineeTrainersByName(
+    ResponseEntity<List<SlimTrainerProfile>> updateTraineeTrainersByName(
             String username, List<String> trainersUsernames);
 
     /**
@@ -173,7 +174,7 @@ public interface TraineeService {
      * @param username the username of the trainee for whom the unassigned trainers are to be retrieved
      * @return a {@link ResponseEntity} containing the list of {@link TrainerProfile}
      */
-    ResponseEntity<List<TrainerProfile>> getNotAssignedTrainers(String username);
+    ResponseEntity<List<SlimTrainerProfile>> getNotAssignedTrainers(String username);
 
 
     /**

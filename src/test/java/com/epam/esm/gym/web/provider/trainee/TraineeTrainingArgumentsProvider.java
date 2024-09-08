@@ -44,7 +44,7 @@ public class TraineeTrainingArgumentsProvider implements ArgumentsProvider {
         Training training = Training.builder()
                 .trainingDate(LocalDate.of(2024, 1, 10))
                 .trainer(Trainer.builder().user(User.builder().username("Minerva McGonagall").build()).build())
-                .type(TrainingType.builder().trainingType(Specialization.TRANSFIGURATION).build())
+                .type(TrainingType.builder().specialization(Specialization.TRANSFIGURATION).build())
                 .build();
 
         Trainee trainee = Trainee.builder()

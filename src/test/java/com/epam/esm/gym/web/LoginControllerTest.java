@@ -1,6 +1,6 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.service.UserService;
 import com.epam.esm.gym.web.provider.AuthenticateArgumentsProvider;
@@ -27,7 +27,7 @@ class LoginControllerTest extends ControllerTest {
 
     @ParameterizedTest
     @ArgumentsSource(AuthenticateArgumentsProvider.class)
-    void testAuthenticate(String name, String password, ResponseEntity<MessageResponse> response) throws Exception {
+    void testAuthenticate(String name, String password, ResponseEntity<BaseResponse> response) throws Exception {
         when(userService.authenticate(name, password)).thenReturn(response);
 
         mockMvc.perform(get("/api/login")
@@ -40,7 +40,7 @@ class LoginControllerTest extends ControllerTest {
     @ParameterizedTest
     @WithMockUser(roles = "ADMIN")
     @ArgumentsSource(ChangePasswordArgumentsProvider.class)
-    void testChangePassword(ProfileRequest request, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
+    void testChangePassword(ProfileRequest request, ResponseEntity<BaseResponse> expectedResponse) throws Exception {
         when(userService.changePassword(request)).thenReturn(expectedResponse);
         mockMvc.perform(put("/api/login/change")
                         .contentType(MediaType.APPLICATION_JSON)

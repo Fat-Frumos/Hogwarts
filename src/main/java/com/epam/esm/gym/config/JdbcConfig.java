@@ -56,7 +56,6 @@ public class JdbcConfig {
      * allowing the application to execute SQL queries and manage transactions.</p>
      *
      * @return a configured {@link HikariDataSource} instance.
-     * @author Pavlo Poliak
      * @see com.zaxxer.hikari.HikariConfig
      * @see com.zaxxer.hikari.HikariDataSource
      * @since 1.0
@@ -83,7 +82,6 @@ public class JdbcConfig {
      *
      * @param dataSource the configured {@link DataSource} for database connections.
      * @return a configured {@link LocalContainerEntityManagerFactoryBean} instance.
-     * @author Pavlo Poliak
      * @see org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
      * @see org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
      * @since 1.0
@@ -109,7 +107,6 @@ public class JdbcConfig {
      *
      * @param dataSource the configured {@link DataSource} for database connections.
      * @return a configured {@link LocalSessionFactoryBean} instance.
-     * @author Pavlo Poliak
      * @see org.springframework.orm.hibernate5.LocalSessionFactoryBean
      * @see javax.sql.DataSource
      * @since 1.0
@@ -136,7 +133,6 @@ public class JdbcConfig {
      *
      * @param entityManagerFactory the configured {@link EntityManagerFactory} for managing persistence.
      * @return a configured {@link JpaTransactionManager} instance.
-     * @author Pavlo Poliak
      * @see org.springframework.orm.jpa.JpaTransactionManager
      * @see jakarta.persistence.EntityManagerFactory
      * @since 1.0

@@ -1,11 +1,14 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
+import com.epam.esm.gym.exception.InvalidJwtAuthenticationException;
+import com.epam.esm.gym.exception.TokenNotFoundException;
 import com.epam.esm.gym.exception.UserNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.security.SignatureException;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -54,8 +58,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<MessageResponse> handleMissingParams(
             MissingServletRequestParameterException ex) {
         String message = String.format(MISSING_MESSAGE, ex.getParameterName());
-        return ResponseEntity.badRequest()
-                .body(new MessageResponse(message));
+        return ResponseEntity.badRequest().body(new MessageResponse(message));
     }
 
     /**
@@ -72,8 +75,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<MessageResponse> handleMethodNotSupported(
             HttpRequestMethodNotSupportedException ex) {
         String message = String.format(NOT_SUPPORTED_MESSAGE, ex.getMethod());
-        return ResponseEntity.status(METHOD_NOT_ALLOWED)
-                .body(new MessageResponse(message));
+        return ResponseEntity.status(METHOD_NOT_ALLOWED).body(new MessageResponse(message));
     }
 
     /**
@@ -94,8 +96,7 @@ public class GlobalExceptionHandler {
                 .map(error -> String.format(MISSING_MESSAGE,
                         ((FieldError) error).getField()))
                 .collect(Collectors.joining(", "));
-        return ResponseEntity.badRequest()
-                .body(new MessageResponse(message));
+        return ResponseEntity.badRequest().body(new MessageResponse(message));
     }
 
     /**
@@ -110,11 +111,9 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     @ExceptionHandler({RuntimeException.class, Exception.class})
-    public ResponseEntity<MessageResponse> handleRuntimeException(
-            RuntimeException ex) {
+    public ResponseEntity<MessageResponse> handleRuntimeException(Exception ex) {
         log.error(ex.getMessage());
-        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
-                .body(new MessageResponse(INTERNAL_MESSAGE));
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new MessageResponse(INTERNAL_MESSAGE));
     }
 
     /**
@@ -129,10 +128,8 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(NOT_FOUND)
     @ExceptionHandler({EntityNotFoundException.class, UserNotFoundException.class})
-    public ResponseEntity<String> handleEntityNotFoundException(
-            EntityNotFoundException ex) {
-        return ResponseEntity.status(NOT_FOUND)
-                .body(ex.getMessage());
+    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return ResponseEntity.status(NOT_FOUND).body(ex.getMessage());
     }
 
     /**
@@ -155,5 +152,25 @@ public class GlobalExceptionHandler {
                 .sorted().distinct()
                 .collect(Collectors.joining(", "));
         return new ResponseEntity<>(new MessageResponse(message), BAD_REQUEST);
+    }
+
+    /**
+     * Handles exceptions related to JWT authentication, specifically {@link InvalidJwtAuthenticationException}
+     * and {@link TokenNotFoundException}.
+     *
+     * <p>This method processes {@link SignatureException} thrown due to invalid JWT signatures or token
+     * issues. It logs the error and returns a {@link ResponseEntity} with an error message and HTTP status
+     * {@link HttpStatus#UNAUTHORIZED}.
+     * </p>
+     *
+     * @param ex the {@link SignatureException} thrown during JWT authentication.
+     * @return a {@link ResponseEntity} containing a {@link MessageResponse} with an error message and
+     *         HTTP status {@link HttpStatus#UNAUTHORIZED}.
+     */
+    @ExceptionHandler({InvalidJwtAuthenticationException.class, TokenNotFoundException.class})
+    public ResponseEntity<MessageResponse> handleSignatureException(SignatureException ex) {
+        log.error("JWT Signature error: {}", ex.getMessage());
+        MessageResponse response = new MessageResponse("Invalid JWT signature");
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 }

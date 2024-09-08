@@ -6,7 +6,7 @@ import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.training.TrainingRequest;
-import com.epam.esm.gym.dto.training.TrainingTypeResponse;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
@@ -60,10 +60,10 @@ class TrainingMapperTest {
     void testToType() {
         TrainingType trainingType = TrainingType.builder()
                 .id(1L)
-                .trainingType(Specialization.TRANSFIGURATION)
+                .specialization(Specialization.TRANSFIGURATION)
                 .build();
 
-        TrainingTypeResponse response = trainingMapper.toType(trainingType);
+        TrainingTypeDto response = trainingMapper.toType(trainingType);
 
         assertNotNull(response);
         assertEquals(Specialization.TRANSFIGURATION, response.getTrainingType());

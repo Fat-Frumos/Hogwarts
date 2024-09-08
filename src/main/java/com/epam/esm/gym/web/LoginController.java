@@ -1,6 +1,7 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.service.UserService;
 import jakarta.validation.Valid;
@@ -58,7 +59,7 @@ public class LoginController implements ILoginController {
      */
     @Override
     @GetMapping("/login")
-    public ResponseEntity<MessageResponse> login(
+    public ResponseEntity<BaseResponse> login(
             @RequestParam("username") @NotNull @Valid @Size(min = 2, max = 50) String username,
             @RequestParam("password") @NotNull @Valid @Size(min = 6, max = 50) String password) {
         return userService.authenticate(username, password);
@@ -78,7 +79,7 @@ public class LoginController implements ILoginController {
      */
     @Override
     @PutMapping("/login/change")
-    public ResponseEntity<MessageResponse> changeLogin(
+    public ResponseEntity<BaseResponse> changeLogin(
             @RequestBody @Valid ProfileRequest request) {
         return userService.changePassword(request);
     }

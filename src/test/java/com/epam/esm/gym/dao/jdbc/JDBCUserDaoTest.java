@@ -77,7 +77,7 @@ class JDBCUserDaoTest {
     @ArgumentsSource(UserDaoArgumentsProvider.class)
     void testFindAll(User user) {
         List<User> users = List.of(user);
-        String hql = "FROM " + User.class.getName();
+        String hql = "SELECT u FROM User u LEFT JOIN FETCH u.tokens";
         when(session.createQuery(hql, User.class)).thenReturn(query);
         when(query.getResultList()).thenReturn(users);
         List<User> result = userDao.findAll();

@@ -1,7 +1,8 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
@@ -90,10 +91,10 @@ class TrainerControllerTest extends ControllerTest {
     @Test
     @WithMockUser(roles = "TRAINER")
     void testGetTrainerProfileWhenNotFound() throws Exception {
-        String username = "Trainer";
-        ResponseEntity<TrainerProfile> expectedResponse = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        when(trainerService.getTrainerProfileByName(username)).thenReturn(expectedResponse);
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/trainers/{username}", username)
+        String trainer = "Trainer";
+        ResponseEntity<SlimTrainerProfile> expectedResponse = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        when(trainerService.getTrainerProfileByName(trainer)).thenReturn(expectedResponse);
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/trainers/{username}", trainer)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(expectedResponse.getStatusCode().value()));
     }
@@ -102,7 +103,7 @@ class TrainerControllerTest extends ControllerTest {
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TrainerProfileNotFoundArgumentsProvider.class)
     void testGetTrainerProfileWhenNotFounds(
-            TrainerRequest request, ResponseEntity<TrainerProfile> expectedResponse) throws Exception {
+            TrainerRequest request, ResponseEntity<SlimTrainerProfile> expectedResponse) throws Exception {
         when(trainerService.getTrainerProfileByName(request.getFirstName())).thenReturn(expectedResponse);
         ResultActions resultActions = mockMvc.perform(get("/api/trainers/{username}", request.getFirstName())
                 .contentType(MediaType.APPLICATION_JSON));

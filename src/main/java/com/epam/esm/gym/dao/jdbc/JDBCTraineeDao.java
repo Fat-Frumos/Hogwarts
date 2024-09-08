@@ -6,6 +6,7 @@ import com.epam.esm.gym.domain.Trainer;
 import org.hibernate.SessionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +43,7 @@ public class JDBCTraineeDao extends AbstractDao<Trainee> implements TraineeDao {
      * @param sessionFactory the {@link SessionFactory} used for obtaining Hibernate sessions.
      */
     public JDBCTraineeDao(SessionFactory sessionFactory) {
-        super(Trainee.class, sessionFactory);
+        super(sessionFactory);
     }
 
     /**
@@ -61,9 +62,9 @@ public class JDBCTraineeDao extends AbstractDao<Trainee> implements TraineeDao {
     @Override
     public Optional<Trainee> findByUsername(String username) {
         String hql = """
-                SELECT t
+                SELECT t.id, t.dateOfBirth, t.address, t.id
                 FROM Trainee t
-                JOIN FETCH t.user u
+                JOIN User u ON u.id = t.id
                 WHERE u.username = :username
                 """;
         return getSession().createQuery(hql, Trainee.class)
@@ -98,6 +99,22 @@ public class JDBCTraineeDao extends AbstractDao<Trainee> implements TraineeDao {
 
         return getSession().createQuery(hql, Trainer.class)
                 .setParameter(USERNAME, username)
+                .getResultList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Trainee> findAll() {
+        String hql = """
+                SELECT DISTINCT t
+                FROM Trainee t
+                LEFT JOIN FETCH t.user u
+                LEFT JOIN FETCH t.trainings tr
+                LEFT JOIN FETCH tr.type
+                LEFT JOIN FETCH tr.trainer tn
+                 """;
+        return getSession()
+                .createQuery(hql, Trainee.class)
                 .getResultList();
     }
 }

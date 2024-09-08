@@ -1,6 +1,6 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.service.UserService;
 import com.epam.esm.gym.web.provider.AuthenticateArgumentsProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +58,7 @@ class AuthenticationTests extends ControllerTest {
     @DisplayName("Successful Login")
     @WithMockUser(roles = "TRAINEE")
     @ArgumentsSource(AuthenticateArgumentsProvider.class)
-    void testLogin(String username, String password, ResponseEntity<MessageResponse> response) throws Exception {
+    void testLogin(String username, String password, ResponseEntity<BaseResponse> response) throws Exception {
         when(userService.authenticate(username, password)).thenReturn(response);
         mockMvc.perform(get("/api/login")
                         .param("username", username)

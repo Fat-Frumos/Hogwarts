@@ -1,7 +1,7 @@
 package com.epam.esm.gym.service.profile;
 
 import com.epam.esm.gym.dao.TrainerDao;
-import com.epam.esm.gym.dao.TrainingDao;
+import com.epam.esm.gym.dao.jpa.JpaTrainingSessionRepository;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.service.SessionService;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class TrainingSessionService implements SessionService {
 
-    private final TrainingDao trainingDao;
+    private final JpaTrainingSessionRepository dao;
     private final TrainerDao trainerDao;
 
     /**
@@ -46,7 +46,7 @@ public class TrainingSessionService implements SessionService {
         LocalDate today = LocalDateTime.now().toLocalDate();
         LocalDateTime startOfWeekDateTime = today.with(DayOfWeek.MONDAY).atStartOfDay();
         LocalDateTime endOfWeekDateTime = today.with(DayOfWeek.SUNDAY).atTime(23, 59, 59);
-        return trainingDao.findByStartTimeBetween(startOfWeekDateTime, endOfWeekDateTime)
+        return dao.findByStartTimeBetween(startOfWeekDateTime, endOfWeekDateTime)
                 .stream()
                 .collect(Collectors.groupingBy(session -> session.getTrainer().getUser().getUsername(),
                         Collectors.summingLong(session -> session.getDuration().toMinutes())));

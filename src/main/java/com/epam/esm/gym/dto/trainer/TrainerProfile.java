@@ -3,14 +3,15 @@ package com.epam.esm.gym.dto.trainer;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Data Transfer Object for representing a trainer profile.
@@ -20,17 +21,30 @@ import java.util.Objects;
  */
 @Getter
 @Setter
-@Builder
 @ToString
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrainerProfile {
-    private String username;
-    private String firstName;
-    private String lastName;
-    private TrainingType specialization;
-    private boolean active;
+public class TrainerProfile extends SlimTrainerProfile {
     private List<TraineeProfile> trainees;
+
+    /**
+     * Constructs a new {@link TrainerProfile} with the specified details.
+     *
+     * @param username       the username of the trainer.
+     * @param firstName      the first name of the trainer.
+     * @param lastName       the last name of the trainer.
+     * @param specialization the specialization of the trainer.
+     * @param active         the status indicating whether the trainer is active.
+     * @param trainees       the list of trainees associated with the trainer.
+     */
+    public TrainerProfile(
+            String username, String firstName,
+            String lastName, TrainingType specialization,
+            boolean active, List<TraineeProfile> trainees) {
+        super(username, firstName, lastName, specialization, active);
+        this.trainees = trainees;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -40,17 +54,18 @@ public class TrainerProfile {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
+        if (!super.equals(obj)) {
+            return false;
+        }
         TrainerProfile profile = (TrainerProfile) obj;
-        return active == profile.active
-                && Objects.equals(username, profile.username)
-                && Objects.equals(firstName, profile.firstName)
-                && Objects.equals(lastName, profile.lastName)
-                && Objects.equals(specialization, profile.specialization)
-                && Objects.equals(trainees, profile.trainees);
+        return new EqualsBuilder().appendSuper(super.equals(obj))
+                .append(trainees, profile.trainees).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, firstName, lastName, specialization, active, trainees);
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(trainees).toHashCode();
     }
 }

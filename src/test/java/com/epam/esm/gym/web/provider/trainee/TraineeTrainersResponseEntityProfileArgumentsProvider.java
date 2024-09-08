@@ -31,11 +31,11 @@ public class TraineeTrainersResponseEntityProfileArgumentsProvider implements Ar
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
         TrainingType transfiguration = TrainingType.builder()
-                .trainingType(Specialization.TRANSFIGURATION)
+                .specialization(Specialization.TRANSFIGURATION)
                 .build();
 
         TrainingType defense = TrainingType.builder()
-                .trainingType(Specialization.DEFENSE)
+                .specialization(Specialization.DEFENSE)
                 .build();
 
         List<TrainerProfile> updatedTrainers = List.of(

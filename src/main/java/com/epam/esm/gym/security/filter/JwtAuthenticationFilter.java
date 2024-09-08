@@ -1,77 +1,75 @@
 package com.epam.esm.gym.security.filter;
 
+import com.epam.esm.gym.dto.auth.UserPrincipal;
 import com.epam.esm.gym.security.JwtProvider;
+import com.epam.esm.gym.security.SecurityUserDetailsService;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 /**
- * A filter that processes JWT-based authentication.
- *
- * <p>This filter extracts the JWT token from the Authorization header, validates
- * the token, and sets the authentication in the SecurityContext if the token is valid.</p>
+ * Filter that processes JWT authentication by extracting and validating the JWT token
+ * from the request header and setting the authentication in the security context.
  */
 @Slf4j
-@Service
+@Component
 @AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private JwtProvider provider;
+    private final JwtProvider jwtProvider;
 
-    private UserDetailsService userDetailsService;
+    private final ApplicationContext context;
 
     /**
-     * Processes the request to perform JWT authentication.
+     * This method is called once per request to filter and authenticate the request
+     * using JWT tokens.
      *
-     * <p>If a valid JWT token is found, it sets the authentication in the
-     * SecurityContext, allowing the request to proceed with authenticated access.</p>
-     *
-     * @param request     the HTTP request
-     * @param response    the HTTP response
-     * @param filterChain the filter chain
-     * @throws ServletException if a servlet exception occurs
-     * @throws IOException      if an I/O error occurs
+     * @param request     the {@link HttpServletRequest} object.
+     * @param response    the {@link HttpServletResponse} object.
+     * @param filterChain the {@link FilterChain} to pass the request and response to the next filter.
+     * @throws ServletException if an error occurs during the request handling.
+     * @throws IOException      if an I/O error occurs during the request handling.
      */
     @Override
     protected void doFilterInternal(
-            final HttpServletRequest request,
-            final @NonNull HttpServletResponse response,
-            final @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
+            HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String jwt = authHeader.substring(7);
-            SecurityContext securityContext = SecurityContextHolder.getContext();
-            UserDetails userDetails = userDetailsService
-                    .loadUserByUsername(provider.getUsername(jwt));
-            log.info(userDetails.toString());
-            log.info(jwt);
-            boolean isValid = provider.findByToken(jwt)
-                    .map(token -> !token.isExpired()
-                            && !token.isRevoked())
-                    .orElse(false);
-            if (isValid && provider.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null,
-                                userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource()
-                        .buildDetails(request));
-                securityContext.setAuthentication(authToken);
+        String token = null;
+        String username = null;
+
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+                username = jwtProvider.extractUserName(token);
+            }
+        } catch (SignatureException exception) {
+            log.error("{}", exception.getMessage());
+        }
+
+        log.info("Extracted UserName {} from token {}", username, token);
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserPrincipal userDetails = context.getBean(SecurityUserDetailsService.class).loadUserByUsername(username);
+            log.info("Extracted {}", userDetails);
+            if (jwtProvider.validateToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
         filterChain.doFilter(request, response);

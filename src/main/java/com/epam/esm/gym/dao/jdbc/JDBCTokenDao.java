@@ -3,13 +3,16 @@ package com.epam.esm.gym.dao.jdbc;
 import com.epam.esm.gym.dao.TokenDao;
 import com.epam.esm.gym.domain.Token;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Data Access Object (DAO) implementation for managing {@link Token} entities using JDBC.
@@ -40,7 +43,7 @@ public class JDBCTokenDao extends AbstractDao<Token> implements TokenDao {
      * @param sessionFactory the {@link SessionFactory} used for obtaining Hibernate sessions.
      */
     public JDBCTokenDao(SessionFactory sessionFactory) {
-        super(Token.class, sessionFactory);
+        super(sessionFactory);
     }
 
     /**
@@ -83,18 +86,17 @@ public class JDBCTokenDao extends AbstractDao<Token> implements TokenDao {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<Token> findAllValidAccessTokenByUserId(Integer id) {
+    public Set<Token> findAllValidAccessTokenByUserId(Integer id) {
         String hql = """
-                select t
-                from Token t
-                inner join User u
-                on t.user.id = u.id
-                where u.id = :id and (t.expired = false or t.revoked = false)
-                """;
-        return getSession().createQuery(
-                        hql, Token.class)
+            select t
+            from Token t
+            inner join User u
+            on t.user.id = u.id
+            where u.id = :id and (t.expired = false or t.revoked = false)
+            """;
+        return new HashSet<>(getSession().createQuery(hql, Token.class)
                 .setParameter("id", id)
-                .getResultList();
+                .getResultList());
     }
 
     /**
@@ -129,7 +131,15 @@ public class JDBCTokenDao extends AbstractDao<Token> implements TokenDao {
      */
     @Override
     @Transactional
-    public void saveAll(List<Token> tokens) {
+    public void saveAll(Set<Token> tokens) {
         tokens.forEach(token -> getSession().persist(token));
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Token> findAll() {
+        Session session = getSession();
+        String hql = "SELECT t FROM Token t LEFT JOIN FETCH t.user";
+        return session.createQuery(hql, Token.class).getResultList();
     }
 }

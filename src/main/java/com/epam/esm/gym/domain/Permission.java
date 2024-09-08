@@ -13,6 +13,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Permission {
 
+    GUEST_READ("guest:read"),
     ADMIN_CREATE("admin:create"),
     ADMIN_READ("admin:read"),
     ADMIN_UPDATE("admin:update"),

@@ -2,6 +2,8 @@ package com.epam.esm.gym.dao;
 
 import com.epam.esm.gym.domain.User;
 
+import java.util.List;
+
 /**
  * Data Access Object (DAO) interface for managing {@link User} entities.
  *
@@ -26,4 +28,17 @@ public interface UserDao extends Dao<User> {
      * @return the {@link User} associated with the username
      */
     User getUserBy(String username);
+
+    /**
+     * Retrieves a list of users whose usernames start with the specified base username.
+     * <p>
+     * This method performs a query to find users where their username begins with the provided
+     * base username. It is useful for searching or autocomplete functionalities where a user may
+     * want to find usernames that match a particular pattern.
+     * </p>
+     *
+     * @param baseUsername the base username to match against the beginning of usernames
+     * @return a list of {@link User} objects with usernames starting with the given base username
+     */
+    List<User> findUsernamesByBaseName(String baseUsername);
 }

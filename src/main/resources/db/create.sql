@@ -52,9 +52,9 @@ CREATE TABLE "training_type"
 CREATE TABLE "trainer"
 (
     id                SERIAL PRIMARY KEY,
-    specialization_id BIGINT NOT NULL,
+    training_type_id BIGINT NOT NULL,
     user_id           BIGINT NOT NULL,
-    FOREIGN KEY (specialization_id) REFERENCES training_type (id),
+    FOREIGN KEY (training_type_id) REFERENCES training_type (id),
     FOREIGN KEY (user_id) REFERENCES "users" (id) ON DELETE CASCADE
 );
 

@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SecurityUserDetailsServiceTest {
+class UserPrincipalDetailsServiceTest {
 
     @Mock
     private UserDao userRepository;

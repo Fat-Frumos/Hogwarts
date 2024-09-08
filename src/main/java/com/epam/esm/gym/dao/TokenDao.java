@@ -2,8 +2,8 @@ package com.epam.esm.gym.dao;
 
 import com.epam.esm.gym.domain.Token;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Data Access Object (DAO) interface for managing {@link Token} entities.
@@ -18,9 +18,9 @@ public interface TokenDao extends Dao<Token> {
      * Finds all valid access tokens associated with a specific user ID.
      *
      * @param id the user ID
-     * @return a list of valid {@link Token} objects
+     * @return a set of valid {@link Token} objects
      */
-    List<Token> findAllValidAccessTokenByUserId(Integer id);
+    Set<Token> findAllValidAccessTokenByUserId(Integer id);
 
     /**
      * Finds a {@link Token} by its access token (JWT).
@@ -35,5 +35,5 @@ public interface TokenDao extends Dao<Token> {
      *
      * @param tokens the list of {@link Token} objects to save
      */
-    void saveAll(List<Token> tokens);
+    void saveAll(Set<Token> tokens);
 }

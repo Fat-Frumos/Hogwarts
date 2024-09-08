@@ -81,7 +81,7 @@ VALUES ('CARDIO'),
        ('TRANSFIGURATION');
 
 
-INSERT INTO "trainer" (specialization_id, user_id)
+INSERT INTO "trainer" (training_type_id, user_id)
 VALUES ((SELECT id FROM "training_type" WHERE training_type_name = 'POTIONS'),
         (SELECT id FROM "users" WHERE username = 'Severus.Snape')),
        ((SELECT id FROM "training_type" WHERE training_type_name = 'CARE'),
@@ -160,10 +160,3 @@ INSERT INTO "roles" (id, permission)
 VALUES (1, 'ROLE_TRAINEE'),
        (2, 'ROLE_TRAINER'),
        (3, 'ROLE_ADMIN');
-
-SELECT column_name
-FROM information_schema.columns
-WHERE table_name = 'users';
-
-SELECT * FROM users WHERE username ='Salazar.Slytherin';
-SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'

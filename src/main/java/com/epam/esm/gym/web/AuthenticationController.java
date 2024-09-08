@@ -2,8 +2,9 @@ package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.auth.AuthenticationRequest;
 import com.epam.esm.gym.dto.auth.AuthenticationResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.RegisterRequest;
-import com.epam.esm.gym.service.profile.AuthenticationUserService;
+import com.epam.esm.gym.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthenticationController implements IAuthenticationController {
 
-    private final AuthenticationUserService service;
+    private final AuthenticationService service;
 
     /**
      * {@inheritDoc}
@@ -41,9 +42,9 @@ public class AuthenticationController implements IAuthenticationController {
      */
     @Override
     @PostMapping("/signup")
-    public ResponseEntity<AuthenticationResponse> signup(
+    public ResponseEntity<BaseResponse> signupUser(
             final @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(service.signup(request));
+        return service.signup(request);
     }
 
     /**
@@ -55,7 +56,7 @@ public class AuthenticationController implements IAuthenticationController {
      */
     @Override
     @PostMapping("/token/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
+    public ResponseEntity<AuthenticationResponse> authenticateUser(
             final @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(service.authenticate(request));
     }
@@ -70,11 +71,10 @@ public class AuthenticationController implements IAuthenticationController {
      */
     @Override
     @PostMapping("/token/refresh")
-    public ResponseEntity<AuthenticationResponse> refreshTokens(
+    public ResponseEntity<BaseResponse> refreshTokens(
             final @RequestHeader("Authorization") String authorizationHeader,
             final HttpServletResponse response) {
-        return ResponseEntity.ok(service.refresh(
-                authorizationHeader, response));
+        return service.refresh(authorizationHeader, response);
     }
 
     /**
@@ -86,9 +86,9 @@ public class AuthenticationController implements IAuthenticationController {
      */
     @Override
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(
+    public ResponseEntity<BaseResponse> loginUser(
             final @RequestBody AuthenticationRequest loginRequest) {
-        return ResponseEntity.ok(service.login(loginRequest));
+        return service.login(loginRequest);
     }
 
     /**
@@ -101,7 +101,7 @@ public class AuthenticationController implements IAuthenticationController {
      */
     @Override
     @PostMapping("/logout")
-    public ResponseEntity<Object> logout(
+    public ResponseEntity<BaseResponse> logout(
             final HttpServletRequest request,
             final HttpServletResponse response) {
         service.logout(request, response);

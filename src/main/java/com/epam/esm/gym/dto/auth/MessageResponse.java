@@ -1,4 +1,4 @@
-package com.epam.esm.gym.dto.profile;
+package com.epam.esm.gym.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +21,7 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageResponse {
+public class MessageResponse implements BaseResponse {
     /**
      * The message content.
      *

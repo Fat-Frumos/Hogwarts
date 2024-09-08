@@ -1,16 +1,15 @@
 package com.epam.esm.gym.service;
 
-import com.epam.esm.gym.domain.SecurityUser;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.AuthenticationRequest;
 import com.epam.esm.gym.dto.auth.AuthenticationResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.RegisterRequest;
+import com.epam.esm.gym.dto.auth.UserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 /**
  * Service interface for handling authentication and user management operations.
@@ -35,7 +34,7 @@ public interface AuthenticationService {
      * @param request The registration request containing user details.
      * @return An {@link AuthenticationResponse} with tokens and user information.
      */
-    AuthenticationResponse signup(RegisterRequest request);
+    ResponseEntity<BaseResponse> signup(RegisterRequest request);
 
     /**
      * Authenticates a user with the provided credentials and returns an authentication response.
@@ -47,7 +46,7 @@ public interface AuthenticationService {
      * @param request The authentication request containing user credentials.
      * @return An {@link AuthenticationResponse} with tokens and user information.
      */
-    AuthenticationResponse login(AuthenticationRequest request);
+    ResponseEntity<BaseResponse> login(AuthenticationRequest request);
 
     /**
      * Handles user authentication based on the provided request and returns an authentication response.
@@ -72,7 +71,7 @@ public interface AuthenticationService {
      * @param response            The HTTP response used to set the new token.
      * @return An {@link AuthenticationResponse} with the refreshed tokens.
      */
-    AuthenticationResponse refresh(String authorizationHeader, HttpServletResponse response);
+    ResponseEntity<BaseResponse> refresh(String authorizationHeader, HttpServletResponse response);
 
     /**
      * Logs out the current user by invalidating the authentication session and associated tokens.
@@ -87,17 +86,17 @@ public interface AuthenticationService {
     void logout(HttpServletRequest request, HttpServletResponse response);
 
     /**
-     * Finds and returns a {@link SecurityUser} object based on the provided username.
+     * Finds and returns a {@link com.epam.esm.gym.dto.auth.UserPrincipal} object based on the provided username.
      * Retrieves user details from the repository using the given username.
      * Throws {@link org.springframework.security.core.userdetails.UsernameNotFoundException}
      * if no user is found with the specified username.
-     * Returns a {@link SecurityUser} instance representing the user with the provided username.
+     * Returns a {@link com.epam.esm.gym.dto.auth.UserPrincipal} representing the user with the provided username.
      * This method is crucial for user authentication and authorization processes.
      *
      * @param username The username of the user to find.
-     * @return A {@link SecurityUser} object representing the user.
+     * @return A {@link com.epam.esm.gym.dto.auth.UserPrincipal} object representing the user.
      */
-    SecurityUser findUser(String username);
+    UserPrincipal findUser(String username);
 
     /**
      * Retrieves a {@link User} object with roles based on the registration request and username.
@@ -113,65 +112,14 @@ public interface AuthenticationService {
     User getUserWithRole(RegisterRequest request, String username);
 
     /**
-     * Finds a user by their username and returns an optional containing the user if found.
-     * Searches the user repository for the specified username.
-     * Returns an {@link Optional} which is empty if no user is found with the provided username.
-     * This method is used for querying user details based on the username.
-     * It supports scenarios where the presence of a user needs to be verified.
-     *
-     * @param username The username of the user to find.
-     * @return An {@link Optional} containing the user if found, otherwise empty.
-     */
-    Optional<User> findByUsername(String username);
-
-    /**
-     * Generates an {@link AuthenticationResponse} for a given {@link SecurityUser} object.
+     * Generates an {@link AuthenticationResponse} for a given {@link com.epam.esm.gym.dto.auth.UserPrincipal} object.
      * Creates an authentication response containing tokens and user details.
-     * Uses the {@link SecurityUser} instance to populate the response data.
+     * Uses the {@link com.epam.esm.gym.dto.auth.UserPrincipal} instance to populate the response data.
      * Returns the generated {@link AuthenticationResponse} for the user.
      * This method supports generating response data for authenticated users.
      *
-     * @param user The {@link SecurityUser} instance for which to generate the response.
+     * @param user The {@link com.epam.esm.gym.dto.auth.UserPrincipal} instance for which to generate the response.
      * @return An {@link AuthenticationResponse} containing tokens and user details.
      */
-    AuthenticationResponse getAuthenticationResponse(SecurityUser user);
-
-    /**
-     * Creates an {@link AuthenticationResponse} using a {@link SecurityUser} and an access token.
-     * Provides an authentication response that includes the specified access token and user details.
-     * Returns the {@link AuthenticationResponse} populated with the access token and user information.
-     * This method is used to generate a response for users with an existing access token.
-     * Supports scenarios where both the user and token are required in the response.
-     *
-     * @param user        The {@link SecurityUser} instance for which to generate the response.
-     * @param accessToken The access token to include in the response.
-     * @return An {@link AuthenticationResponse} containing the access token and user details.
-     */
-    AuthenticationResponse getAuthenticationResponse(SecurityUser user, String accessToken);
-
-    /**
-     * Generates an {@link AuthenticationResponse} based on user details and JWT token.
-     * Creates a response that includes the JWT token, user details, and access token.
-     * This method is used to return comprehensive authentication data including token details.
-     * Supports scenarios where detailed response data is required for authenticated users.
-     * Ensures that all relevant information is included in the authentication response.
-     *
-     * @param user        The user details to include in the response.
-     * @param jwtToken    The JWT token to include in the response.
-     * @param accessToken The access token to include in the response.
-     * @return An {@link AuthenticationResponse} containing token and user information.
-     */
-    AuthenticationResponse getAuthenticationResponse(UserDetails user, String jwtToken, Long accessToken);
-
-    /**
-     * Generates a token for the specified user.
-     * Creates a new authentication token based on the provided {@link UserDetails}.
-     * The generated token can be used for user authentication in secured operations.
-     * This method supports the token generation process required for user authentication.
-     * Returns the generated token as a {@link String}.
-     *
-     * @param user The {@link UserDetails} for which to generate the token.
-     * @return The generated token as a {@link String}.
-     */
-    String generateToken(UserDetails user);
+    AuthenticationResponse getAuthenticationResponse(UserPrincipal user);
 }

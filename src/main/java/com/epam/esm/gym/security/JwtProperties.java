@@ -20,6 +20,8 @@ import java.util.Objects;
 @Component
 @ConfigurationProperties("jwt")
 public class JwtProperties {
+
+    private Long expiration;
     /**
      * The issuer of the JWT, typically used to identify the origin of the token.
      * This value is used when generating the token to set the "iss" claim.

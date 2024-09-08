@@ -1,34 +1,36 @@
 package com.epam.esm.gym.service.profile;
 
 import com.epam.esm.gym.dao.UserDao;
-import com.epam.esm.gym.domain.SecurityUser;
 import com.epam.esm.gym.domain.Token;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.AuthenticationRequest;
 import com.epam.esm.gym.dto.auth.AuthenticationResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.auth.RegisterRequest;
-import com.epam.esm.gym.exception.InvalidJwtAuthenticationException;
+import com.epam.esm.gym.dto.auth.UserPrincipal;
 import com.epam.esm.gym.security.JwtProvider;
 import com.epam.esm.gym.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 import static com.epam.esm.gym.domain.RoleType.ROLE_TRAINER;
-import static java.time.Instant.now;
 
 /**
  * Implementation of the {@link AuthenticationService} interface.
@@ -44,7 +46,7 @@ public class AuthenticationUserService implements AuthenticationService {
 
     private final AuthenticationManager manager;
     private final PasswordEncoder encoder;
-    private final JwtProvider provider;
+    private final JwtProvider jwtProvider;
     private final UserDao dao;
 
     /**
@@ -53,18 +55,18 @@ public class AuthenticationUserService implements AuthenticationService {
      */
     @Override
     @Transactional
-    public AuthenticationResponse signup(final RegisterRequest request) {
-        String username = request.getUsername();
-        String baseUsername = username;
-        int suffix = 1;
-        while (dao.findByUsername(username).isPresent()) {
-            username = baseUsername + suffix;
-            suffix++;
-        }
-        SecurityUser user = SecurityUser.builder()
-                .user(dao.save(getUserWithRole(request, username)))
-                .build();
-        return getAuthenticationResponse(user);
+    public ResponseEntity<BaseResponse> signup(final RegisterRequest request) {
+        String baseUsername = request.getUsername();
+        List<User> existingUsernames = dao.findUsernamesByBaseName(request.getUsername());
+        int suffix = existingUsernames.stream()
+                .map(user -> user.getUsername().replace(baseUsername + ".", ""))
+                .filter(s -> s.matches("\\d+"))
+                .mapToInt(Integer::parseInt)
+                .max()
+                .orElse(0) + 1;
+        User saved = dao.save(getUserWithRole(request, baseUsername + "." + suffix));
+        UserPrincipal user = UserPrincipal.builder().user(saved).build();
+        return ResponseEntity.ok(getAuthenticationResponse(user));
     }
 
     /**
@@ -73,11 +75,25 @@ public class AuthenticationUserService implements AuthenticationService {
      */
     @Override
     @Transactional
-    public AuthenticationResponse login(
+    public ResponseEntity<BaseResponse> login(
             final AuthenticationRequest request) {
-        setAuthenticationToken(request);
-        SecurityUser user = findUser(request.getUsername());
-        return getAuthenticationResponse(user);
+        Optional<User> userOptional = dao.findByUsername(request.getUsername());
+        if (userOptional.isEmpty()){
+            return ResponseEntity.badRequest().body(new MessageResponse("User not found " + request.getUsername()));
+        }
+        UserPrincipal user = UserPrincipal.builder().user(userOptional.get()).build();
+        Authentication authentication = manager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        if (authentication.isAuthenticated()) {
+            String token = jwtProvider.generateToken(user);
+            log.info(user.toString());
+            log.info(token);
+            return ResponseEntity.ok(AuthenticationResponse.builder().accessToken(token)
+                    .username(request.getUsername())
+                    .refreshToken(token)
+                    .expiresAt(new java.sql.Timestamp(System.currentTimeMillis() + 60 * 60 * 1000)).build());
+        }
+        return ResponseEntity.badRequest().body(new MessageResponse("Failed Authenticates login"));
     }
 
     /**
@@ -89,9 +105,11 @@ public class AuthenticationUserService implements AuthenticationService {
     public AuthenticationResponse authenticate(
             final AuthenticationRequest request) {
         setAuthenticationToken(request);
-        SecurityUser user = findUser(request.getUsername());
-        provider.revokeAllUserTokens(user.getUser());
-        return getAuthenticationResponse(user);
+        UserPrincipal user = findUser(request.getUsername());
+        jwtProvider.revokeAllUserTokens(user.user());
+        String jwtToken = jwtProvider.generateToken(user);
+        Token token = jwtProvider.updateUserTokens(user, jwtToken);
+        return jwtProvider.getAuthenticationResponse(user, jwtToken, token.getAccessTokenTTL());
     }
 
     /**
@@ -101,27 +119,27 @@ public class AuthenticationUserService implements AuthenticationService {
      */
     @Override
     @Transactional
-    public AuthenticationResponse refresh(
+    public ResponseEntity<BaseResponse> refresh(
             final String authorizationHeader,
             final HttpServletResponse response) {
-        if (provider.isBearerToken(authorizationHeader)) {
+        if (jwtProvider.isBearerToken(authorizationHeader)) {
             String refreshToken = authorizationHeader.substring(7);
-            String username = provider.getUsername(refreshToken);
+            String username = jwtProvider.extractUserName(refreshToken);
             if (username != null) {
-                SecurityUser user = findUser(username);
-                if (provider.isTokenValid(refreshToken, user)) {
-                    String accessToken = provider.generateToken(user);
-                    Token token = provider.updateUserTokens(user, accessToken);
-                    return AuthenticationResponse.builder()
+                UserPrincipal user = UserPrincipal.builder().user(dao.getUserBy(username)).build();
+                if (jwtProvider.validateToken(refreshToken, user)) {
+                    String accessToken = jwtProvider.generateToken(user);
+                    Token token = jwtProvider.updateUserTokens(user, accessToken);
+                    return ResponseEntity.ok(AuthenticationResponse.builder()
                             .username(username)
                             .accessToken(token.getAccessToken())
                             .refreshToken(refreshToken)
                             .expiresAt(new Timestamp(token.getAccessTokenTTL()))
-                            .build();
+                            .build());
                 }
             }
         }
-        throw new InvalidJwtAuthenticationException("Invalid Jwt Authentication");
+        return ResponseEntity.badRequest().body(new MessageResponse("Invalid Jwt Authentication"));
     }
 
     /**
@@ -135,11 +153,11 @@ public class AuthenticationUserService implements AuthenticationService {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
-            Token token = provider.findByToken(jwt).orElse(null);
+            Token token = jwtProvider.findByToken(jwt).orElse(null);
             if (token != null) {
                 token.setExpired(true);
                 token.setRevoked(true);
-                provider.save(token);
+                jwtProvider.save(token);
             }
         }
         response.setStatus(HttpServletResponse.SC_OK);
@@ -162,7 +180,7 @@ public class AuthenticationUserService implements AuthenticationService {
      * </p>
      *
      * @param request the {@link AuthenticationRequest} containing the username and password to authenticate
-     * @throws org.springframework.security.core.AuthenticationException if the authentication fails
+     * @throws BadCredentialsException if the authentication fails
      */
     private void setAuthenticationToken(
             final AuthenticationRequest request) {
@@ -170,18 +188,22 @@ public class AuthenticationUserService implements AuthenticationService {
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
                         request.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        if (authenticate.isAuthenticated()) {
+            SecurityContextHolder.getContext().setAuthentication(authenticate);
+        } else {
+            throw new BadCredentialsException("Authentication failed");
+        }
     }
 
     /**
      * {@inheritDoc}
-     * Retrieves user details based on the username and returns a {@link SecurityUser} object.
+     * Retrieves user details based on the username and returns a {@link UserPrincipal} object.
      */
     @Override
     @Transactional
-    public SecurityUser findUser(final String username) {
+    public UserPrincipal findUser(final String username) {
         User user = dao.getUserBy(username);
-        return SecurityUser.builder().user(user).build();
+        return UserPrincipal.builder().user(user).build();
     }
 
     /**
@@ -199,61 +221,13 @@ public class AuthenticationUserService implements AuthenticationService {
 
     /**
      * {@inheritDoc}
-     * Finds a user by their username and returns an {@link Optional}.
+     * Constructs an authentication response from a {@link UserPrincipal} object.
      */
     @Override
     @Transactional
-    public Optional<User> findByUsername(
-            final String username) {
-        return dao.findByUsername(username);
-    }
-
-    /**
-     * {@inheritDoc}
-     * Constructs an authentication response from a {@link SecurityUser} object.
-     */
-    @Override
-    @Transactional
-    public AuthenticationResponse getAuthenticationResponse(final SecurityUser user) {
-        String jwtToken = provider.generateToken(user);
-        Token token = provider.updateUserTokens(user, jwtToken);
-        return getAuthenticationResponse(user, jwtToken, token.getAccessTokenTTL());
-    }
-
-    /**
-     * {@inheritDoc}
-     * Constructs an authentication response from a {@link SecurityUser} and an access token.
-     */
-    @Override
-    public AuthenticationResponse getAuthenticationResponse(
-            final SecurityUser user, final String accessToken) {
-        return getAuthenticationResponse(user, accessToken, provider.getExpiration());
-    }
-
-    /**
-     * {@inheritDoc}
-     * Constructs an authentication response from user details, a JWT token, and an access token.
-     */
-    @Override
-    public AuthenticationResponse getAuthenticationResponse(
-            final UserDetails user,
-            final String jwtToken,
-            final Long accessToken) {
-        return AuthenticationResponse.builder()
-                .username(user.getUsername())
-                .expiresAt(Timestamp.from(now()
-                        .plusMillis(accessToken)))
-                .refreshToken(provider.generateRefreshToken(user))
-                .accessToken(jwtToken)
-                .build();
-    }
-
-    /**
-     * {@inheritDoc}
-     * Generates a token for the provided user details.
-     */
-    @Override
-    public String generateToken(UserDetails user) {
-        return provider.generateToken(user);
+    public AuthenticationResponse getAuthenticationResponse(final UserPrincipal user) {
+        String jwtToken = jwtProvider.generateToken(user);
+        Token token = jwtProvider.updateUserTokens(user, jwtToken);
+        return jwtProvider.getAuthenticationResponse(user, jwtToken, token.getAccessTokenTTL());
     }
 }

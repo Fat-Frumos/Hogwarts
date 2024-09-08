@@ -10,6 +10,7 @@ import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.profile.UserProfile;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.mapper.TraineeMapper;
@@ -64,17 +65,27 @@ class TraineeProfileServiceTest {
     void register(
             TraineeRequest request, ResponseEntity<ProfileResponse> expectedResponse, Trainee trainee) {
         User user = trainee.getUser();
-        when(userService.saveTraineeUser(request)).thenReturn(user);
+        String rawPassword = "rawPassword";
+        String encodedPassword = "encodedPassword";
+        when(userService.createTraineeUser(request)).thenReturn(user);
+        when(userService.generateRandomPassword()).thenReturn(rawPassword);
+        when(userService.encodePassword(rawPassword)).thenReturn(encodedPassword);
+        when(userService.saveUser(user)).thenReturn(user);
         when(mapper.toTrainee(user, request)).thenReturn(trainee);
         when(dao.save(trainee)).thenReturn(trainee);
-        when(mapper.toProfile(user)).thenReturn(new ProfileResponse(user.getUsername(), user.getPassword()));
+        when(mapper.toProfile(user.getUsername(), rawPassword)).thenReturn(expectedResponse.getBody());
+
         ResponseEntity<ProfileResponse> response = service.register(request);
+
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(expectedResponse.getBody(), response.getBody());
-        verify(userService).saveTraineeUser(request);
+        verify(userService).createTraineeUser(request);
+        verify(userService).generateRandomPassword();
+        verify(userService).encodePassword(rawPassword);
+        verify(userService).saveUser(user);
         verify(mapper).toTrainee(user, request);
         verify(dao).save(trainee);
-        verify(mapper).toProfile(user);
+        verify(mapper).toProfile(user.getUsername(), rawPassword);
     }
 
 
@@ -186,7 +197,7 @@ class TraineeProfileServiceTest {
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
         when(mapper.toTrainers(anyList())).thenReturn(new HashSet<>());
 
-        ResponseEntity<List<TrainerProfile>> response =
+        ResponseEntity<List<SlimTrainerProfile>> response =
                 service.updateTraineeTrainersByName(username, trainerUsernames);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -227,7 +238,7 @@ class TraineeProfileServiceTest {
         List<TrainerProfile> trainerProfiles = List.of(new TrainerProfile(), new TrainerProfile());
         when(dao.findNotAssignedTrainers(username)).thenReturn(trainers);
         when(mapper.toTrainerProfile(any())).thenReturn(new TrainerProfile());
-        ResponseEntity<List<TrainerProfile>> response = service.getNotAssignedTrainers(username);
+        ResponseEntity<List<SlimTrainerProfile>> response = service.getNotAssignedTrainers(username);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(trainerProfiles, response.getBody());
@@ -237,26 +248,36 @@ class TraineeProfileServiceTest {
     void register() {
         TraineeRequest request = new TraineeRequest("Hermione", "Granger",
                 LocalDate.of(1990, 1, 1), "Hogwarts", true);
+        String rawPassword = "rawPassword";
+        String encodedPassword = "encodedPassword";
         User user = User.builder()
                 .username("hermione.granger")
-                .password("password123")
+                .password(rawPassword)
                 .build();
         Trainee trainee = Trainee.builder()
                 .user(user)
                 .build();
         ProfileResponse response = ProfileResponse.builder()
                 .username("hermione.granger")
-                .password("password123")
+                .password(rawPassword)
                 .build();
-        when(userService.saveTraineeUser(request)).thenReturn(user);
+        when(userService.createTraineeUser(request)).thenReturn(user);
+        when(userService.generateRandomPassword()).thenReturn(rawPassword);
+        when(userService.encodePassword(rawPassword)).thenReturn(encodedPassword);
+        when(userService.saveUser(user)).thenReturn(user);
         when(mapper.toTrainee(user, request)).thenReturn(trainee);
         when(dao.save(trainee)).thenReturn(trainee);
-        when(mapper.toProfile(user)).thenReturn(response);
-
+        when(mapper.toProfile(user.getUsername(), rawPassword)).thenReturn(response);
         ResponseEntity<ProfileResponse> result = service.register(request);
 
         assertEquals(HttpStatus.CREATED, result.getStatusCode());
         assertEquals(response, result.getBody());
+        verify(userService).createTraineeUser(request);
+        verify(userService).generateRandomPassword();
+        verify(userService).encodePassword(rawPassword);
+        verify(userService).saveUser(user);
+        verify(mapper).toTrainee(user, request);
         verify(dao).save(trainee);
+        verify(mapper).toProfile(user.getUsername(), rawPassword);
     }
 }

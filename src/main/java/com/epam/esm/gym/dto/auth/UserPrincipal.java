@@ -1,8 +1,7 @@
-package com.epam.esm.gym.domain;
+package com.epam.esm.gym.dto.auth;
 
+import com.epam.esm.gym.domain.User;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,17 +10,24 @@ import java.util.Collection;
 import java.util.Objects;
 
 /**
- * Implementation of {@link UserDetails} representing a security user.
- *
- * <p>This class wraps a {@link User} entity and provides access to user details required for authentication.
+ * Implementation of {@link org.springframework.security.core.userdetails.UserDetails} representing a security user.
+ * <p>This class implements {@link org.springframework.security.core.userdetails.UserDetails}
+ * and provides the necessary user information for authentication and authorization processes.</p>
+ * <p>This class wraps a {@link com.epam.esm.gym.domain.User} entity and provides access for authentication.
  * It includes methods for retrieving authorities, username, and password.</p>
+ *
+ * @param user Constructs a new {@link UserPrincipal} with the given {@link com.epam.esm.gym.domain.User} entity.
  */
-@Getter
 @Builder
-@ToString
-public class SecurityUser implements UserDetails {
+public record UserPrincipal(User user) implements UserDetails {
 
-    private User user;
+    /**
+     * Constructs a new {@link UserPrincipal} with the given {@link com.epam.esm.gym.domain.User} entity.
+     *
+     * @param user the {@link com.epam.esm.gym.domain.User} entity to be used for authentication.
+     */
+    public UserPrincipal {
+    }
 
     /**
      * Retrieves a list of granted authorities for the role.
@@ -38,6 +44,13 @@ public class SecurityUser implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Hibernate.initialize(user.getPermission());
         return user.getPermission().getGrantedAuthorities();
+    }
+
+    @Override
+    public String toString() {
+        return "UserPrincipal{" +
+                "user=" + user.toString() +
+                '}';
     }
 
     @Override
@@ -58,12 +71,27 @@ public class SecurityUser implements UserDetails {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        SecurityUser that = (SecurityUser) obj;
+        UserPrincipal that = (UserPrincipal) obj;
         return Objects.equals(user, that.user);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(user);
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return user.getActive();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return user.getActive();
     }
 }

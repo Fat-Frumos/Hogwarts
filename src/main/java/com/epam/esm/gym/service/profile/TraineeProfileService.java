@@ -1,6 +1,7 @@
 package com.epam.esm.gym.service.profile;
 
 import com.epam.esm.gym.dao.TraineeDao;
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
@@ -10,7 +11,7 @@ import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.profile.UserProfile;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.exception.UserNotFoundException;
@@ -68,12 +69,17 @@ public class TraineeProfileService implements TraineeService {
      */
     @Override
     public ResponseEntity<ProfileResponse> register(TraineeRequest dto) {
-        User user = userService.saveTraineeUser(dto);
-        Trainee trainee = mapper.toTrainee(user, dto);
-        Trainee saved = dao.save(trainee);
-        log.info("Saved Trainee: {}", saved);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(mapper.toProfile(saved.getUser()));
+        User user = userService.createTraineeUser(dto);
+        String rawPassword = userService.generateRandomPassword();
+        String password = userService.encodePassword(rawPassword);
+        user.setPassword(password);
+        user.setPermission(RoleType.ROLE_TRAINEE);
+        User savedUser = userService.saveUser(user);
+        log.info("Created User: {}", savedUser);
+        Trainee trainee = mapper.toTrainee(savedUser, dto);
+        ProfileResponse response = mapper.toProfile(dao.save(trainee).getUser().getUsername(), rawPassword);
+        log.info("Saved Trainee: {}", response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
@@ -139,9 +145,9 @@ public class TraineeProfileService implements TraineeService {
      * Updates the list of trainers assigned to a trainee identified by their username.
      */
     @Override
-    public ResponseEntity<List<TrainerProfile>> updateTraineeTrainersByName(
+    public ResponseEntity<List<SlimTrainerProfile>> updateTraineeTrainersByName(
             String username, List<String> trainersUsernames) {
-        List<TrainerProfile> trainerProfiles = trainersUsernames.stream()
+        List<SlimTrainerProfile> trainerProfiles = trainersUsernames.stream()
                 .map(trainerService::getTrainer)
                 .map(mapper::toTrainerProfile)
                 .collect(Collectors.toList());
@@ -183,7 +189,7 @@ public class TraineeProfileService implements TraineeService {
      * Retrieves trainers that are not assigned to a specific trainee identified by username.
      */
     @Override
-    public ResponseEntity<List<TrainerProfile>> getNotAssignedTrainers(String username) {
+    public ResponseEntity<List<SlimTrainerProfile>> getNotAssignedTrainers(String username) {
         List<Trainer> trainers = dao.findNotAssignedTrainers(username);
         return ResponseEntity.ok(trainers.stream()
                 .map(mapper::toTrainerProfile)
@@ -252,7 +258,7 @@ public class TraineeProfileService implements TraineeService {
                 .equalsIgnoreCase(filter.getTrainerName())) {
             return false;
         }
-        return filter.getTrainingType() == null || training.getType().getTrainingType().name()
+        return filter.getTrainingType() == null || training.getType().getSpecialization().name()
                 .equalsIgnoreCase(filter.getTrainingType());
     }
 }

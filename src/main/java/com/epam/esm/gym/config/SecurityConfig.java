@@ -7,18 +7,20 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -41,10 +43,12 @@ import java.util.List;
 public class SecurityConfig {
     public static final String ADMIN = "ADMIN";
     public static final String TRAINER = "TRAINER";
+    public static final String TRAINEE = "TRAINEE";
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    private final UserDetailsService userDetailsService;
     private final BruteForceProtectionFilter bruteForceProtectionFilter;
-    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     /**
      * Configures the security filter chain for the application, specifying security
@@ -58,18 +62,19 @@ public class SecurityConfig {
      * @param http the {@link HttpSecurity} object used to configure the security of the application.
      * @return the configured {@link SecurityFilterChain}.
      * @throws Exception if there is an error configuring the security settings.
-     * Disables CSRF protection and sets the session management policy stateless to
-     * accommodate RESTful API security needs.
-     * @author Pavlo Poliak
+     *                   Disables CSRF protection and sets the session management policy stateless to
+     *                   accommodate RESTful API security needs.
      * @see org.springframework.security.config.annotation.web.builders.HttpSecurity
      * @see org.springframework.security.web.SecurityFilterChain
      * @since 1.0
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
+
+        return http.csrf(AbstractHttpConfigurer::disable).
+                authorizeHttpRequests(request -> request
                         .requestMatchers(
+                                "login", "register",
                                 "/actuator/**",
                                 "/api/trainers/register",
                                 "/api/trainees/register",
@@ -82,71 +87,19 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/index.html"
                         ).permitAll()
+//                        .requestMatchers("/api/trainees/**").hasAnyRole(TRAINEE, TRAINER, ADMIN)
                         .requestMatchers("/api/trainers/**").hasAnyRole(TRAINER, ADMIN)
-                        .requestMatchers("/api/trainees/**").hasAnyRole(TRAINER, ADMIN)
-                        .anyRequest().hasRole(ADMIN)
-                )
-                .formLogin(form -> form
-                        .loginPage("/authentication/login")
-                        .loginProcessingUrl("/api/login")
-                        .usernameParameter("username")
-                        .passwordParameter("password")
-                        .failureUrl("/authentication/login?failed")
-                        .failureHandler(authenticationFailureHandler)
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/api/logout")
-                        .logoutSuccessHandler(logoutSuccessHandler())
-                )
+//                        .anyRequest().hasRole(ADMIN))
+                        .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults())
                 .exceptionHandling(exception -> exception
                         .accessDeniedPage("/403")
                         .authenticationEntryPoint(unauthorizedHandler())
                 )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(bruteForceProtectionFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-    /**
-     * Provides a custom logout success handler that redirects to the login page after logout.
-     *
-     * <p>This method creates a {@link LogoutSuccessHandler} that redirects the user to the
-     * login page with a logout success parameter after they have successfully logged out.</p>
-     *
-     * @return the configured {@link LogoutSuccessHandler}.
-     * This handler customizes the logout behavior to improve the user experience.
-     * @see org.springframework.security.web.authentication.logout.LogoutSuccessHandler
-     * @since 1.0
-     */
-    @Bean
-    public LogoutSuccessHandler logoutSuccessHandler() {
-        return (request, response, authentication) -> response.sendRedirect("/login?logout");
-    }
-
-    /**
-     * Provides an {@link AuthenticationManager} bean for managing authentication.
-     *
-     * <p>This method creates and configures an {@link AuthenticationManager} using the
-     * provided {@link AuthenticationConfiguration}. The {@link AuthenticationManager}
-     * is responsible for authenticating user credentials.</p>
-     *
-     * @param authConfig the {@link AuthenticationConfiguration} to configure the
-     *                   {@link AuthenticationManager}.
-     * @return the configured {@link AuthenticationManager}.
-     * @throws Exception if an error occurs during the configuration process.
-     * This method is essential for setting up the authentication mechanism in the application.
-     * @see org.springframework.security.authentication.AuthenticationManager
-     * @since 1.0
-     */
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+                .addFilterBefore(bruteForceProtectionFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     /**
@@ -162,7 +115,7 @@ public class SecurityConfig {
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(12);
     }
 
     /**
@@ -187,6 +140,45 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    /**
+     * Configures the {@link AuthenticationProvider} bean for authentication in the application.
+     * <p>
+     * This method creates an instance of {@link DaoAuthenticationProvider}, sets up the password encoder
+     * with a BCrypt password encoder (strength of 12), and sets the user details service used for
+     * retrieving user-specific data during authentication.
+     * </p>
+     *
+     * @return the configured {@link AuthenticationProvider} instance
+     */
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
+        provider.setUserDetailsService(userDetailsService);
+        return provider;
+    }
+
+    /**
+     * Provides an {@link AuthenticationManager} bean for managing authentication.
+     *
+     * <p>This method creates and configures an {@link AuthenticationManager} using the
+     * provided {@link AuthenticationConfiguration}. The {@link AuthenticationManager}
+     * is responsible for authenticating user credentials.</p>
+     *
+     * @param authConfig the {@link AuthenticationConfiguration} to configure the
+     *                   {@link AuthenticationManager}.
+     * @return the configured {@link AuthenticationManager}.
+     * @throws Exception if an error occurs during the configuration process.
+     *                   This method is essential for setting up the authentication mechanism in the application.
+     * @see org.springframework.security.authentication.AuthenticationManager
+     * @since 1.0
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     /**

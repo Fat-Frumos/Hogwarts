@@ -1,6 +1,6 @@
 package com.epam.esm.gym.security.handler;
 
-import com.epam.esm.gym.domain.SecurityUser;
+import com.epam.esm.gym.dto.auth.UserPrincipal;
 import com.epam.esm.gym.dto.auth.AuthenticationResponse;
 import com.epam.esm.gym.service.profile.AuthenticationUserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,9 +48,8 @@ public class SuccessAuthenticationHandler implements AuthenticationSuccessHandle
             HttpServletRequest request,
             HttpServletResponse response,
             Authentication authentication) throws IOException {
-        SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
-        String accessToken = service.generateToken(userDetails);
-        AuthenticationResponse authResponse = service.getAuthenticationResponse(userDetails, accessToken);
+        UserPrincipal userDetails = (UserPrincipal) authentication.getPrincipal();
+        AuthenticationResponse authResponse = service.getAuthenticationResponse(userDetails);
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write(convertToJson(authResponse));

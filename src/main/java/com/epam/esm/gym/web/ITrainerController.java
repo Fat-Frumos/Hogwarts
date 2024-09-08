@@ -1,6 +1,7 @@
 package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
@@ -137,7 +138,7 @@ public interface ITrainerController {
                     @ApiResponse(responseCode = "404", description = "Trainer not found")
             }
     )
-    ResponseEntity<TrainerProfile> getTrainerProfile(@PathVariable String username);
+    ResponseEntity<SlimTrainerProfile> getTrainerProfile(@PathVariable String username);
 
     /**
      * Updates an existing trainer profile by username.

@@ -1,13 +1,16 @@
 package com.epam.esm.gym.dao.jdbc;
 
 import com.epam.esm.gym.dao.TrainerDao;
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.exception.UserNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +48,7 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
      * @param sessionFactory the {@link SessionFactory} used for obtaining Hibernate sessions.
      */
     public JDBCTrainerDao(SessionFactory sessionFactory) {
-        super(Trainer.class, sessionFactory);
+        super(sessionFactory);
     }
 
     /**
@@ -174,5 +177,22 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
             }
             throw new UserNotFoundException(e.getMessage());
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Trainer> findAll() {
+        Session session = getSession();
+        String hql = """
+                    SELECT t
+                    FROM Trainer t
+                    LEFT JOIN FETCH t.user u
+                    LEFT JOIN FETCH t.specialization s
+                    WHERE u.permission = :rolePermission
+                """;
+        Query<Trainer> query = session.createQuery(hql, Trainer.class);
+        query.setParameter("rolePermission", RoleType.ROLE_TRAINER);
+
+        return query.getResultList();
     }
 }

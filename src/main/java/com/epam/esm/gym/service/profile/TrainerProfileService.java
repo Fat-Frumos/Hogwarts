@@ -1,9 +1,12 @@
 package com.epam.esm.gym.service.profile;
 
 import com.epam.esm.gym.dao.TrainerDao;
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainer;
+import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
@@ -12,6 +15,7 @@ import com.epam.esm.gym.mapper.TrainerMapper;
 import com.epam.esm.gym.service.TrainerService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,6 +33,7 @@ import java.util.List;
  * and to map between entities and DTOs (Data Transfer Objects).
  * </p>
  */
+@Slf4j
 @Service
 @Transactional
 @AllArgsConstructor
@@ -44,9 +49,15 @@ public class TrainerProfileService implements TrainerService {
      */
     @Override
     public ResponseEntity<ProfileResponse> registerTrainer(TrainerRequest dto) {
-        TrainerProfile profile = userService.saveTrainer(dto);
-        Trainer trainer = dao.save(mapper.toEntity(profile));
-        ProfileResponse response = mapper.toProfileDto(trainer.getUser());
+        User user = userService.createTrainerUser(dto);
+        String rawPassword = userService.generateRandomPassword();
+        String password = userService.encodePassword(rawPassword);
+        user.setPassword(password);
+        user.setPermission(RoleType.ROLE_TRAINER);
+        Trainer trainer = mapper.toTrainer(user, dto);
+        Trainer saved = dao.save(trainer);
+        log.info("Saved user: {}", saved);
+        ProfileResponse response = mapper.toProfileDto(trainer.getUsername(), rawPassword);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -73,7 +84,7 @@ public class TrainerProfileService implements TrainerService {
      * Retrieves the profile of the trainer identified by the given username.
      */
     @Override
-    public ResponseEntity<TrainerProfile> getTrainerProfileByName(String username) {
+    public ResponseEntity<SlimTrainerProfile> getTrainerProfileByName(String username) {
         return ResponseEntity.ok(mapper.toDto(getTrainer(username)));
     }
 
@@ -85,7 +96,7 @@ public class TrainerProfileService implements TrainerService {
     public ResponseEntity<TrainerProfile> updateTrainer(
             String username, TrainerUpdateRequest request) {
         Trainer trainer = mapper.toEntity(request);
-        TrainerProfile profile = mapper.toDto(dao.update(trainer));
+        TrainerProfile profile = mapper.toDto(dao.save(trainer));
         return ResponseEntity.ok(profile);
     }
 
@@ -96,7 +107,7 @@ public class TrainerProfileService implements TrainerService {
     @Override
     public ResponseEntity<List<TrainerProfile>> getNotAssigned(String username) {
         List<Trainer> notAssigned = dao.findNotAssigned(username);
-        return ResponseEntity.ok(mapper.toDtos(notAssigned));
+        return ResponseEntity.ok(mapper.toTrainerProfiles(notAssigned));
     }
 
     /**
@@ -129,7 +140,7 @@ public class TrainerProfileService implements TrainerService {
      */
     @Override
     public ResponseEntity<List<TrainerProfile>> findAll() {
-        return ResponseEntity.ok(mapper.toDtos(dao.findAll()));
+        return ResponseEntity.ok(mapper.toTrainerProfiles(dao.findAll()));
     }
 
     /**

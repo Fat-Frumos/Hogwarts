@@ -91,6 +91,14 @@ public class InMemoryUserDao extends AbstractInMemoryDao<User> implements UserDa
         return userMap.get(username);
     }
 
+    @Override
+    public List<User> findUsernamesByBaseName(String baseUsername) {
+        return userMap.entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(baseUsername))
+                .map(Map.Entry::getValue)
+                .toList();
+    }
+
     /**
      * Saves a {@link User} entity to the storage.
      *

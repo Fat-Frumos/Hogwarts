@@ -7,6 +7,7 @@ import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import org.mapstruct.Mapper;
@@ -31,17 +32,18 @@ public interface TraineeMapper {
      * <p>This method converts a {@link User} entity to a {@link ProfileResponse} DTO.
      * It validates that the user and required fields are not null before creating the response object.</p>
      *
-     * @param user the user to convert
+     * @param username the user to convert
+     * @param password the user to convert
      * @return the converted {@link ProfileResponse}
      * @throws IllegalArgumentException if user, username, or password is null
      */
-    default ProfileResponse toProfile(User user) {
-        if (user == null || user.getUsername() == null || user.getPassword() == null) {
-            throw new IllegalArgumentException("User, username, or password cannot be null");
+    default ProfileResponse toProfile(String username, String password) {
+        if (username == null || password == null) {
+            throw new IllegalArgumentException("Username, or password cannot be null");
         }
         return ProfileResponse.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
+                .username(username)
+                .password(password)
                 .build();
     }
 
@@ -126,7 +128,7 @@ public interface TraineeMapper {
         return TrainingResponse.builder()
                 .trainerName(training.getTrainer().getUser().getUsername())
                 .trainingName(training.getTrainingName())
-                .trainingType(training.getType().getTrainingType().name())
+                .trainingType(training.getType().getSpecialization().name())
                 .trainingDuration(training.getTrainingDuration())
                 .trainingDate(training.getTrainingDate())
                 .build();
@@ -141,7 +143,7 @@ public interface TraineeMapper {
      * @param trainers the list of trainer profiles
      * @return the set of {@link Trainer} entities
      */
-    default Set<Trainer> toTrainers(List<TrainerProfile> trainers) {
+    default Set<Trainer> toTrainers(List<SlimTrainerProfile> trainers) {
         return trainers.stream()
                 .map(trainerProfile -> Trainer.builder()
                         .id(null)
@@ -160,7 +162,7 @@ public interface TraineeMapper {
      * @param profile the trainer profile to convert
      * @return the converted {@link User}
      */
-    default User toUser(TrainerProfile profile) {
+    default User toUser(SlimTrainerProfile profile) {
         return User.builder()
                 .username(profile.getUsername())
                 .firstName(profile.getFirstName())
@@ -178,16 +180,13 @@ public interface TraineeMapper {
      * @param trainer the trainer to convert
      * @return the converted {@link TrainerProfile}
      */
-    default TrainerProfile toTrainerProfile(Trainer trainer) {
+    default SlimTrainerProfile toTrainerProfile(Trainer trainer) {
         return TrainerProfile.builder()
                 .username(trainer.getUser().getUsername())
                 .firstName(trainer.getUser().getFirstName())
                 .lastName(trainer.getUser().getLastName())
                 .specialization(trainer.getSpecialization())
                 .active(trainer.getUser().getActive())
-                .trainees(trainer.getTrainees().stream()
-                        .map(this::toTraineeProfile)
-                        .toList())
                 .build();
     }
 
@@ -202,9 +201,31 @@ public interface TraineeMapper {
      * @return the converted {@link Trainee}
      */
     default Trainee toTrainee(User user, TraineeRequest dto) {
+        String address = dto.getAddress() != null ? dto.getAddress() : "";
         return Trainee.builder()
                 .dateOfBirth(dto.getDateOfBirth())
-                .address(dto.getAddress())
+                .address(address)
                 .user(user).build();
+    }
+
+    /**
+     * Converts a {@link Trainee} entity to a {@link TraineeProfile} DTO.
+     *
+     * @param trainee the {@link Trainee} entity to be converted.
+     * @return a {@link TraineeProfile} DTO representing the trainee,
+     * or {@code null} if the input entity is {@code null}.
+     */
+    static TraineeProfile toDto(Trainee trainee) {
+        if (trainee == null) {
+            return null;
+        }
+
+        return TraineeProfile.builder()
+                .username(trainee.getUser().getUsername())
+                .firstName(trainee.getUser().getFirstName() != null ? trainee.getUser().getFirstName() : "")
+                .lastName(trainee.getUser().getLastName() != null ? trainee.getUser().getLastName() : "")
+                .address(trainee.getAddress() != null ? trainee.getAddress() : "")
+                .active(Boolean.TRUE.equals(trainee.getUser().getActive()))
+                .build();
     }
 }

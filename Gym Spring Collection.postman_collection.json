@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b0765bac-8b38-46ca-aa47-94f22ed28d49",
+		"_postman_id": "7ee9a0a0-9c17-4c25-91b0-334d7f0e2832",
 		"name": "Gym Spring Collection",
 		"description": "Collection to test Gym application microservices",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -25,12 +25,9 @@
 							"raw": "{\"firstName\": \"Hermione\", \"lastName\": \"Granger\", \"username\": \"hermione.granger@hogwarts.edu\", \"password\": \"password123\", \"isActive\": true}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/auth/signup",
-							"protocol": "https",
+							"raw": "{{url}}/api/auth/signup",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -43,6 +40,74 @@
 				},
 				{
 					"name": "AuthLogin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response schema and save tokens\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.have.jsonSchema({\r",
+									"        type: \"object\",\r",
+									"        properties: {\r",
+									"            username: { type: \"string\" },\r",
+									"            access_token: { type: \"string\" },\r",
+									"            refresh_token: { type: \"string\" },\r",
+									"            expires_at: { type: \"string\" }\r",
+									"        },\r",
+									"        required: [\"username\", \"access_token\", \"refresh_token\", \"expires_at\"]\r",
+									"    });\r",
+									"\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.globals.set(\"username\", responseData.username);\r",
+									"    pm.globals.set(\"access_token\", responseData.access_token);\r",
+									"    pm.globals.set(\"refresh_token\", responseData.refresh_token);\r",
+									"    pm.globals.set(\"expires_at\", responseData.expires_at);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Authorization header is set\", function () {\r",
+									"    const accessToken = pm.globals.get(\"access_token\");\r",
+									"    console.log(accessToken)\r",
+									"\r",
+									"    if (accessToken) {\r",
+									"        pm.request.headers.add({\r",
+									"            key: \"Authorization\",\r",
+									"            value: `Bearer ${accessToken}`\r",
+									"        });\r",
+									"    } else {\r",
+									"        throw new Error(\"Access token is not set.\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const password = pm.globals.get(\"password\");\r",
+									"console.log(username)\r",
+									"console.log(password)\r",
+									"if (!username || !password) {\r",
+									"    throw new Error(\"Global variables 'username' and 'password' must be set.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.body.raw = JSON.stringify({\r",
+									"    username: username,\r",
+									"    password: password\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -53,10 +118,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"username\": \"hermione.granger@hogwarts.edu\", \"password\": \"password123\"}"
+							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/api/auth/login?username=Ron.Weasley.3&password=XPsKCN8Hjd",
+							"raw": "{{url}}/api/auth/login",
 							"host": [
 								"{{url}}"
 							],
@@ -64,16 +129,6 @@
 								"api",
 								"auth",
 								"login"
-							],
-							"query": [
-								{
-									"key": "username",
-									"value": "Ron.Weasley.3"
-								},
-								{
-									"key": "password",
-									"value": "XPsKCN8Hjd"
-								}
 							]
 						}
 					},
@@ -91,15 +146,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"username\": \"hermione.granger@hogwarts.edu\", \"password\": \"password123\"}"
+							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/auth/token/authenticate",
-							"protocol": "https",
+							"raw": "{{url}}/api/auth/token/authenticate",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -122,12 +174,9 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8080/api/auth/token/refresh",
-							"protocol": "https",
+							"raw": "{{url}}/api/auth/token/refresh",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -150,12 +199,9 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8080/api/auth/logout",
-							"protocol": "https",
+							"raw": "{{url}}/api/auth/logout",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -186,12 +232,9 @@
 							"raw": "{\"username\": \"luna.lovegood@hogwarts.edu\", \"firstName\": \"Luna\", \"lastName\": \"Lovegood\", \"password\": \"password123\", \"isActive\": true}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/users",
-							"protocol": "https",
+							"raw": "{{url}}/api/users",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -207,12 +250,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/users/luna.lovegood@hogwarts.edu",
-							"protocol": "https",
+							"raw": "{{url}}/api/users/luna.lovegood@hogwarts.edu",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -238,12 +278,9 @@
 							"raw": "{\"firstName\": \"Luna\", \"lastName\": \"Lovegood\"}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/users/luna.lovegood@hogwarts.edu",
-							"protocol": "https",
+							"raw": "{{url}}/api/users/luna.lovegood@hogwarts.edu",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -260,17 +297,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/users/luna.lovegood@hogwarts.edu",
-							"protocol": "https",
+							"raw": "{{url}}/api/users/luna.lovegood",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"luna.lovegood@hogwarts.edu"
+								"luna.lovegood"
 							]
 						}
 					},
@@ -278,20 +312,105 @@
 				},
 				{
 					"name": "List All Users",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/users",
-							"protocol": "https",
+							"raw": "{{url}}/api/users",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
 								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"Ron\", \"password\": \"Weasley\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"Ron\", \"password\": \"Weasley\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"register"
 							]
 						}
 					},
@@ -309,7 +428,9 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
 									"\r",
 									"pm.test(\"Content-Type header is application/json\", function () {\r",
 									"  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
@@ -318,20 +439,106 @@
 									"\r",
 									"pm.test(\"Response has the required fields - message and statusCode\", function () {\r",
 									"    const responseData = pm.response.json();\r",
-									"    \r",
+									"\r",
 									"    pm.expect(responseData).to.be.an('object');\r",
 									"    pm.expect(responseData.message).to.exist;\r",
-									"    pm.expect(responseData.statusCode).to.exist;\r",
 									"});\r",
-									"\r",
 									"\r",
 									"pm.test(\"Message is a non-empty string\", function () {\r",
-									"  const responseData = pm.response.json();\r",
-									"  \r",
-									"  pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Message should not be empty\");\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Message should not be empty\");\r",
 									"});\r",
 									"\r",
+									"pm.test(\"Message is 'Authentication successful'\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.message).to.eql(\"Authentication successful\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const password = pm.globals.get(\"password\");\r",
 									"\r",
+									"console.log(\"Username from globals:\", username);\r",
+									"console.log(\"Password from globals:\", password);\r",
+									"if (!username || !password) {\r",
+									"    throw new Error(\"Environment variables 'username' and 'password' must be set.\");\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/login?username={{username}}&password={{password}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "{{username}}"
+								},
+								{
+									"key": "password",
+									"value": "{{password}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BadRequestLogin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Missing password returns 400 Bad Request\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.message).to.exist;\r",
+									"    pm.expect(responseData.message).to.include(\"Required request parameter 'password' is not present\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
 									""
 								],
 								"type": "text/javascript",
@@ -355,7 +562,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/login?username=Ron.Weasley.3&password=XPsKCN8Hjd",
+							"raw": "{{url}}/api/login?username={{username}}",
 							"host": [
 								"{{url}}"
 							],
@@ -366,11 +573,7 @@
 							"query": [
 								{
 									"key": "username",
-									"value": "Ron.Weasley.3"
-								},
-								{
-									"key": "password",
-									"value": "XPsKCN8Hjd"
+									"value": "{{username}}"
 								}
 							]
 						}
@@ -379,6 +582,76 @@
 				},
 				{
 					"name": "Register Trainee",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"        username: { type: \"string\" },\r",
+									"        password: { type: \"string\" }\r",
+									"    },\r",
+									"    required: [\"username\", \"password\"]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Response schema is valid\", function () {\r",
+									"    pm.response.to.have.jsonSchema(schema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 201\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(201);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields - username and password\", function () {\r",
+									"    const responseData = pm.response.json();    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('username');\r",
+									"    pm.expect(responseData).to.have.property('password');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Username and password are non-empty strings\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.username).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Username should not be empty\");\r",
+									"    pm.expect(responseData.password).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Password should not be empty\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Save response to environment variables\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    if (response.username && response.password) {\r",
+									"        pm.globals.set(\"username\", response.username);\r",
+									"        pm.globals.set(\"password\", response.password);\r",
+									"    } else {\r",
+									"        throw new Error(\"Response does not contain 'username' and 'password'.\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -406,22 +679,110 @@
 					"response": []
 				},
 				{
-					"name": "Get Trainee Profile",
+					"name": "Get Trainee Profile Dynamic",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"// const accessToken = pm.globals.get(\"access_token\");\r",
+									"// const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"// const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"// console.log(accessToken)\r",
+									"// const currentDate = new Date();\r",
+									"// const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"// if (currentDate >= expirationDate) {\r",
+									"//     console.log(\"Token has expired. Please refresh the token.\");\r",
+									"// }\r",
+									"\r",
+									"// pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has the required fields\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData).to.have.property(\"username\");\r",
+									"    pm.expect(responseData).to.have.property(\"profileData\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Profile data is correct\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    const expectedUsername = pm.variables.get(\"username\");\r",
+									"    pm.expect(responseData.username).to.eql(expectedUsername);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainees/ron.weasley@hogwarts.edu",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainers/{{username}}",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trainee Profile Static",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/trainees/{{username}}",
+							"host": [
+								"{{url}}"
 							],
 							"path": [
 								"api",
 								"trainees",
-								"ron.weasley@hogwarts.edu"
+								"{{username}}"
 							]
 						}
 					},
@@ -442,12 +803,9 @@
 							"raw": "{\"firstName\": \"Ronald\", \"lastName\": \"Weasley\"}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/trainees/ron.weasley@hogwarts.edu",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainees/ron.weasley@hogwarts.edu",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -464,17 +822,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainees/ron.weasley@hogwarts.edu",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainees/ron.weasley",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
 								"trainees",
-								"ron.weasley@hogwarts.edu"
+								"ron.weasley"
 							]
 						}
 					},
@@ -482,16 +837,126 @@
 				},
 				{
 					"name": "List All Trainees",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Updated response time test to 300ms\r",
+									"pm.test(\"Response schema is valid\", function () {\r",
+									"  var schema = {\r",
+									"    type: \"array\",\r",
+									"    items: {\r",
+									"      type: \"object\",\r",
+									"      properties: {\r",
+									"        firstName: { type: \"string\" },\r",
+									"        lastName: { type: \"string\" },\r",
+									"        username: { type: \"string\" },\r",
+									"        address: { type: \"string\" },\r",
+									"        active: { type: \"boolean\" },\r",
+									"        dateOfBirth: { type: \"string\" },\r",
+									"        trainers: { type: \"array\" }\r",
+									"      },\r",
+									"      required: [\"firstName\", \"lastName\", \"username\", \"address\", \"active\", \"dateOfBirth\", \"trainers\"]\r",
+									"    }\r",
+									"  };\r",
+									"\r",
+									"  var response = pm.response.json();\r",
+									"  response.forEach((trainee) => {\r",
+									"    pm.expect(tv4.validate(trainee, schema)).to.be.true;\r",
+									"  });\r",
+									"});\r",
+									"// Verify that the response content type is application/json\r",
+									"pm.test(\"Response content type is application/json\", function () {\r",
+									"  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"// Verify the length of the response data\r",
+									"pm.test(\"The response data length must be greater than zero\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.length).to.be.greaterThan(0, \"Response data should not be empty\");\r",
+									"});\r",
+									"\r",
+									"// Verify that the response status code is 200\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Updated response time test to 300ms\r",
+									"pm.test(\"Response time is less than 300ms\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(300);\r",
+									"});\r",
+									"\r",
+									"// Verify that all trainee objects have non-empty 'firstName', 'lastName', 'username', and 'address'\r",
+									"pm.test(\"All trainee objects have non-empty 'firstName', 'lastName', 'username', and 'address'\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"\r",
+									"    responseData.forEach(function(trainee) {\r",
+									"        pm.expect(trainee.firstName).to.exist.and.to.not.be.empty;\r",
+									"        pm.expect(trainee.lastName).to.exist.and.to.not.be.empty;\r",
+									"        pm.expect(trainee.username).to.exist.and.to.not.be.empty;\r",
+									"        pm.expect(trainee.address).to.exist.and.to.not.be.empty;\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"// Verify that the 'active' field is a boolean value for all trainee objects\r",
+									"pm.test(\"Active field is a boolean value for all trainee objects\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    responseData.forEach(function(trainee) {\r",
+									"        pm.expect(trainee.active).to.be.a('boolean');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"// Verify that the 'dateOfBirth' field has a valid date format for all trainee objects\r",
+									"pm.test(\"Date of birth field has a valid date format for all trainee objects\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    responseData.forEach(function(trainee) {\r",
+									"        pm.expect(trainee.dateOfBirth).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainees",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainees",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -521,12 +986,9 @@
 							"raw": "{\"username\": \"severus.snape@hogwarts.edu\", \"firstName\": \"Severus\", \"lastName\": \"Snape\", \"password\": \"password123\", \"isActive\": true}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/trainers/register",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainers/register",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -543,17 +1005,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainers/severus.snape@hogwarts.edu",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainers/severus.snape",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
 								"trainers",
-								"severus.snape@hogwarts.edu"
+								"severus.snape"
 							]
 						}
 					},
@@ -574,12 +1033,9 @@
 							"raw": "{\"firstName\": \"Severus\", \"lastName\": \"Snape\"}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/trainers/severus.snape@hogwarts.edu",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainers/severus.snape@hogwarts.edu",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -596,12 +1052,9 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainers/severus.snape@hogwarts.edu",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainers/severus.snape@hogwarts.edu",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -614,16 +1067,159 @@
 				},
 				{
 					"name": "List All Trainers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response schema is valid\", function () {\r",
+									"  var schema = {\r",
+									"    type: \"array\",\r",
+									"    items: {\r",
+									"      type: \"object\",\r",
+									"      properties: {\r",
+									"        username: { type: \"string\" },\r",
+									"        firstName: { type: \"string\" },\r",
+									"        lastName: { type: \"string\" },\r",
+									"        specialization: {\r",
+									"          type: \"object\",\r",
+									"          properties: {\r",
+									"            id: { type: \"number\" },\r",
+									"            specialization: { type: \"string\" },\r",
+									"            trainers: { type: \"array\" },\r",
+									"            trainings: { type: \"array\" }\r",
+									"          },\r",
+									"          required: [\"id\", \"specialization\", \"trainers\", \"trainings\"]\r",
+									"        },\r",
+									"        active: { type: \"boolean\" },\r",
+									"        trainees: {\r",
+									"          type: \"array\",\r",
+									"          items: {\r",
+									"            type: \"object\",\r",
+									"            properties: {\r",
+									"              firstName: { type: \"string\" },\r",
+									"              lastName: { type: \"string\" },\r",
+									"              username: { type: \"string\" },\r",
+									"              address: { type: \"string\" },\r",
+									"              active: { type: \"boolean\" },\r",
+									"              dateOfBirth: { type: \"null\" },\r",
+									"              trainers: { type: \"null\" }\r",
+									"            },\r",
+									"            required: [\"firstName\", \"lastName\", \"username\", \"address\", \"active\", \"dateOfBirth\", \"trainers\"]\r",
+									"          }\r",
+									"        }\r",
+									"      },\r",
+									"      required: [\"username\", \"firstName\", \"lastName\", \"specialization\", \"active\", \"trainees\"]\r",
+									"    }\r",
+									"  };\r",
+									"\r",
+									"  var response = pm.response.json();\r",
+									"  pm.expect(tv4.validate(response, schema)).to.be.true;\r",
+									"});\r",
+									"// Test for response content type\r",
+									"pm.test(\"Response has content type of application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"// Verify the length of the response data\r",
+									"pm.test(\"The response data length must be greater than zero\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.length).to.be.greaterThan(0, \"Response data should not be empty\");\r",
+									"\r",
+									"    responseData.forEach((trainer) => {\r",
+									"        pm.expect(trainer.username).to.be.a('string');\r",
+									"        pm.expect(trainer.firstName).to.be.a('string');\r",
+									"        pm.expect(trainer.lastName).to.be.a('string');\r",
+									"        pm.expect(trainer.active).to.be.a('boolean');\r",
+									"\r",
+									"        pm.expect(trainer.specialization.id).to.be.a('number');\r",
+									"        pm.expect(trainer.specialization.specialization).to.be.a('string');\r",
+									"        pm.expect(trainer.specialization.trainers).to.be.an('array');\r",
+									"        pm.expect(trainer.specialization.trainings).to.be.an('array');\r",
+									"\r",
+									"        trainer.trainees.forEach((trainee) => {\r",
+									"            pm.expect(trainee.firstName).to.be.a('string');\r",
+									"            pm.expect(trainee.lastName).to.be.a('string');\r",
+									"            pm.expect(trainee.username).to.be.a('string');\r",
+									"            pm.expect(trainee.address).to.be.a('string');\r",
+									"            pm.expect(trainee.active).to.be.a('boolean');\r",
+									"            pm.expect(trainee.dateOfBirth).to.be.null;\r",
+									"            pm.expect(trainee.trainers).to.be.null;\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has content type of application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response data length must be greater than zero\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"  \r",
+									"  pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1, \"Array should not be empty\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Each trainer's username, firstName, lastName, and active status have correct data type\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    responseData.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.be.an('object');\r",
+									"        pm.expect(trainer.username).to.be.a('string');\r",
+									"        pm.expect(trainer.firstName).to.be.a('string');\r",
+									"        pm.expect(trainer.lastName).to.be.a('string');\r",
+									"        pm.expect(trainer.active).to.be.a('boolean');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainers",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainers",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -653,12 +1249,9 @@
 							"raw": "{\"title\": \"Potions Mastery\", \"description\": \"Advanced potions techniques.\", \"trainerUsername\": \"severus.snape@hogwarts.edu\", \"schedule\": \"2024-09-01T10:00:00Z\"}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/trainings/add",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainings/add",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -675,7 +1268,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainings/1",
+							"raw": "https://hogwart-gym.onrender.com/api/trainings/1",
 							"protocol": "https",
 							"host": [
 								"hogwart-gym",
@@ -706,7 +1299,7 @@
 							"raw": "{\"title\": \"Advanced Potions Mastery\", \"description\": \"In-depth potions techniques.\", \"schedule\": \"2024-09-01T11:00:00Z\"}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/trainings/1",
+							"raw": "https://hogwart-gym.onrender.com/api/trainings/1",
 							"protocol": "https",
 							"host": [
 								"hogwart-gym",
@@ -728,7 +1321,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainings/1",
+							"raw": "https://hogwart-gym.onrender.com/api/trainings/1",
 							"protocol": "https",
 							"host": [
 								"hogwart-gym",
@@ -750,12 +1343,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainings",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainings",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -785,12 +1375,9 @@
 							"raw": "{\"name\": \"Potions\", \"description\": \"Training sessions related to potion-making.\"}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/trainings/types",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainings/types",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -807,12 +1394,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainings/types/1",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainings/types/1",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -839,12 +1423,9 @@
 							"raw": "{\"name\": \"Advanced Potions\", \"description\": \"In-depth potion-making sessions.\"}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/trainings/types/1",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainings/types/1",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -862,12 +1443,9 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainings/types/1",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainings/types/1",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",
@@ -885,12 +1463,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/trainings/types",
-							"protocol": "https",
+							"raw": "{{url}}/api/trainings/types",
 							"host": [
-								"hogwart-gym",
-								"onrender",
-								"com"
+								"{{url}}"
 							],
 							"path": [
 								"api",

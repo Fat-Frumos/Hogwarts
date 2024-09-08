@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -26,18 +26,18 @@ class TokenProfileServiceTest {
     @InjectMocks
     private TokenProfileService tokenService;
     private Token token;
-    private List<Token> tokens;
+    private Set<Token> tokens;
 
     @BeforeEach
     void setUp() {
         token = new Token();
-        tokens = List.of(token);
+        tokens = Set.of(token);
     }
 
     @Test
     void testFindAllValidAccessTokenByUserId() {
         when(dao.findAllValidAccessTokenByUserId(1)).thenReturn(tokens);
-        List<Token> result = tokenService.findAllValidAccessTokenByUserId(1);
+        Set<Token> result = tokenService.findAllValidAccessTokenByUserId(1);
         assertEquals(tokens, result);
         verify(dao).findAllValidAccessTokenByUserId(1);
     }

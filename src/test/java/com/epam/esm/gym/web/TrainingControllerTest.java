@@ -1,6 +1,6 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.training.TrainingTypeResponse;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,14 +37,14 @@ public class TrainingControllerTest extends ControllerTest {
 
     private static final String base_url = "/api/trainings";
     public static Map<String, Object> training;
-    public static List<TrainingTypeResponse> trainingTypes;
+    public static List<TrainingTypeDto> trainingTypes;
 
     @BeforeAll
     static void beforeAll() {
         trainingTypes = List.of(
-                new TrainingTypeResponse(POTIONS, 1L),
-                new TrainingTypeResponse(DEFENSE, 2L),
-                new TrainingTypeResponse(TRANSFIGURATION, 3L)
+                new TrainingTypeDto(POTIONS, 1L),
+                new TrainingTypeDto(DEFENSE, 2L),
+                new TrainingTypeDto(TRANSFIGURATION, 3L)
         );
 
         training = new HashMap<>();
@@ -76,7 +76,7 @@ public class TrainingControllerTest extends ControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Assertions.assertThat(Arrays.asList(objectMapper.readValue(result, TrainingTypeResponse[].class)))
+        Assertions.assertThat(Arrays.asList(objectMapper.readValue(result, TrainingTypeDto[].class)))
                 .usingRecursiveComparison()
                 .isEqualTo(trainingTypes);
 

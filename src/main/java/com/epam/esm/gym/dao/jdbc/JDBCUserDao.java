@@ -4,7 +4,6 @@ import com.epam.esm.gym.dao.UserDao;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
@@ -12,6 +11,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -45,7 +45,7 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
      * @param sessionFactory the {@link SessionFactory} used for obtaining Hibernate sessions.
      */
     public JDBCUserDao(SessionFactory sessionFactory) {
-        super(User.class, sessionFactory);
+        super(sessionFactory);
     }
 
     /**
@@ -79,9 +79,22 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
      * @throws UserNotFoundException if no user with the specified username is found.
      */
     @Override
+    @Transactional(readOnly = true)
     public User getUserBy(String username) {
-        return findByUsername(username).orElseThrow(
+        String sql = "SELECT u FROM User u WHERE username = :username";
+        Query<User> query = getSession().createQuery(sql, User.class);
+        query.setParameter(USERNAME, username);
+        return query.uniqueResultOptional().orElseThrow(
                 () -> new UserNotFoundException(format("User not found: %s", username)));
+    }
+
+    @Override
+    public List<User> findUsernamesByBaseName(String baseUsername) {
+        String hql = "SELECT u FROM User u WHERE u.username LIKE :baseUsernamePattern";
+        return getSession()
+                .createQuery(hql, User.class)
+                .setParameter("baseUsernamePattern", baseUsername + "%")
+                .getResultList();
     }
 
     /**
@@ -95,10 +108,10 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
      * @return an {@link Optional} containing the {@link User} if found, otherwise an empty {@link Optional}.
      */
     @Override
+    @Transactional(readOnly = true)
     public Optional<User> findByUsername(String username) {
-        Session session = getSession();
         String sql = "SELECT u FROM User u WHERE username = :username";
-        Query<User> query = session.createQuery(sql, User.class);
+        Query<User> query = getSession().createQuery(sql, User.class);
         query.setParameter(USERNAME, username);
         return query.uniqueResultOptional();
     }
@@ -132,5 +145,13 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
             log.error("Error updating user: " + e.getMessage());
         }
         return user;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<User> findAll() {
+        String hql = "SELECT u FROM User u LEFT JOIN FETCH u.tokens";
+        Query<User> query = getSession().createQuery(hql, User.class);
+        return query.getResultList();
     }
 }

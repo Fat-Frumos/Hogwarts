@@ -4,6 +4,7 @@ import com.epam.esm.gym.domain.Specialization;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
@@ -32,14 +33,14 @@ public class TraineeProfileArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
         TrainingType herbology = TrainingType.builder()
-                .trainingType(Specialization.HERBOLOGY)
+                .specialization(Specialization.HERBOLOGY)
                 .build();
 
         TrainingType potions = TrainingType.builder()
-                .trainingType(Specialization.POTIONS)
+                .specialization(Specialization.POTIONS)
                 .build();
 
-        List<TrainerProfile> trainers = List.of(
+        List<SlimTrainerProfile> trainers = List.of(
                 TrainerProfile.builder()
                         .username("Pomona.Sprout")
                         .firstName("Pomona")

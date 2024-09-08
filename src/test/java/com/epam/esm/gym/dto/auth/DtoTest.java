@@ -1,20 +1,18 @@
 package com.epam.esm.gym.dto.auth;
 
 import com.epam.esm.gym.domain.RoleType;
-import com.epam.esm.gym.domain.SecurityUser;
 import com.epam.esm.gym.domain.Specialization;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingSession;
 import com.epam.esm.gym.domain.User;
-import com.epam.esm.gym.dto.profile.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import com.epam.esm.gym.dto.training.TrainingTypeResponse;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import com.epam.esm.gym.security.JwtProperties;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -252,9 +250,9 @@ class DtoTest {
 
     @Test
     void testTrainingTypeResponse() {
-        TrainingTypeResponse type1 = new TrainingTypeResponse(Specialization.CARDIO, 1L);
-        TrainingTypeResponse type2 = new TrainingTypeResponse(Specialization.CARDIO, 1L);
-        TrainingTypeResponse type3 = new TrainingTypeResponse(Specialization.POTIONS, 2L);
+        TrainingTypeDto type1 = new TrainingTypeDto(Specialization.CARDIO, 1L);
+        TrainingTypeDto type2 = new TrainingTypeDto(Specialization.CARDIO, 1L);
+        TrainingTypeDto type3 = new TrainingTypeDto(Specialization.POTIONS, 2L);
 
         assertEquals(type1, type2);
         assertNotEquals(type1, type3);
@@ -302,7 +300,7 @@ class DtoTest {
         Mockito.when(permission.getGrantedAuthorities()).thenReturn(authorities);
         Mockito.when(user.getPassword()).thenReturn("password123");
         Mockito.when(user.getUsername()).thenReturn("harrypotter");
-        SecurityUser securityUser = SecurityUser.builder().user(user).build();
+        UserPrincipal securityUser = UserPrincipal.builder().user(user).build();
         assertEquals("password123", securityUser.getPassword());
         assertEquals("harrypotter", securityUser.getUsername());
     }

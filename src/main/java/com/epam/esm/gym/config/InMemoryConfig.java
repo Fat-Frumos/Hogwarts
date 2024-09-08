@@ -38,7 +38,6 @@ public class InMemoryConfig {
      * without persisting to a database, enabling testing, caching, or other in-memory operations.</p>
      *
      * @return a new {@link HashMap} instance for managing {@link Trainer} objects.
-     * @author Pavlo Poliak
      * @see java.util.HashMap
      * @see com.epam.esm.gym.domain.Trainer
      * @since 1.0
@@ -81,7 +80,6 @@ public class InMemoryConfig {
      * caching, or managing session data dynamically.</p>
      *
      * @return a new {@link HashMap} instance for managing {@link Training} objects.
-     * @author Pavlo Poliak
      * @see java.util.HashMap
      * @see com.epam.esm.gym.domain.Training
      * @since 1.0
@@ -103,7 +101,6 @@ public class InMemoryConfig {
      * during the application's runtime.</p>
      *
      * @return a new {@link HashMap} instance for managing {@link User} objects.
-     * @author Pavlo Poliak
      * @see java.util.HashMap
      * @see com.epam.esm.gym.domain.User
      * @since 1.0

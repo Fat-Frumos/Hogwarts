@@ -3,7 +3,7 @@ package com.epam.esm.gym.web;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -161,7 +161,7 @@ public interface ITraineeController {
                     @ApiResponse(responseCode = "403", description = "Forbidden access")
             }
     )
-    ResponseEntity<List<TrainerProfile>> updateTraineeTrainers(
+    ResponseEntity<List<SlimTrainerProfile>> updateTraineeTrainers(
             @PathVariable String username,
             @Valid @RequestBody List<String> trainersUsernames);
 

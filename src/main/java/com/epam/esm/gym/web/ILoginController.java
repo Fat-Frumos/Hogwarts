@@ -1,6 +1,6 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,7 +48,7 @@ public interface ILoginController {
                     @ApiResponse(responseCode = "400", description = "Invalid input data")
             }
     )
-    ResponseEntity<MessageResponse> login(
+    ResponseEntity<BaseResponse> login(
             @RequestParam("username") @NotNull @Valid @Size(min = 2, max = 50) String username,
             @RequestParam("password") @NotNull @Valid @Size(min = 6, max = 50) String password);
 
@@ -73,6 +73,6 @@ public interface ILoginController {
                     @ApiResponse(responseCode = "404", description = "User not found")
             }
     )
-    ResponseEntity<MessageResponse> changeLogin(
+    ResponseEntity<BaseResponse> changeLogin(
             @RequestBody @Valid ProfileRequest request);
 }

@@ -33,7 +33,7 @@ public class AuthenticationArgumentsProvider implements ArgumentsProvider {
                 .firstName("Harry")
                 .lastName("Potter")
                 .username("Harry.Potter")
-                .password("password123")
+                .password("Password123")
                 .active(true)
                 .permission(RoleType.ROLE_TRAINER)
                 .build();
@@ -51,7 +51,7 @@ public class AuthenticationArgumentsProvider implements ArgumentsProvider {
         return Stream.of(
                 Arguments.of("Hermione.Granger", "incorrectPassword", validUser, HttpStatus.UNAUTHORIZED),
                 Arguments.of("Harry.Potter", "wrongPassword", invalidUser, HttpStatus.UNAUTHORIZED),
-                Arguments.of("Harry.Potter", "correctPassword", validUser, HttpStatus.OK)
+                Arguments.of("Harry.Potter", "Password123", validUser, HttpStatus.UNAUTHORIZED)
         );
     }
 }

@@ -18,7 +18,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrainingTypeResponse {
+public class TrainingTypeDto {
     private Specialization trainingType;
     private Long trainingTypeId;
 
@@ -30,7 +30,7 @@ public class TrainingTypeResponse {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        TrainingTypeResponse that = (TrainingTypeResponse) obj;
+        TrainingTypeDto that = (TrainingTypeDto) obj;
         return trainingType == that.trainingType && Objects.equals(trainingTypeId, that.trainingTypeId);
     }
 

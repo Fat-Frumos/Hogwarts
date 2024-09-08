@@ -70,12 +70,10 @@ public class User {
     @Column(name = "permission")
     @Fetch(FetchMode.JOIN)
     private RoleType permission;
-
     @Builder.Default
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user",
-            cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Token> tokens = new HashSet<>();
 
     @Override

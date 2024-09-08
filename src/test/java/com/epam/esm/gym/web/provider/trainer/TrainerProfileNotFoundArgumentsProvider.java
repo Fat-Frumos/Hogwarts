@@ -1,7 +1,7 @@
 package com.epam.esm.gym.web.provider.trainer;
 
 import com.epam.esm.gym.domain.Specialization;
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;

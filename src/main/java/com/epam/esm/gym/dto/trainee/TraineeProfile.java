@@ -1,20 +1,16 @@
 package com.epam.esm.gym.dto.trainee;
 
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Data Transfer Object for representing a trainer profile.
@@ -23,21 +19,32 @@ import java.util.Objects;
  * specialization, active status, and associated trainees.</p>
  */
 @Getter
-@Builder
 @ToString
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TraineeProfile {
-    private String firstName;
-    private String lastName;
-    private String username;
-    private String address;
-    private Boolean active;
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
-    private LocalDate dateOfBirth;
-    private List<TrainerProfile> trainers;
+public class TraineeProfile extends SlimTraineeProfile {
+
+    private List<SlimTrainerProfile> trainers;
+
+    /**
+     * Constructs a new {@link TraineeProfile} with the specified details.
+     *
+     * @param firstName   the first name of the trainee.
+     * @param lastName    the last name of the trainee.
+     * @param username    the username of the trainee.
+     * @param address     the address of the trainee.
+     * @param active      the status indicating whether the trainee is active.
+     * @param dateOfBirth the date of birth of the trainee.
+     * @param trainers    the list of trainers associated with the trainee.
+     */
+    public TraineeProfile(
+            String firstName, String lastName,
+            String username, String address, Boolean active,
+            LocalDate dateOfBirth, List<SlimTrainerProfile> trainers) {
+        super(firstName, lastName, username, address, active, dateOfBirth);
+        this.trainers = trainers;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -47,18 +54,19 @@ public class TraineeProfile {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
+        if (!super.equals(obj)) {
+            return false;
+        }
         TraineeProfile profile = (TraineeProfile) obj;
-        return Objects.equals(firstName, profile.firstName)
-                && Objects.equals(lastName, profile.lastName)
-                && Objects.equals(username, profile.username)
-                && Objects.equals(address, profile.address)
-                && Objects.equals(active, profile.active)
-                && Objects.equals(dateOfBirth, profile.dateOfBirth)
-                && Objects.equals(trainers, profile.trainers);
+        return new EqualsBuilder()
+                .append(trainers, profile.trainers)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstName, lastName, username, address, active, dateOfBirth, trainers);
+        return new HashCodeBuilder(17, 37)
+                .append(super.hashCode())
+                .append(trainers).toHashCode();
     }
 }

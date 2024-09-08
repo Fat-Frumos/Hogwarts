@@ -1,7 +1,8 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.domain.User;
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.UserProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
@@ -36,7 +37,7 @@ public interface UserService {
      * @param dto the {@link TrainerRequest} containing the details of the trainer to be saved
      * @return the {@link TrainerProfile} representing the saved trainer
      */
-    TrainerProfile saveTrainer(TrainerRequest dto);
+    User createTrainerUser(TrainerRequest dto);
 
     /**
      * Updates an existing user profile with new information.
@@ -88,7 +89,7 @@ public interface UserService {
      * @param user the {@link ProfileRequest} containing the current and new passwords
      * @return a {@link ResponseEntity} with a {@link MessageResponse} indicating the result of the password change
      */
-    ResponseEntity<MessageResponse> changePassword(ProfileRequest user);
+    ResponseEntity<BaseResponse> changePassword(ProfileRequest user);
 
     /**
      * Activates a user profile based on the username.
@@ -125,7 +126,7 @@ public interface UserService {
      * @return a {@link ResponseEntity} with a {@link MessageResponse}
      * indicating the result of the authentication attempt
      */
-    ResponseEntity<MessageResponse> authenticate(String username, String password);
+    ResponseEntity<BaseResponse> authenticate(String username, String password);
 
     /**
      * Saves a new trainee user based on the provided request.
@@ -138,7 +139,7 @@ public interface UserService {
      * @param request the {@link TraineeRequest} containing the details of the trainee user to be saved
      * @return the {@link User} representing the saved trainee
      */
-    User saveTraineeUser(TraineeRequest request);
+    User createTraineeUser(TraineeRequest request);
 
     /**
      * Retrieves a user profile based on the username.
@@ -152,4 +153,38 @@ public interface UserService {
      * @return the {@link User} associated with the given username
      */
     User getUser(String username);
+
+    /**
+     * Generates a random password.
+     *
+     * <p>This method creates a random password using {@link java.security.SecureRandom}
+     * and {@link java.util.Base64} encoding. The length of the password is determined
+     * by the {@code PASSWORD_LENGTH} constant. </p>
+     *
+     * @return a randomly generated password.
+     */
+    String generateRandomPassword();
+
+    /**
+     * Encodes a plain-text password.
+     *
+     * <p>This method uses {@link org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder}
+     * to hash the provided plain-text password securely. The encoded password
+     * can be stored in the database for user authentication purposes. </p>
+     *
+     * @param password the plain-text password to be encoded.
+     * @return the encoded password.
+     */
+    String encodePassword(String password);
+
+    /**
+     * Saves a {@link User} entity.
+     *
+     * <p>This method persists the provided {@link User} entity to the database using
+     * the {@link com.epam.esm.gym.dao.UserDao}. The user entity must be valid before saving. </p>
+     *
+     * @param user the {@link User} entity to be saved.
+     * @return the saved {@link User} entity.
+     */
+    User saveUser(User user);
 }

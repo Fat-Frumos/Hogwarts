@@ -1,52 +1,49 @@
 package com.epam.esm.gym.security;
 
-import com.epam.esm.gym.domain.SecurityUser;
 import com.epam.esm.gym.domain.Token;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.auth.AuthenticationResponse;
+import com.epam.esm.gym.dto.auth.UserPrincipal;
 import com.epam.esm.gym.exception.InvalidJwtAuthenticationException;
-import com.epam.esm.gym.exception.TokenNotFoundException;
 import com.epam.esm.gym.service.TokenService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import lombok.Getter;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+
+import static java.time.Instant.now;
 
 /**
  * Service for handling JWT (JSON Web Token) operations.
  * <p>
  * This class provides functionality for generating, parsing, and validating JWTs.
  * It supports both access and refresh tokens, managing token claims and expiration.
- * It interacts with the {@link TokenService} to save, retrieve, and update tokens.
+ * It interacts with the {@link com.epam.esm.gym.service.TokenService} to save, retrieve, and update tokens.
  * Additionally, it provides methods to verify token validity and handle token-related exceptions.
  * </p>
  */
 @Slf4j
 @Service
 public class JwtProvider {
-    @Getter
-    @Value("${jwt.expiration}")
-    private Long expiration;
-    @Value("${jwt.refresh-token.expiration}")
-    private Long refreshExpiration;
-    private final SecretKey secretKey;
-    private final TokenService tokenService;
     private final JwtProperties jwtProperty;
-    private static final String USERNAME = "username";
+    private final TokenService tokenService;
+    private final String secretKey;
 
     /**
      * Constructs a new JwtProvider with the provided JWT properties and token service.
@@ -57,102 +54,21 @@ public class JwtProvider {
      *
      * @param jwtProperty  the JWT properties containing issuer and secret key information
      * @param tokenService the token service for interacting with tokens
-     * @throws IllegalArgumentException if the entity is null.
+     * @throws InvalidJwtAuthenticationException if the entity is null.
      */
     public JwtProvider(JwtProperties jwtProperty, TokenService tokenService) {
         this.jwtProperty = jwtProperty;
         this.tokenService = tokenService;
-        if (jwtProperty.getSecret() == null || jwtProperty.getSecret().isEmpty()) {
-            throw new IllegalArgumentException("Secret key cannot be null or empty");
-        }
-        this.secretKey = Jwts.SIG.HS256.key().build();
-    }
 
-    /**
-     * Extracts the username from the provided JWT token.
-     * Handles expired tokens based on the expiration check flag.
-     * Throws an exception if the token is expired and the flag is set to true.
-     * Otherwise, it retrieves the username from the claims of the expired token.
-     * This method helps in managing token validation and expiration scenarios.
-     *
-     * @param token           the JWT token
-     * @param expirationCheck flag indicating whether to check for token expiration
-     * @return the username extracted from the token
-     * @throws IllegalArgumentException if the entity is null.     *
-     */
-    public String getUsername(String token, boolean expirationCheck) {
         try {
-            return getUsername(getAllClaims(token));
-        } catch (ExpiredJwtException e) {
-            if (expirationCheck) {
-                throw new IllegalArgumentException("Invalid or expired refresh token.");
-            } else {
-                return getUsername(e.getClaims());
-            }
+            secretKey = Base64.getEncoder().encodeToString(
+                    KeyGenerator.getInstance("HmacSHA256")
+                            .generateKey()
+                            .getEncoded());
+        } catch (NoSuchAlgorithmException e) {
+            log.error("Invalid JwtAuthentication Exception: {}", e.getMessage());
+            throw new InvalidJwtAuthenticationException(e.getMessage());
         }
-    }
-
-    /**
-     * Retrieves the username claim from the provided JWT claims.
-     * This method casts the claim to a String and returns it.
-     * It extracts the username from the token payload for validation and user identification.
-     * This method is used internally to access user information from JWT claims.
-     * It is crucial for retrieving user details during authentication and authorization.
-     *
-     * @param payload the JWT claims
-     * @return the username from the claims
-     */
-    private String getUsername(Claims payload) {
-        return (String) payload.get(USERNAME);
-    }
-
-    /**
-     * Retrieves a specific claim from the JWT token using a provided function.
-     * Applies the function to extract the desired claim from the JWT claims.
-     * This method allows for flexible retrieval of various claims from the token.
-     * It is useful for accessing different pieces of information embedded in the JWT.
-     * Ensures that the claims are parsed and retrieved correctly for further processing.
-     *
-     * @param token  the JWT token
-     * @param claims a function to extract the claim from the JWT claims
-     * @param <T>    the type of the claim
-     * @return the extracted claim
-     */
-    public <T> T getClaim(
-            final String token,
-            final Function<Claims, T> claims) {
-        return claims.apply(getAllClaims(token));
-    }
-
-    /**
-     * Generates a new refresh token for the given user details.
-     * The refresh token has a longer expiration time compared to access tokens.
-     * This method creates a JWT token with the refresh expiration setting.
-     * It includes user details and other claims to ensure the token's validity.
-     * This method is essential for managing user sessions and refreshing authentication tokens.
-     *
-     * @param user the user details
-     * @return the generated refresh token
-     */
-    public String generateRefreshToken(
-            final UserDetails user) {
-        return generateToken(new HashMap<>(), user, refreshExpiration);
-    }
-
-    /**
-     * Generates a new access token for the given user details.
-     * The access token is used for authenticating user requests.
-     * This method creates a JWT token with the access expiration setting.
-     * It includes user details and other claims to ensure token validity.
-     * It is crucial for providing secure access to protected resources.
-     *
-     * @param userDetails the user details
-     * @return the generated access token
-     */
-    public String generateToken(
-            final UserDetails userDetails) {
-        return generateToken(new HashMap<>(),
-                userDetails, expiration);
     }
 
     /**
@@ -162,28 +78,68 @@ public class JwtProvider {
      * This method is used for both access and refresh tokens based on the provided expiration.
      * It ensures that the token contains the required information for authentication.
      *
-     * @param claims      the claims to include in the token
-     * @param userDetails the user details
-     * @param expiration  the expiration time in seconds
+     * @param claims   the claims to include in the token
+     * @param username the username
      * @return the generated JWT token
      */
-    private String generateToken(
-            final Map<String, Object> claims,
-            final UserDetails userDetails,
-            final Long expiration) {
-        try {
-            return Jwts.builder()
-                    .signWith(secretKey, Jwts.SIG.HS256)
-                    .issuer(jwtProperty.getIssuer())
-                    .subject(String.valueOf(userDetails.getUsername()))
-                    .issuedAt(new Date(System.currentTimeMillis()))
-                    .expiration(new Date(System.currentTimeMillis() + expiration * 1000))
-                    .claim(USERNAME, userDetails.getUsername())
-                    .claims(claims)
-                    .compact();
-        } catch (Exception e) {
-            throw new InvalidJwtAuthenticationException(e.getMessage());
-        }
+    public String generateToken(String username, Map<String, Object> claims) {
+        return Jwts.builder()
+                .claims()
+                .add(claims)
+                .subject(username)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
+                .and()
+                .signWith(getKey())
+                .compact();
+
+    }
+
+    /**
+     * Generates a SecretKey instance using the provided secret key string.
+     * This method decodes the Base64 encoded secret key and creates an HMAC SHA key.
+     *
+     * @return the SecretKey used for signing and verifying JWT tokens
+     */
+    public SecretKey getKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    /**
+     * Extracts the username from the provided JWT token.
+     * Otherwise, it retrieves the username from the claims of the expired token.
+     * This method helps in managing token validation and expiration scenarios.
+     *
+     * @param token the JWT token
+     * @return the username extracted from the token
+     */
+    public String extractUserName(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    /**
+     * Retrieves a specific claim from the JWT token using a provided function.
+     * Applies the function to extract the desired claim from the JWT claims.
+     * This method allows for flexible retrieval of various claims from the token.
+     * It is useful for accessing different pieces of information embedded in the JWT.
+     * Ensures that the claims are parsed and retrieved correctly for further processing.
+     *
+     * @param token         the JWT token
+     * @param claimResolver a function to extract the claim from the JWT claims
+     * @param <T>           the type of the claim
+     * @return the extracted claim
+     */
+    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
+        return claimResolver.apply(extractAllClaims(token));
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     /**
@@ -197,39 +153,50 @@ public class JwtProvider {
      * @param userDetails the user details
      * @return true if the token is valid, otherwise false
      */
-    public boolean isTokenValid(final String token, final UserDetails userDetails) {
-        try {
-            return getUsername(token).equals(userDetails.getUsername())
-                    && !getClaim(token, Claims::getExpiration).before(new Date());
-        } catch (Exception e) {
-            return false;
-        }
+    public boolean validateToken(String token, UserDetails userDetails) {
+        final String userName = extractUserName(token);
+        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     /**
-     * Retrieves all claims from the provided JWT token.
-     * This method parses the token and extracts its claims.
-     * Handles various exceptions related to JWT parsing and validation.
-     * Ensures that claims are correctly retrieved for further processing.
-     * This method is crucial for accessing token data and validating JWTs.
+     * Checks whether the provided JWT token has expired.
      *
-     * @param token the JWT token
-     * @return the claims extracted from the token
-     * @throws InvalidJwtAuthenticationException if the catch a error.
+     * @param token the JWT token to check
+     * @return {@code true} if the token has expired, otherwise {@code false}
      */
-    public Claims getAllClaims(final String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        } catch (MalformedJwtException
-                 | ExpiredJwtException
-                 | UnsupportedJwtException
-                 | IllegalArgumentException e) {
-            throw new InvalidJwtAuthenticationException(e.getMessage());
+    public boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    /**
+     * Extracts the expiration date from the provided JWT token.
+     *
+     * @param token the JWT token from which to extract the expiration date
+     * @return the expiration date of the token
+     */
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    /**
+     * Revokes all tokens for the specified user.
+     * This method updates the status of each token to expired and revoked.
+     * It interacts with the TokenService to save the updated tokens.
+     * Ensures that all tokens for the user are invalidated effectively.
+     * This method is used to manage token revocation and user session termination.
+     *
+     * @param user the user whose tokens are to be revoked
+     */
+    @Transactional
+    public void revokeAllUserTokens(final User user) {
+        Set<Token> tokens = tokenService.findAllValidAccessTokenByUserId(user.getId());
+        if (!tokens.isEmpty()) {
+            tokens.forEach(token -> {
+                token.setExpired(true);
+                token.setRevoked(true);
+            });
         }
+        tokenService.saveAll(tokens);
     }
 
     /**
@@ -249,18 +216,19 @@ public class JwtProvider {
     }
 
     /**
-     * Finds all valid access tokens for the given user.
-     * This method interacts with the TokenService to retrieve tokens by user ID.
-     * It filters tokens to return only those that are valid.
-     * This method is used for managing and validating user tokens.
-     * Ensures that only tokens with valid statuses are considered.
+     * Generates a JWT token with the specified claims and expiration time.
+     * This method supports creating tokens with custom claims and expiration settings.
+     * It builds the token with a specified expiration time, user details, and claims.
+     * This method is used for both access and refresh tokens based on the provided expiration.
+     * It ensures that the token contains the required information for authentication.
      *
-     * @param user the user whose tokens are to be retrieved
-     * @return a list of valid tokens for the user
+     * @param userDetails the user details
+     * @return the generated JWT token
      */
-    @Transactional
-    public List<Token> findAllValidToken(final User user) {
-        return tokenService.findAllValidAccessTokenByUserId(user.getId());
+    public String generateToken(UserPrincipal userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", userDetails.user().getPermission());
+        return generateToken(userDetails.getUsername(), claims);
     }
 
     /**
@@ -276,31 +244,10 @@ public class JwtProvider {
      */
     @Transactional
     public Token updateUserTokens(
-            final SecurityUser user,
+            final UserPrincipal user,
             final String accessToken) {
         Token token = getToken(user, accessToken);
-        return save(token);
-    }
-
-    /**
-     * Revokes all tokens for the specified user.
-     * This method updates the status of each token to expired and revoked.
-     * It interacts with the TokenService to save the updated tokens.
-     * Ensures that all tokens for the user are invalidated effectively.
-     * This method is used to manage token revocation and user session termination.
-     *
-     * @param user the user whose tokens are to be revoked
-     */
-    @Transactional
-    public void revokeAllUserTokens(final User user) {
-        List<Token> tokens = findAllValidToken(user);
-        if (!tokens.isEmpty()) {
-            tokens.forEach(token -> {
-                token.setExpired(true);
-                token.setRevoked(true);
-            });
-        }
-        tokenService.saveAll(tokens);
+        return tokenService.save(token);
     }
 
     /**
@@ -319,50 +266,6 @@ public class JwtProvider {
     }
 
     /**
-     * Creates a new Token object with the specified user and access token details.
-     * This method builds a Token instance with the provided user and token information.
-     * It sets the token type, expiration, and other necessary details.
-     * This method is used for creating and managing tokens within the system.
-     * Ensures that the token is accurately represented and ready for use.
-     *
-     * @param user        the security user
-     * @param accessToken the access token string
-     * @return the created Token object
-     */
-    public Token getToken(
-            final SecurityUser user,
-            final String accessToken) {
-        return Token.builder()
-                .user(user.getUser())
-                .expired(false)
-                .revoked(false)
-                .tokenType(Token.TokenType.BEARER)
-                .accessToken(accessToken)
-                .accessTokenTTL(getExpiration())
-                .build();
-    }
-
-    /**
-     * Retrieves the username from the provided JWT token.
-     * This method extracts the username from the token's subject claim.
-     * It handles cases where the token is malformed and throws an exception if necessary.
-     * This method is used for validating and retrieving user information from tokens.
-     * Ensures that username extraction is handled securely and accurately.
-     *
-     * @param token the JWT token
-     * @return the username extracted from the token
-     * @throws TokenNotFoundException if there is token fon found
-     */
-    public String getUsername(final String token) {
-        try {
-            return getClaim(token, Claims::getSubject);
-        } catch (MalformedJwtException e) {
-            throw new TokenNotFoundException(
-                    String.format("Token not found: %s", token));
-        }
-    }
-
-    /**
      * Saves the provided Token object using the TokenService.
      * This method interacts with the TokenService to persist the token data.
      * It ensures that the token is stored correctly for future use.
@@ -374,5 +277,51 @@ public class JwtProvider {
      */
     public Token save(Token token) {
         return tokenService.save(token);
+    }
+
+    /**
+     * Creates a new Token object with the specified user and access token details.
+     * This method builds a Token instance with the provided user and token information.
+     * It sets the token type, expiration, and other necessary details.
+     * This method is used for creating and managing tokens within the system.
+     * Ensures that the token is accurately represented and ready for use.
+     *
+     * @param user        the security user
+     * @param accessToken the access token string
+     * @return the created Token object
+     */
+    public Token getToken(
+            final UserPrincipal user,
+            final String accessToken) {
+        return Token.builder()
+                .user(user.user())
+                .expired(false)
+                .revoked(false)
+                .tokenType(Token.TokenType.BEARER)
+                .accessToken(accessToken)
+                .accessTokenTTL(jwtProperty.getExpiration())
+                .build();
+    }
+
+    /**
+     * Generates an {@link AuthenticationResponse} based on user details and JWT token.
+     * Creates a response that includes the JWT token, user details, and access token.
+     * This method is used to return comprehensive authentication data including token details.
+     * Supports scenarios where detailed response data is required for authenticated users.
+     * Ensures that all relevant information is included in the authentication response.
+     *
+     * @param user        The user details to include in the response.
+     * @param jwtToken    The JWT token to include in the response.
+     * @param accessToken The access token to include in the response.
+     * @return An {@link AuthenticationResponse} containing token and user information.
+     */
+    public AuthenticationResponse getAuthenticationResponse(UserPrincipal user, String jwtToken, Long accessToken) {
+        return AuthenticationResponse.builder()
+                .username(user.getUsername())
+                .expiresAt(Timestamp.from(now()
+                        .plusMillis(accessToken)))
+                .refreshToken(generateToken(user))
+                .accessToken(jwtToken)
+                .build();
     }
 }

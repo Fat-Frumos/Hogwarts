@@ -1,10 +1,8 @@
 package com.epam.esm.gym.dao;
 
 import com.epam.esm.gym.domain.Training;
-import com.epam.esm.gym.domain.TrainingSession;
 import com.epam.esm.gym.domain.TrainingType;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,13 +28,4 @@ public interface TrainingDao extends Dao<Training> {
      * @return a list of {@link Training} objects
      */
     List<Training> findTrainingsByTrainerUsername(String username);
-
-    /**
-     * Finds training sessions that start within a specific time range.
-     *
-     * @param startOfWeekDateTime the start of the time range
-     * @param endOfWeekDateTime   the end of the time range
-     * @return a list of {@link TrainingSession} objects
-     */
-    List<TrainingSession> findByStartTimeBetween(LocalDateTime startOfWeekDateTime, LocalDateTime endOfWeekDateTime);
 }

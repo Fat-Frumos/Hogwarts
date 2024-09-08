@@ -2,6 +2,10 @@ package com.epam.esm.gym.security;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -13,8 +17,6 @@ class BruteForceProtectionServiceTest {
 
     @Test
     void testRegisterFailedAttempt() {
-        String username = "user1";
-
         bruteForceProtectionService.registerFailedAttempt(username);
         bruteForceProtectionService.registerFailedAttempt(username);
         bruteForceProtectionService.registerFailedAttempt(username);
@@ -23,25 +25,23 @@ class BruteForceProtectionServiceTest {
 
     @Test
     void testIsLockedNotLocked() {
-        String username = "user2";
         assertFalse(bruteForceProtectionService.isLocked(username));
     }
 
     @Test
-    void testIsLockedAfterLockDuration() throws InterruptedException {
-
+    void testIsLockedAfterLockDuration() {
         bruteForceProtectionService.registerFailedAttempt(username);
         bruteForceProtectionService.registerFailedAttempt(username);
         bruteForceProtectionService.registerFailedAttempt(username);
-
-        Thread.sleep(LOCK_TIME_DURATION + 1000);
-
+        try (ScheduledExecutorService executor = Executors.newScheduledThreadPool(1)) {
+            executor.schedule(() -> assertTrue(bruteForceProtectionService.isLocked(username)),
+                    LOCK_TIME_DURATION + 1000, TimeUnit.MILLISECONDS);
+        }
         assertTrue(bruteForceProtectionService.isLocked(username));
     }
 
     @Test
     void testResetAttempts() {
-        String username = "user4";
         bruteForceProtectionService.registerFailedAttempt(username);
         bruteForceProtectionService.registerFailedAttempt(username);
         bruteForceProtectionService.registerFailedAttempt(username);

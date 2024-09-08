@@ -53,8 +53,7 @@ public class DatabaseHealthIndicator implements HealthIndicator {
      * @return the health status of the database as {@link Health#up()} if the connection is valid,
      * otherwise {@link Health#down()}.
      * This method relies on {@code checkDatabase()} to determine the database's availability.
-     * @author Pavlo Poliak
-     * @see #checkDatabase()
+:     * @see #checkDatabase()
      * @see org.springframework.boot.actuate.health.Health
      * @see org.springframework.boot.actuate.health.HealthIndicator
      * @since 1.0
@@ -77,7 +76,6 @@ public class DatabaseHealthIndicator implements HealthIndicator {
      *
      * @return {@code true} if the database connection is valid; {@code false} otherwise.
      * This method is used internally by {@code health()} to determine database status.
-     * @author Pavlo Poliak
      * @see java.sql.Connection#isValid(int)
      * @since 1.0
      */

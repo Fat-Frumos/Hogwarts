@@ -55,7 +55,7 @@ public class Training {
     @JoinColumn(name = "trainer_id", nullable = false)
     private Trainer trainer;
 
-    @Column(nullable = false)
+    @Column(name = "training_name", nullable = false)
     private String trainingName;
 
     @ManyToOne
@@ -65,12 +65,13 @@ public class Training {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
-    @Column(nullable = false)
+    @Column(name = "training_date", nullable = false)
     private LocalDate trainingDate;
 
-    @Column(nullable = false)
+    @Column(name = "training_duration", nullable = false)
     private Integer trainingDuration;
 
+    @Column(name = "training_sessions")
     @OneToMany(mappedBy = "training", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<TrainingSession> trainingSessions;
 
@@ -84,8 +85,6 @@ public class Training {
         }
         Training training = (Training) obj;
         return Objects.equals(id, training.id)
-                && Objects.equals(trainee, training.trainee)
-                && Objects.equals(trainer, training.trainer)
                 && Objects.equals(trainingName, training.trainingName)
                 && Objects.equals(type, training.type)
                 && Objects.equals(trainingDate, training.trainingDate)
@@ -94,6 +93,6 @@ public class Training {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, trainee, trainer, trainingName, type, trainingDate, trainingDuration);
+        return Objects.hash(id, trainingName, type, trainingDate, trainingDuration);
     }
 }

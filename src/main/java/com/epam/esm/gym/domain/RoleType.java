@@ -12,6 +12,7 @@ import static com.epam.esm.gym.domain.Permission.ADMIN_CREATE;
 import static com.epam.esm.gym.domain.Permission.ADMIN_DELETE;
 import static com.epam.esm.gym.domain.Permission.ADMIN_READ;
 import static com.epam.esm.gym.domain.Permission.ADMIN_UPDATE;
+import static com.epam.esm.gym.domain.Permission.GUEST_READ;
 import static com.epam.esm.gym.domain.Permission.TRAINEE_READ;
 import static com.epam.esm.gym.domain.Permission.TRAINER_CREATE;
 import static com.epam.esm.gym.domain.Permission.TRAINER_READ;
@@ -30,6 +31,7 @@ import static java.util.stream.Collectors.toList;
 @AllArgsConstructor
 public enum RoleType {
 
+    ROLE_GUEST(new HashSet<>(singletonList(GUEST_READ))),
     ROLE_TRAINEE(new HashSet<>(singletonList(TRAINEE_READ))),
 
     ROLE_TRAINER(new HashSet<>(asList(
@@ -62,7 +64,7 @@ public enum RoleType {
                         .map(permission -> new SimpleGrantedAuthority(
                                 permission.getAuthority()))
                         .collect(toList());
-        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
+        grantedAuthorities.add(new SimpleGrantedAuthority(this.name()));
         return grantedAuthorities;
     }
 }

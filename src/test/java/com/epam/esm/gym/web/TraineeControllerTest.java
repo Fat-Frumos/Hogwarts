@@ -1,10 +1,10 @@
 package com.epam.esm.gym.web;
 
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.web.provider.trainee.NotFoundTraineeProfileArgumentsProvider;
@@ -135,7 +135,7 @@ class TraineeControllerTest extends ControllerTest {
     @ArgumentsSource(TraineeTrainersResponseEntityProfileArgumentsProvider.class)
     void testUpdateTraineeTrainers(
             String username, List<String> trainersUsernames,
-            ResponseEntity<List<TrainerProfile>> expectedResponse) throws Exception {
+            ResponseEntity<List<SlimTrainerProfile>> expectedResponse) throws Exception {
         when(service.updateTraineeTrainersByName(username, trainersUsernames)).thenReturn(expectedResponse);
         ResultActions resultActions = mockMvc.perform(put("/api/trainees/{username}/trainers", username)
                 .contentType(MediaType.APPLICATION_JSON)

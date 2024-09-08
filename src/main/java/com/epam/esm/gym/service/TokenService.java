@@ -2,8 +2,8 @@ package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.domain.Token;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service interface for managing tokens.
@@ -27,9 +27,9 @@ public interface TokenService {
      * </p>
      *
      * @param id the user ID for which to find valid access tokens
-     * @return a list of valid tokens associated with the specified user ID
+     * @return a set of valid tokens associated with the specified user ID
      */
-    List<Token> findAllValidAccessTokenByUserId(Integer id);
+    Set<Token> findAllValidAccessTokenByUserId(Integer id);
 
     /**
      * Saves a list of tokens to the storage.
@@ -41,7 +41,7 @@ public interface TokenService {
      *
      * @param tokens the list of tokens to be saved
      */
-    void saveAll(List<Token> tokens);
+    void saveAll(Set<Token> tokens);
 
     /**
      * Finds a token by its access token string.

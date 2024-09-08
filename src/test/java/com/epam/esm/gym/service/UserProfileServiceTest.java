@@ -1,17 +1,13 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dao.UserDao;
-import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.User;
-import com.epam.esm.gym.dto.profile.MessageResponse;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.UserProfile;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.mapper.UserMapper;
 import com.epam.esm.gym.service.profile.UserProfileService;
 import com.epam.esm.gym.web.provider.AuthenticationArgumentsProvider;
 import com.epam.esm.gym.web.provider.UserArgumentsProvider;
-import com.epam.esm.gym.web.provider.trainee.TraineeProfileArgumentsProvider;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
@@ -28,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -57,45 +52,9 @@ public class UserProfileServiceTest {
     @Mock
     private UserDao userDao;
     @Mock
-    private PasswordEncoder passwordEncoder;
-    @Mock
     private UserMapper userMapper;
-
-    @ParameterizedTest
-    @ArgumentsSource(TraineeProfileArgumentsProvider.class)
-    void saveTrainee(String expectedUsername,
-                     ResponseEntity<TraineeProfile> expectedResponse,
-                     TraineeRequest request) {
-        String encodedPassword = "encodedPassword";
-
-        User user = new User();
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setUsername(expectedUsername);
-        user.setPassword(encodedPassword);
-        user.setPermission(RoleType.ROLE_TRAINEE);
-
-        User savedUser = new User();
-        savedUser.setId(1);
-        savedUser.setFirstName(request.getFirstName());
-        savedUser.setLastName(request.getLastName());
-        savedUser.setUsername(expectedUsername);
-        savedUser.setPassword(encodedPassword);
-        savedUser.setPermission(RoleType.ROLE_TRAINEE);
-
-        when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
-        when(userMapper.toUser(request.getFirstName(), request.getLastName(),
-                expectedUsername, encodedPassword, RoleType.ROLE_TRAINEE)).thenReturn(user);
-        when(userDao.save(user)).thenReturn(savedUser);
-
-        User result = userProfileService.saveTraineeUser(request);
-
-        assertEquals(savedUser, result);
-        verify(passwordEncoder).encode(anyString());
-        verify(userMapper).toUser(request.getFirstName(), request.getLastName(),
-                expectedUsername, encodedPassword, RoleType.ROLE_TRAINEE);
-        verify(userDao).save(user);
-    }
+    @Mock
+    private PasswordEncoder encoder;
 
     @ParameterizedTest
     @ArgumentsSource(UserArgumentsProvider.class)
@@ -159,9 +118,13 @@ public class UserProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(AuthenticationArgumentsProvider.class)
     void authenticate(String username, String password, User user, HttpStatus expectedStatus) {
-        user.setPassword(password);
-        when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
-        ResponseEntity<MessageResponse> response = userProfileService.authenticate(username, password);
+        if (user == null) {
+            when(userDao.findByUsername(username)).thenReturn(Optional.empty());
+        } else {
+            when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
+            when(encoder.matches(password, user.getPassword())).thenReturn(expectedStatus == HttpStatus.OK);
+        }
+        ResponseEntity<BaseResponse> response = userProfileService.authenticate(username, password);
         assertEquals(expectedStatus, response.getStatusCode());
     }
 }

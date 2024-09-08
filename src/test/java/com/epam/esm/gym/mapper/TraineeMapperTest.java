@@ -6,14 +6,21 @@ import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
+import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -69,7 +76,7 @@ class TraineeMapperTest {
         Training training = Training.builder()
                 .trainer(Trainer.builder().user(User.builder().username("Minerva McGonagall").build()).build())
                 .trainingName("Advanced Transfiguration")
-                .type(TrainingType.builder().trainingType(Specialization.TRANSFIGURATION).build())
+                .type(TrainingType.builder().specialization(Specialization.TRANSFIGURATION).build())
                 .trainingDuration(60)
                 .trainingDate(LocalDate.of(2024, 1, 10))
                 .build();
@@ -115,11 +122,63 @@ class TraineeMapperTest {
                 .trainees(Set.of())
                 .build();
 
-        TrainerProfile profile = traineeMapper.toTrainerProfile(trainer);
+        SlimTrainerProfile profile = traineeMapper.toTrainerProfile(trainer);
 
         assertNotNull(profile);
         assertEquals("Harry", profile.getFirstName());
         assertEquals("Potter", profile.getLastName());
         assertEquals("Harry.Potter", profile.getUsername());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideUserAndPassword")
+    @DisplayName("Test toProfile method")
+    void testToProfile(String username, String password, ProfileResponse expectedResponse) {
+        TraineeMapper mapper = Mappers.getMapper(TraineeMapper.class);
+        ProfileResponse result = mapper.toProfile(username, password);
+        assertEquals(expectedResponse, result);
+    }
+
+    private static Stream<Arguments> provideUserAndPassword() {
+        return Stream.of(
+                Arguments.of("harry.potter", "password123", ProfileResponse.builder()
+                        .username("harry.potter")
+                        .password("password123")
+                        .build()
+                ),
+                Arguments.of("hermione.granger", "password456", ProfileResponse.builder()
+                        .username("hermione.granger")
+                        .password("password456")
+                        .build()
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTrainerProfileAndExpectedUser")
+    @DisplayName("Test toUser method")
+    void testToUser(SlimTrainerProfile profile, User expectedUser) {
+        TraineeMapper mapper = Mappers.getMapper(TraineeMapper.class);
+        User result = mapper.toUser(profile);
+        assertEquals(expectedUser, result);
+    }
+
+    private static Stream<Arguments> provideTrainerProfileAndExpectedUser() {
+        SlimTrainerProfile profile = new SlimTrainerProfile();
+        profile.setUsername("professor.snape");
+        profile.setFirstName("Severus");
+        profile.setLastName("Snape");
+        profile.setActive(true);
+
+        User expectedUser = User.builder()
+                .username("professor.snape")
+                .firstName("Severus")
+                .lastName("Snape")
+                .active(true)
+                .build();
+
+        return Stream.of(
+                Arguments.of(profile, expectedUser)
+        );
     }
 }

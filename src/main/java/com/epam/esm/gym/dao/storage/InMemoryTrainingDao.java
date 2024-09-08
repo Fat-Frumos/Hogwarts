@@ -3,12 +3,10 @@ package com.epam.esm.gym.dao.storage;
 import com.epam.esm.gym.dao.TrainingDao;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
-import com.epam.esm.gym.domain.TrainingSession;
 import com.epam.esm.gym.domain.TrainingType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -106,27 +104,6 @@ public class InMemoryTrainingDao extends AbstractInMemoryDao<Training> implement
         }
         return storage.values().stream()
                 .filter(training -> training.getTrainer().equals(trainer))
-                .toList();
-    }
-
-    /**
-     * Finds all {@link TrainingSession} entities within a specified time range.
-     *
-     * <p>This method retrieves all {@link TrainingSession} entities from the in-memory storage and filters them to
-     * include only those whose start time falls within the specified range.
-     * It uses Java Streams to process the training sessions and collect those that meet the criteria.</p>
-     *
-     * @param startOfWeekDateTime the start time of the range to filter sessions.
-     * @param endOfWeekDateTime   the end time of the range to filter sessions.
-     * @return a list of {@link TrainingSession} entities whose start time falls within the specified range.
-     */
-    @Override
-    public List<TrainingSession> findByStartTimeBetween(
-            LocalDateTime startOfWeekDateTime, LocalDateTime endOfWeekDateTime) {
-        return storage.values().stream()
-                .flatMap(training -> training.getTrainingSessions().stream())
-                .filter(session -> !session.getStartTime().isBefore(startOfWeekDateTime)
-                        && !session.getStartTime().isAfter(endOfWeekDateTime))
                 .toList();
     }
 

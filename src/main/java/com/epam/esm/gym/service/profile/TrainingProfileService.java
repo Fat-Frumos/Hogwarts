@@ -8,7 +8,7 @@ import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import com.epam.esm.gym.dto.training.TrainingTypeResponse;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import com.epam.esm.gym.mapper.TrainingMapper;
 import com.epam.esm.gym.service.TraineeService;
 import com.epam.esm.gym.service.TrainerService;
@@ -42,10 +42,11 @@ public class TrainingProfileService implements TrainingService {
      * {@inheritDoc}
      * Retrieves a list of all available training types.
      *
-     * @return A list of {@link TrainingTypeResponse} objects representing the available training types.
+     * @return A list of {@link com.epam.esm.gym.dto.training.TrainingTypeDto}
+     * objects representing the available training types.
      */
     @Override
-    public List<TrainingTypeResponse> getTrainingTypes() {
+    public List<TrainingTypeDto> getTrainingTypes() {
         List<TrainingType> trainingTypes = dao.findAllTrainingTypes();
         return trainingTypes.stream()
                 .map(mapper::toType)
@@ -81,12 +82,7 @@ public class TrainingProfileService implements TrainingService {
         Trainee trainee = traineeService.getTrainee(request.getTraineeUsername());
         Trainer trainer = trainerService.getTrainer(request.getTrainerUsername());
         Training training = mapper.toEntity(request, trainee, trainer);
-        try {
-            dao.save(training);
-            log.info("Training entity saved successfully: {}", training);
-        } catch (Exception e) {
-            log.error("Failed to save Training entity: {} {}", training, e.getMessage());
-            throw new RuntimeException("Failed to save Training entity", e);
-        }
+        Training saved = dao.save(training);
+        log.info("Training entity saved successfully: {}", saved);
     }
 }
