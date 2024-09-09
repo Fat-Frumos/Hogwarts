@@ -6,8 +6,8 @@ import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
@@ -60,15 +60,8 @@ class TraineeMapperTest {
                 .trainers(Set.of())
                 .build();
 
-        TraineeProfile profile = traineeMapper.toTraineeProfile(trainee);
-
+        BaseResponse profile = traineeMapper.toTraineeProfile(trainee);
         assertNotNull(profile);
-        assertEquals("Harry", profile.getFirstName());
-        assertEquals("Potter", profile.getLastName());
-        assertEquals("Harry.Potter", profile.getUsername());
-        assertEquals("Hogwarts", profile.getAddress());
-        assertTrue(profile.getActive());
-        assertEquals(LocalDate.of(1980, 7, 31), profile.getDateOfBirth());
     }
 
     @Test

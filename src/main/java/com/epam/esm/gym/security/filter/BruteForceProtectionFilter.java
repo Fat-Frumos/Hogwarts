@@ -1,6 +1,6 @@
 package com.epam.esm.gym.security.filter;
 
-import com.epam.esm.gym.security.BruteForceProtectionService;
+import com.epam.esm.gym.security.service.BruteForceProtectionService;
 import lombok.AllArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;

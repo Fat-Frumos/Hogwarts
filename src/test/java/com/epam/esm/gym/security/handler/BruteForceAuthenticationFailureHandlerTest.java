@@ -1,6 +1,6 @@
 package com.epam.esm.gym.security.handler;
 
-import com.epam.esm.gym.security.BruteForceProtectionService;
+import com.epam.esm.gym.security.service.BruteForceProtectionService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

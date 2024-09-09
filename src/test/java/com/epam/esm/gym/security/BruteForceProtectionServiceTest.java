@@ -1,5 +1,6 @@
 package com.epam.esm.gym.security;
 
+import com.epam.esm.gym.security.service.BruteForceProtectionService;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

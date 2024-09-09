@@ -1,11 +1,5 @@
 package com.epam.esm.gym.domain;
 
-import com.epam.esm.gym.domain.RoleType;
-import com.epam.esm.gym.domain.Specialization;
-import com.epam.esm.gym.domain.Trainer;
-import com.epam.esm.gym.domain.Training;
-import com.epam.esm.gym.domain.TrainingSession;
-import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.auth.RegisterRequest;
 import com.epam.esm.gym.dto.auth.UserPrincipal;
@@ -16,7 +10,7 @@ import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.dto.training.TrainingTypeDto;
-import com.epam.esm.gym.security.JwtProperties;
+import com.epam.esm.gym.security.service.JwtProperties;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -1,4 +1,4 @@
-package com.epam.esm.gym.security;
+package com.epam.esm.gym.security.service;
 
 import com.epam.esm.gym.domain.Token;
 import com.epam.esm.gym.domain.User;
@@ -10,7 +10,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +37,6 @@ import static java.time.Instant.now;
  * Additionally, it provides methods to verify token validity and handle token-related exceptions.
  * </p>
  */
-@Slf4j
 @Service
 public class JwtProvider {
     private final JwtProperties jwtProperty;
@@ -66,7 +64,6 @@ public class JwtProvider {
                             .generateKey()
                             .getEncoded());
         } catch (NoSuchAlgorithmException e) {
-            log.error("Invalid JwtAuthentication Exception: {}", e.getMessage());
             throw new InvalidJwtAuthenticationException(e.getMessage());
         }
     }

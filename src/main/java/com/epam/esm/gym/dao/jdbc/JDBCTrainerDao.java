@@ -69,7 +69,7 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
         String hql = """
                     SELECT t
                     FROM Trainer t
-                    JOIN FETCH t.user u
+                    JOIN User u ON u.id = t.user.id
                     WHERE u.username = :username
                 """;
         return getSession().createQuery(hql, Trainer.class)

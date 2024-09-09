@@ -5,6 +5,7 @@ import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.profile.UserProfile;
@@ -117,7 +118,7 @@ class TraineeProfileServiceTest {
             ResponseEntity<TraineeProfile> profile) {
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
         when(mapper.toTraineeProfile(trainee)).thenReturn(profile.getBody());
-        ResponseEntity<TraineeProfile> response = service.getTraineeProfileByName(username);
+        ResponseEntity<BaseResponse> response = service.getTraineeProfileByName(username);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(profile, response);
     }
@@ -126,7 +127,7 @@ class TraineeProfileServiceTest {
     @ArgumentsSource(TraineeArgumentsProvider.class)
     void getTraineeProfileByNameWhenTraineeDoesNotExist(String username) {
         when(dao.findByUsername(username)).thenReturn(Optional.empty());
-        ResponseEntity<TraineeProfile> response = service.getTraineeProfileByName(username);
+        ResponseEntity<BaseResponse> response = service.getTraineeProfileByName(username);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
@@ -146,7 +147,7 @@ class TraineeProfileServiceTest {
         when(mapper.update(request, trainee)).thenReturn(updatedTrainee);
         when(dao.update(updatedTrainee)).thenReturn(updatedTrainee);
         when(mapper.toTraineeProfile(updatedTrainee)).thenReturn(updatedProfile);
-        ResponseEntity<TraineeProfile> response = service.updateTrainee(username, request);
+        ResponseEntity<BaseResponse> response = service.updateTrainee(username, request);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(updatedProfile, response.getBody());
     }

@@ -61,7 +61,7 @@ public interface UserMapper {
                 .permission(role)
                 .password(password)
                 .username(username)
-                .active(true)
+                .active(false)
                 .build();
     }
 }

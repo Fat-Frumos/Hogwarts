@@ -4,6 +4,7 @@ import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
@@ -101,7 +102,7 @@ public interface TraineeMapper {
      * @param trainee the trainee to convert
      * @return the converted {@link TraineeProfile}
      */
-    default TraineeProfile toTraineeProfile(Trainee trainee) {
+    default BaseResponse toTraineeProfile(Trainee trainee) {
         return TraineeProfile.builder()
                 .firstName(trainee.getUser().getFirstName())
                 .lastName(trainee.getUser().getLastName())

@@ -1,7 +1,7 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
@@ -52,7 +52,7 @@ public interface ITraineeController {
                     @ApiResponse(responseCode = "403", description = "Forbidden access")
             }
     )
-    ResponseEntity<List<TraineeProfile>> getAllTrainees();
+    ResponseEntity<List<BaseResponse>> getAllTrainees();
 
     /**
      * Registers a new trainee with the provided details.
@@ -95,7 +95,7 @@ public interface ITraineeController {
                     @ApiResponse(responseCode = "403", description = "Forbidden access")
             }
     )
-    ResponseEntity<TraineeProfile> getTraineeProfile(
+    ResponseEntity<BaseResponse> getTraineeProfile(
             @PathVariable @NotNull @Valid String username);
 
     /**
@@ -117,7 +117,7 @@ public interface ITraineeController {
                     @ApiResponse(responseCode = "403", description = "Forbidden access")
             }
     )
-    ResponseEntity<TraineeProfile> updateTraineeProfile(
+    ResponseEntity<BaseResponse> updateTraineeProfile(
             @PathVariable String username,
             @Valid @RequestBody TraineeRequest request);
 

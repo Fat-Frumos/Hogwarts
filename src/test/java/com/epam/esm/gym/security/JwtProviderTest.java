@@ -3,6 +3,8 @@ package com.epam.esm.gym.security;
 import com.epam.esm.gym.domain.Token;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.UserPrincipal;
+import com.epam.esm.gym.security.service.JwtProperties;
+import com.epam.esm.gym.security.service.JwtProvider;
 import com.epam.esm.gym.service.TokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

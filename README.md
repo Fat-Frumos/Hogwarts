@@ -2,7 +2,7 @@
 
 [![Java CI with Maven](https://github.com/Fat-Frumos/XStack/actions/workflows/maven.yml/badge.svg)](https://github.com/Fat-Frumos/XStack/actions/workflows/maven.yml)
 
-http://localhost:8080/swagger-ui/index.html#/
+[Swagger](https://hogward-gym.onrender.com/swagger-ui/index.html#)
 
 ### General description
 
@@ -51,7 +51,7 @@ Below is a description of each component of the solution.
 15. Get Trainer Trainings List by trainer username and criteria.
 16. Add training.
 17. Get not assigned on specific trainee active trainers list.
-18. Update Tranee's trainers list
+18. Update Trainee's trainers list
 
 ### Technical Notes:
 
@@ -385,3 +385,7 @@ Clean, install and report
 Clean, install and report
 
 `mvn sonar:sonar`
+
+Check conflicting dependencies
+
+`mvn dependency:tree`

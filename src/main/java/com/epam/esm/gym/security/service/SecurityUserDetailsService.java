@@ -1,4 +1,4 @@
-package com.epam.esm.gym.security;
+package com.epam.esm.gym.security.service;
 
 import com.epam.esm.gym.dao.UserDao;
 import com.epam.esm.gym.domain.User;

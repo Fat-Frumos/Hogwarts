@@ -31,7 +31,7 @@ public class ProfileRequest {
 
     @NotNull(message = "Password is required")
     @Size(min = 6, max = 50, message = "Password must be between 6 and 50 characters")
-    private String password;
+    private String oldPassword;
 
     @NotNull(message = "New password is required")
     @Size(min = 6, max = 50, message = "New password must be between 6 and 50 characters")
@@ -47,12 +47,12 @@ public class ProfileRequest {
         }
         ProfileRequest that = (ProfileRequest) obj;
         return Objects.equals(username, that.username)
-                && Objects.equals(password, that.password)
+                && Objects.equals(oldPassword, that.oldPassword)
                 && Objects.equals(newPassword, that.newPassword);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, password, newPassword);
+        return Objects.hash(username, oldPassword, newPassword);
     }
 }

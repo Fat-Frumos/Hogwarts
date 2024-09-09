@@ -2,6 +2,7 @@ package com.epam.esm.gym;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * The entry point of the Gym application.
@@ -9,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * <p>This class contains the main method which is used to launch the Spring Boot application.</p>
  */
 @SpringBootApplication
+@EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)
 public class GymApplication {
 
     /**

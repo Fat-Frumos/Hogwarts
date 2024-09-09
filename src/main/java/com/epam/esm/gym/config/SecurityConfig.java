@@ -79,6 +79,7 @@ public class SecurityConfig {
                                 "/api/trainers/register",
                                 "/api/trainees/register",
                                 "/api/login",
+                                "/api/login/change",
                                 "/api/auth/login",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",

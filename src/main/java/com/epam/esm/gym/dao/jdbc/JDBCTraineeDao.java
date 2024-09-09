@@ -62,9 +62,9 @@ public class JDBCTraineeDao extends AbstractDao<Trainee> implements TraineeDao {
     @Override
     public Optional<Trainee> findByUsername(String username) {
         String hql = """
-                SELECT t.id, t.dateOfBirth, t.address, t.id
+                SELECT t
                 FROM Trainee t
-                JOIN User u ON u.id = t.id
+                JOIN User u ON u.id = t.user.id
                 WHERE u.username = :username
                 """;
         return getSession().createQuery(hql, Trainee.class)

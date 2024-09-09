@@ -1,18 +1,20 @@
 package com.epam.esm.gym.security.filter;
 
 import com.epam.esm.gym.dto.auth.UserPrincipal;
-import com.epam.esm.gym.security.JwtProvider;
-import com.epam.esm.gym.security.SecurityUserDetailsService;
+import com.epam.esm.gym.exception.InvalidJwtAuthenticationException;
+import com.epam.esm.gym.exception.UnauthorizedAccessException;
+import com.epam.esm.gym.security.service.JwtProvider;
+import com.epam.esm.gym.security.service.SecurityUserDetailsService;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -24,7 +26,6 @@ import java.io.IOException;
  * Filter that processes JWT authentication by extracting and validating the JWT token
  * from the request header and setting the authentication in the security context.
  */
-@Slf4j
 @Component
 @AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -58,13 +59,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 username = jwtProvider.extractUserName(token);
             }
         } catch (SignatureException exception) {
-            log.error("{}", exception.getMessage());
+            throw new InvalidJwtAuthenticationException(exception.getMessage());
         }
 
-        log.info("Extracted UserName {} from token {}", username, token);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserPrincipal userDetails = context.getBean(SecurityUserDetailsService.class).loadUserByUsername(username);
-            log.info("Extracted {}", userDetails);
             if (jwtProvider.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
@@ -72,6 +71,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        filterChain.doFilter(request, response);
+        try {
+            filterChain.doFilter(request, response);
+        } catch (AuthenticationException e) {
+            throw new UnauthorizedAccessException(e.getMessage());
+        }
     }
 }

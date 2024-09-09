@@ -1,6 +1,7 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.domain.Trainee;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
@@ -70,7 +71,7 @@ public interface TraineeService {
      * @param username the username of the trainee whose profile is to be retrieved
      * @return a {@link ResponseEntity} containing the {@link TraineeProfile} of the requested trainee
      */
-    ResponseEntity<TraineeProfile> getTraineeProfileByName(String username);
+    ResponseEntity<BaseResponse> getTraineeProfileByName(String username);
 
     /**
      * Updates an existing trainee profile with the new details provided.
@@ -85,7 +86,7 @@ public interface TraineeService {
      * @param request  the updated details of the trainee
      * @return a {@link ResponseEntity} containing the updated {@link TraineeProfile}
      */
-    ResponseEntity<TraineeProfile> updateTrainee(
+    ResponseEntity<BaseResponse> updateTrainee(
             String username, TraineeRequest request);
 
     /**
@@ -201,5 +202,5 @@ public interface TraineeService {
      *
      * @return a {@link ResponseEntity} containing the list of {@link TraineeProfile}
      */
-    ResponseEntity<List<TraineeProfile>> findAll();
+    ResponseEntity<List<BaseResponse>> findAll();
 }

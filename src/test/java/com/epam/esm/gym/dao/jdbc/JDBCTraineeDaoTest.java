@@ -70,9 +70,9 @@ class JDBCTraineeDaoTest {
     @ArgumentsSource(TraineeTrainerArgumentsProvider.class)
     void testFindByUsername(Trainee trainee) {
         String hql = """
-                SELECT t.id, t.dateOfBirth, t.address, t.id
+                SELECT t
                 FROM Trainee t
-                JOIN User u ON u.id = t.id
+                JOIN User u ON u.id = t.user.id
                 WHERE u.username = :username
                 """;
         Optional<Trainee> expectedTrainee = Optional.of(trainee);

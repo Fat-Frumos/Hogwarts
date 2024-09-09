@@ -6,7 +6,7 @@ import com.epam.esm.gym.domain.Token;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.UserPrincipal;
 import com.epam.esm.gym.dto.auth.RegisterRequest;
-import com.epam.esm.gym.security.JwtProvider;
+import com.epam.esm.gym.security.service.JwtProvider;
 import com.epam.esm.gym.service.profile.AuthenticationUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

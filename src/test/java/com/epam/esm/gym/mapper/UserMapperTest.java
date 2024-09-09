@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserMapperTest {
 
@@ -56,7 +56,7 @@ class UserMapperTest {
         assertEquals(lastName, user.getLastName());
         assertEquals(username, user.getUsername());
         assertEquals(role, user.getPermission());
-        assertTrue(user.getActive());
+        assertFalse(user.getActive());
     }
 
     @Test
@@ -67,6 +67,6 @@ class UserMapperTest {
         assertNull(user.getLastName());
         assertNull(user.getUsername());
         assertNull(user.getPermission());
-        assertTrue(user.getActive());
+        assertFalse(user.getActive());
     }
 }

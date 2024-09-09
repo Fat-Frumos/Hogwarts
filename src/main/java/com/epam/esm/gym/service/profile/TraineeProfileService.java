@@ -5,10 +5,11 @@ import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.profile.UserProfile;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
 import com.epam.esm.gym.dto.trainee.TraineeRequest;
 import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingProfile;
@@ -19,7 +20,6 @@ import com.epam.esm.gym.service.TraineeService;
 import com.epam.esm.gym.service.TrainerService;
 import com.epam.esm.gym.service.UserService;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -39,13 +39,12 @@ import java.util.stream.Collectors;
  * Additionally, it manages password changes and deletion of trainee profiles.
  * </p>
  */
-@Slf4j
 @Service
 @AllArgsConstructor
 public class TraineeProfileService implements TraineeService {
 
-    private final TraineeDao dao;
     private final TraineeMapper mapper;
+    private final TraineeDao traineeDao;
     private final UserService userService;
     private final TrainerService trainerService;
 
@@ -54,12 +53,11 @@ public class TraineeProfileService implements TraineeService {
      * Finds and retrieves all trainee profiles in the system.
      */
     @Override
-    public ResponseEntity<List<TraineeProfile>> findAll() {
-        List<TraineeProfile> trainees = dao.findAll()
+    public ResponseEntity<List<BaseResponse>> findAll() {
+        return ResponseEntity.ok(traineeDao.findAll()
                 .stream()
                 .map(mapper::toTraineeProfile)
-                .toList();
-        return ResponseEntity.ok(trainees);
+                .toList());
     }
 
     /**
@@ -72,10 +70,9 @@ public class TraineeProfileService implements TraineeService {
         String password = userService.encodePassword(rawPassword);
         User user = userService.createTraineeUser(dto, password);
         User savedUser = userService.saveUser(user);
-        log.info("Created User: {}", savedUser);
         Trainee trainee = mapper.toTrainee(savedUser, dto);
-        ProfileResponse response = mapper.toProfile(dao.save(trainee).getUser().getUsername(), rawPassword);
-        log.info("Saved Trainee: {}", response);
+        Trainee savedTrainee = traineeDao.save(trainee);
+        ProfileResponse response = mapper.toProfile(savedTrainee.getUser().getUsername(), rawPassword);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -85,9 +82,9 @@ public class TraineeProfileService implements TraineeService {
      */
     @Override
     public ResponseEntity<Void> deleteTrainee(String username) {
-        Optional<Trainee> traineeOptional = dao.findByUsername(username);
+        Optional<Trainee> traineeOptional = traineeDao.findByUsername(username);
         if (traineeOptional.isPresent()) {
-            dao.delete(traineeOptional.get());
+            traineeDao.delete(traineeOptional.get());
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -99,10 +96,11 @@ public class TraineeProfileService implements TraineeService {
      * Retrieves a trainee profile by the given username, returning a detailed profile if found.
      */
     @Override
-    public ResponseEntity<TraineeProfile> getTraineeProfileByName(String username) {
-        return dao.findByUsername(username)
+    public ResponseEntity<BaseResponse> getTraineeProfileByName(String username) {
+        return traineeDao.findByUsername(username)
                 .map(trainee -> ResponseEntity.ok(mapper.toTraineeProfile(trainee)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new MessageResponse(String.format("User by name: %s not found", username))));
     }
 
     /**
@@ -110,11 +108,11 @@ public class TraineeProfileService implements TraineeService {
      * Updates an existing trainee profile with the provided request data.
      */
     @Override
-    public ResponseEntity<TraineeProfile> updateTrainee(
+    public ResponseEntity<BaseResponse> updateTrainee(
             String username, TraineeRequest request) {
-        return dao.findByUsername(username)
+        return traineeDao.findByUsername(username)
                 .map(trainee -> ResponseEntity.ok(mapper.toTraineeProfile(
-                        dao.update(mapper.update(request, trainee)))))
+                        traineeDao.update(mapper.update(request, trainee)))))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
@@ -125,7 +123,7 @@ public class TraineeProfileService implements TraineeService {
     @Override
     public boolean validateUser(ProfileRequest request) {
         UserProfile user = userService.getUserByUsername(request.getUsername());
-        return request.getPassword().equals(user.getPassword()) || user.getActive();
+        return request.getOldPassword().equals(user.getPassword()) || user.getActive();
     }
 
     /**
@@ -150,7 +148,7 @@ public class TraineeProfileService implements TraineeService {
                 .collect(Collectors.toList());
         Trainee trainee = getTrainee(username);
         trainee.setTrainers(mapper.toTrainers(trainerProfiles));
-        dao.save(trainee);
+        traineeDao.save(trainee);
         return ResponseEntity.ok(trainerProfiles);
     }
 
@@ -161,7 +159,7 @@ public class TraineeProfileService implements TraineeService {
     @Override
     public ResponseEntity<List<TrainingResponse>> getTraineeTrainingsByName(
             String username, Map<String, String> params) {
-        return dao.findByUsername(username)
+        return traineeDao.findByUsername(username)
                 .map(trainee -> ResponseEntity.ok(trainee.getTrainings()
                         .stream()
                         .filter(training -> matches(training, getProfile(params)))
@@ -177,7 +175,7 @@ public class TraineeProfileService implements TraineeService {
     public ResponseEntity<Void> activateDeactivateProfile(String username, Boolean active) {
         Trainee trainee = getTrainee(username);
         trainee.getUser().setActive(active);
-        dao.save(trainee);
+        traineeDao.save(trainee);
         return ResponseEntity.ok().build();
     }
 
@@ -187,7 +185,7 @@ public class TraineeProfileService implements TraineeService {
      */
     @Override
     public ResponseEntity<List<SlimTrainerProfile>> getNotAssignedTrainers(String username) {
-        List<Trainer> trainers = dao.findNotAssignedTrainers(username);
+        List<Trainer> trainers = traineeDao.findNotAssignedTrainers(username);
         return ResponseEntity.ok(trainers.stream()
                 .map(mapper::toTrainerProfile)
                 .toList());
@@ -201,7 +199,7 @@ public class TraineeProfileService implements TraineeService {
      */
     @Override
     public Trainee getTrainee(String username) {
-        return dao.findByUsername(username).orElseThrow(
+        return traineeDao.findByUsername(username).orElseThrow(
                 () -> new UserNotFoundException("Trainee not found: " + username));
     }
 

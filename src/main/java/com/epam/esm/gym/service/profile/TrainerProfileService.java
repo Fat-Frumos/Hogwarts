@@ -15,9 +15,9 @@ import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.exception.UserNotFoundException;
 import com.epam.esm.gym.mapper.TrainerMapper;
 import com.epam.esm.gym.service.TrainerService;
+import com.epam.esm.gym.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -35,15 +35,14 @@ import java.util.List;
  * and to map between entities and DTOs (Data Transfer Objects).
  * </p>
  */
-@Slf4j
 @Service
 @Transactional
 @AllArgsConstructor
 public class TrainerProfileService implements TrainerService {
 
-    private final UserProfileService userService;
     private final TrainerMapper mapper;
-    private final TrainerDao dao;
+    private final TrainerDao trainerDao;
+    private final UserService userService;
     private final TrainingTypeRepository trainingTypeDao;
 
     /**
@@ -55,17 +54,16 @@ public class TrainerProfileService implements TrainerService {
         String rawPassword = userService.generateRandomPassword();
         String password = userService.encodePassword(rawPassword);
         User user = userService.createTrainerUser(dto, password);
-        log.info("Saved {}", user);
-        user = userService.saveUser(user);
+        User savedUser = userService.saveUser(user);
         Specialization specialization = Specialization.fromString(dto.getSpecialization());
         TrainingType trainingType = trainingTypeDao
                 .findBySpecialization(specialization)
                 .orElseGet(() -> trainingTypeDao.save(TrainingType.builder()
                         .specialization(specialization)
                         .build()));
-        Trainer trainer = mapper.toTrainer(user, trainingType);
-        log.info("Saved {}", trainer);
-        ProfileResponse response = mapper.toProfileDto(trainer.getUsername(), rawPassword);
+        Trainer trainer = mapper.toTrainer(savedUser, trainingType);
+        Trainer savedTrainer = trainerDao.save(trainer);
+        ProfileResponse response = mapper.toProfileDto(savedTrainer.getUsername(), rawPassword);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -85,7 +83,7 @@ public class TrainerProfileService implements TrainerService {
      */
     @Override
     public void deleteTrainer(String username) {
-        dao.delete(getTrainer(username));
+        trainerDao.delete(getTrainer(username));
     }
 
     /**
@@ -105,7 +103,7 @@ public class TrainerProfileService implements TrainerService {
     public ResponseEntity<TrainerProfile> updateTrainer(
             String username, TrainerUpdateRequest request) {
         Trainer trainer = mapper.toEntity(request);
-        TrainerProfile profile = mapper.toDto(dao.save(trainer));
+        TrainerProfile profile = mapper.toDto(trainerDao.save(trainer));
         return ResponseEntity.ok(profile);
     }
 
@@ -115,7 +113,7 @@ public class TrainerProfileService implements TrainerService {
      */
     @Override
     public ResponseEntity<List<TrainerProfile>> getNotAssigned(String username) {
-        List<Trainer> notAssigned = dao.findNotAssigned(username);
+        List<Trainer> notAssigned = trainerDao.findNotAssigned(username);
         return ResponseEntity.ok(mapper.toTrainerProfiles(notAssigned));
     }
 
@@ -125,7 +123,7 @@ public class TrainerProfileService implements TrainerService {
      */
     @Override
     public ResponseEntity<Void> activateDeactivateProfile(String username, Boolean active) {
-        dao.activateTrainer(username, active);
+        trainerDao.activateTrainer(username, active);
         return ResponseEntity.ok().build();
     }
 
@@ -139,7 +137,7 @@ public class TrainerProfileService implements TrainerService {
      */
     @Override
     public Trainer getTrainer(String username) {
-        return dao.findByUsername(username)
+        return trainerDao.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
     }
 
@@ -149,7 +147,7 @@ public class TrainerProfileService implements TrainerService {
      */
     @Override
     public ResponseEntity<List<TrainerProfile>> findAll() {
-        return ResponseEntity.ok(mapper.toTrainerProfiles(dao.findAll()));
+        return ResponseEntity.ok(mapper.toTrainerProfiles(trainerDao.findAll()));
     }
 
     /**
@@ -161,6 +159,6 @@ public class TrainerProfileService implements TrainerService {
     @Override
     public void assignTraineeToTrainer(String traineeUsername) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        dao.assignTraineeToTrainer(authentication.getName(), traineeUsername);
+        trainerDao.assignTraineeToTrainer(authentication.getName(), traineeUsername);
     }
 }

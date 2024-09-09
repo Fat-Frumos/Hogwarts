@@ -172,7 +172,7 @@ public class UserProfileService implements UserService {
         }
 
         User user = userOptional.get();
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             return getResponseEntity(HttpStatus.PAYMENT_REQUIRED);
         }
 
@@ -197,11 +197,18 @@ public class UserProfileService implements UserService {
     @Override
     public ResponseEntity<BaseResponse> authenticate(String username, String password) {
         Optional<User> userOptional = dao.findByUsername(username);
-        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        HttpStatus status;
         if (userOptional.isEmpty()) {
             status = HttpStatus.NOT_FOUND;
-        } else if (validateUser(userOptional.get(), username, password)) {
-            status = HttpStatus.OK;
+        } else {
+            User user = userOptional.get();
+            if (validateUser(user, username, password)) {
+                user.setActive(true);
+                dao.save(user);
+                status = HttpStatus.OK;
+            } else {
+                status = HttpStatus.UNAUTHORIZED;
+            }
         }
         return getResponseEntity(status);
     }

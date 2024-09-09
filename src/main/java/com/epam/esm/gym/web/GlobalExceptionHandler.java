@@ -7,9 +7,9 @@ import com.epam.esm.gym.exception.UserNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 /**
@@ -37,7 +36,6 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
  * @version 1.0.0
  * @since 1.0
  */
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     private static final String INTERNAL_MESSAGE = "An unexpected error occurred";
@@ -92,7 +90,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<MessageResponse> handleMethodNotSupported(
             HttpRequestMethodNotSupportedException ex) {
         String message = String.format(NOT_SUPPORTED_MESSAGE, ex.getMethod());
-        return ResponseEntity.status(METHOD_NOT_ALLOWED).body(new MessageResponse(message));
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(new MessageResponse(message));
     }
 
     /**
@@ -129,7 +128,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     @ExceptionHandler({RuntimeException.class, Exception.class})
     public ResponseEntity<MessageResponse> handleRuntimeException(Exception ex) {
-        log.error(ex.getMessage());
         return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new MessageResponse(INTERNAL_MESSAGE));
     }
 
@@ -145,8 +143,8 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(NOT_FOUND)
     @ExceptionHandler({EntityNotFoundException.class, UserNotFoundException.class})
-    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException ex) {
-        return ResponseEntity.status(NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<MessageResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return ResponseEntity.status(NOT_FOUND).body(new MessageResponse(ex.getMessage()));
     }
 
     /**
@@ -184,10 +182,12 @@ public class GlobalExceptionHandler {
      * @return a {@link ResponseEntity} containing a {@link MessageResponse} with an error message and
      * HTTP status {@link HttpStatus#UNAUTHORIZED}.
      */
-    @ExceptionHandler({InvalidJwtAuthenticationException.class, TokenNotFoundException.class})
-    public ResponseEntity<MessageResponse> handleSignatureException(SignatureException ex) {
-        log.error("JWT Signature error: {}", ex.getMessage());
-        MessageResponse response = new MessageResponse("Invalid JWT signature");
+    @ExceptionHandler({
+            InvalidJwtAuthenticationException.class,
+            TokenNotFoundException.class,
+            AuthenticationException.class})
+    public ResponseEntity<MessageResponse> handleSignatureException(RuntimeException ex) {
+        MessageResponse response = new MessageResponse(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 }

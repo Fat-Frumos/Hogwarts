@@ -1,5 +1,6 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.TraineeProfile;
@@ -104,7 +105,7 @@ class TraineeControllerTest extends ControllerTest {
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
     void testGetTraineeProfile(
-            String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
+            String username, ResponseEntity<BaseResponse> expectedResponse) throws Exception {
         when(service.getTraineeProfileByName(username)).thenReturn(expectedResponse);
 
         String result = mockMvc.perform(get("/api/trainees/{username}", username)
@@ -124,7 +125,7 @@ class TraineeControllerTest extends ControllerTest {
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(NotFoundTraineeProfileArgumentsProvider.class)
     void testGetNotFoundTraineeProfile(
-            String username, ResponseEntity<TraineeProfile> expectedResponse) throws Exception {
+            String username, ResponseEntity<BaseResponse> expectedResponse) throws Exception {
         when(service.getTraineeProfileByName(username)).thenReturn(expectedResponse);
         mockMvc.perform(get("/api/trainees/{username}", username))
                 .andExpect(status().isNotFound());
@@ -215,7 +216,7 @@ class TraineeControllerTest extends ControllerTest {
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
     void testUpdateTraineeProfile(
-            String username, ResponseEntity<TraineeProfile> response, TraineeRequest request) throws Exception {
+            String username, ResponseEntity<BaseResponse> response, TraineeRequest request) throws Exception {
         when(service.updateTrainee(username, request)).thenReturn(response);
 
         ResultActions resultActions = mockMvc.perform(put("/api/trainees/{username}", username)

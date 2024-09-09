@@ -1,5 +1,6 @@
 package com.epam.esm.gym.dto.trainee;
 
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -26,7 +27,7 @@ import java.time.LocalDate;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SlimTraineeProfile {
+public class SlimTraineeProfile implements BaseResponse {
     protected String firstName;
     protected String lastName;
     protected String username;

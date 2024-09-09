@@ -39,7 +39,794 @@
 					"response": []
 				},
 				{
-					"name": "AuthLogin",
+					"name": "Authenticate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/api/auth/token/authenticate",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"token",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Tokens",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <refresh_token>"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/auth/token/refresh",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"token",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <access_token>"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/auth/logout",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login 405",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 405\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(405);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response content type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is within an acceptable range\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.message).to.exist;\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Message is a non-empty string\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Verify that the response schema matches the expected schema\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.message).to.exist.and.to.be.a('string');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response status code is not 200\", function () {\r",
+									"  pm.expect(pm.response.code).to.not.equal(200);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"Ron\", \"password\": \"Weasley\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields - message and statusCode\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.message).to.exist;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Message is a non-empty string\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Message should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Message is 'Authentication successful'\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.message).to.eql(\"Authentication successful\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const password = pm.globals.get(\"password\");\r",
+									"\r",
+									"console.log(\"Username from globals:\", username);\r",
+									"console.log(\"Password from globals:\", password);\r",
+									"if (!username || !password) {\r",
+									"    throw new Error(\"Environment variables 'username' and 'password' must be set.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.url = pm.request.url.toString().replace(\"{{username}}\", username).replace(\"{{password}}\", password);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/login?username={{username}}&password={{password}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "{{username}}"
+								},
+								{
+									"key": "password",
+									"value": "{{password}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User API",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"luna.lovegood@hogwarts.edu\", \"firstName\": \"Luna\", \"lastName\": \"Lovegood\", \"password\": \"password123\", \"isActive\": true}"
+						},
+						"url": {
+							"raw": "{{url}}/api/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Username",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/users/luna.lovegood@hogwarts.edu",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"luna.lovegood@hogwarts.edu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"firstName\": \"Luna\", \"lastName\": \"Lovegood\"}"
+						},
+						"url": {
+							"raw": "{{url}}/api/users/luna.lovegood",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"luna.lovegood"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/users/luna.lovegood",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"luna.lovegood"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Users",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"username\": \"Ron\", \"password\": \"Weasley\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Trainee API",
+			"item": [
+				{
+					"name": "manual",
+					"item": [
+						{
+							"name": "Register Trainee OK",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const schema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        username: { type: \"string\" },\r",
+											"        password: { type: \"string\" }\r",
+											"    },\r",
+											"    required: [\"username\", \"password\"]\r",
+											"};\r",
+											"\r",
+											"pm.test(\"Response schema is valid\", function () {\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response status code is 201\", function () {\r",
+											"  pm.expect(pm.response.code).to.equal(201);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response has the required fields - username and password\", function () {\r",
+											"    const responseData = pm.response.json();    \r",
+											"    pm.expect(responseData).to.be.an('object');\r",
+											"    pm.expect(responseData).to.have.property('username');\r",
+											"    pm.expect(responseData).to.have.property('password');\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Username and password are non-empty strings\", function () {\r",
+											"    const responseData = pm.response.json();\r",
+											"\r",
+											"    pm.expect(responseData).to.be.an('object');\r",
+											"    pm.expect(responseData.username).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Username should not be empty\");\r",
+											"    pm.expect(responseData.password).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Password should not be empty\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Content-Type header is application/json\", function () {\r",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Save response to environment variables\", function () {\r",
+											"    const response = pm.response.json();\r",
+											"    if (response.username && response.password) {\r",
+											"        pm.globals.set(\"username\", response.username);\r",
+											"        pm.globals.set(\"password\", response.password);\r",
+											"    } else {\r",
+											"        throw new Error(\"Response does not contain 'username' and 'password'.\");\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"firstName\": \"Ron\", \"lastName\": \"Weasley\"}"
+								},
+								"url": {
+									"raw": "{{url}}/api/trainees/register",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"trainees",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Trainee Profile OK",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/trainees/{{username}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"trainees",
+										"{{username}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Add new Trainee OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"        username: { type: \"string\" },\r",
+									"        password: { type: \"string\" }\r",
+									"    },\r",
+									"    required: [\"username\", \"password\"]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Response schema is valid\", function () {\r",
+									"    pm.response.to.have.jsonSchema(schema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 201\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(201);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields - username and password\", function () {\r",
+									"    const responseData = pm.response.json();    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('username');\r",
+									"    pm.expect(responseData).to.have.property('password');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Username and password are non-empty strings\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.username).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Username should not be empty\");\r",
+									"    pm.expect(responseData.password).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Password should not be empty\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Save response to environment variables\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    if (response.username && response.password) {\r",
+									"        pm.globals.set(\"username\", response.username);\r",
+									"        pm.globals.set(\"password\", response.password);\r",
+									"    } else {\r",
+									"        throw new Error(\"Response does not contain 'username' and 'password'.\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"firstName\", \"Harry\");\r",
+									"pm.environment.set(\"lastName\", \"Potter\");\r",
+									"pm.environment.set(\"dateOfBirth\", \"1990-01-01\");\r",
+									"pm.environment.set(\"address\", \"4 Privet Drive, Little Whinging, Surrey\");\r",
+									"\r",
+									"const firstName = pm.variables.get(\"firstName\");\r",
+									"const lastName = pm.variables.get(\"lastName\");\r",
+									"const dateOfBirth = pm.variables.get(\"dateOfBirth\");\r",
+									"const address = pm.variables.get(\"address\");\r",
+									"\r",
+									"pm.request.body.raw = JSON.stringify({\r",
+									"    firstName: firstName,\r",
+									"    lastName: lastName,\r",
+									"    dateOfBirth: dateOfBirth,\r",
+									"    address: address\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/api/trainees/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainees",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields - message and statusCode\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.message).to.exist;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Message is a non-empty string\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Message should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Message is 'Authentication successful'\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.message).to.eql(\"Authentication successful\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const password = pm.globals.get(\"password\");\r",
+									"\r",
+									"console.log(\"Username from globals:\", username);\r",
+									"console.log(\"Password from globals:\", password);\r",
+									"if (!username || !password) {\r",
+									"    throw new Error(\"Environment variables 'username' and 'password' must be set.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.url = pm.request.url.toString().replace(\"{{username}}\", username).replace(\"{{password}}\", password);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/login?username={{username}}&password={{password}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "{{username}}"
+								},
+								{
+									"key": "password",
+									"value": "{{password}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AuthJWTLogin Trainee",
 					"event": [
 						{
 							"listen": "test",
@@ -135,183 +922,7 @@
 					"response": []
 				},
 				{
-					"name": "Authenticate",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{url}}/api/auth/token/authenticate",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"token",
-								"authenticate"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Refresh Tokens",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer <refresh_token>"
-							}
-						],
-						"url": {
-							"raw": "{{url}}/api/auth/token/refresh",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"token",
-								"refresh"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer <access_token>"
-							}
-						],
-						"url": {
-							"raw": "{{url}}/api/auth/logout",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "User API",
-			"item": [
-				{
-					"name": "Create User",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"username\": \"luna.lovegood@hogwarts.edu\", \"firstName\": \"Luna\", \"lastName\": \"Lovegood\", \"password\": \"password123\", \"isActive\": true}"
-						},
-						"url": {
-							"raw": "{{url}}/api/users",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get User By Username",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/api/users/luna.lovegood@hogwarts.edu",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"luna.lovegood@hogwarts.edu"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update User",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"firstName\": \"Luna\", \"lastName\": \"Lovegood\"}"
-						},
-						"url": {
-							"raw": "{{url}}/api/users/luna.lovegood@hogwarts.edu",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"luna.lovegood@hogwarts.edu"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete User",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/api/users/luna.lovegood",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"luna.lovegood"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List All Users",
+					"name": "Get Trainee Profile Dynamic",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -335,374 +946,6 @@
 								"type": "text/javascript",
 								"packages": {}
 							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/api/users",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "login",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"username\": \"Ron\", \"password\": \"Weasley\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/api/login",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "register",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"username\": \"Ron\", \"password\": \"Weasley\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/register",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"register"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Trainee API",
-			"item": [
-				{
-					"name": "Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response status code is 200\", function () {\r",
-									"  pm.expect(pm.response.code).to.equal(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Content-Type header is application/json\", function () {\r",
-									"  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response has the required fields - message and statusCode\", function () {\r",
-									"    const responseData = pm.response.json();\r",
-									"\r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData.message).to.exist;\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Message is a non-empty string\", function () {\r",
-									"    const responseData = pm.response.json();\r",
-									"    pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Message should not be empty\");\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Message is 'Authentication successful'\", function () {\r",
-									"    const responseData = pm.response.json();\r",
-									"    pm.expect(responseData.message).to.eql(\"Authentication successful\");\r",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const username = pm.globals.get(\"username\");\r",
-									"const password = pm.globals.get(\"password\");\r",
-									"\r",
-									"console.log(\"Username from globals:\", username);\r",
-									"console.log(\"Password from globals:\", password);\r",
-									"if (!username || !password) {\r",
-									"    throw new Error(\"Environment variables 'username' and 'password' must be set.\");\r",
-									"}\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/api/login?username={{username}}&password={{password}}",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"login"
-							],
-							"query": [
-								{
-									"key": "username",
-									"value": "{{username}}"
-								},
-								{
-									"key": "password",
-									"value": "{{password}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "BadRequestLogin",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Missing password returns 400 Bad Request\", function () {\r",
-									"    pm.response.to.have.status(400);\r",
-									"    const responseData = pm.response.json();\r",
-									"    pm.expect(responseData.message).to.exist;\r",
-									"    pm.expect(responseData.message).to.include(\"Required request parameter 'password' is not present\");\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const username = pm.globals.get(\"username\");\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"password\": \"Password123\",\"username\": \"Harry.Potter\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/api/login?username={{username}}",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"login"
-							],
-							"query": [
-								{
-									"key": "username",
-									"value": "{{username}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Register Trainee",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const schema = {\r",
-									"    type: \"object\",\r",
-									"    properties: {\r",
-									"        username: { type: \"string\" },\r",
-									"        password: { type: \"string\" }\r",
-									"    },\r",
-									"    required: [\"username\", \"password\"]\r",
-									"};\r",
-									"\r",
-									"pm.test(\"Response schema is valid\", function () {\r",
-									"    pm.response.to.have.jsonSchema(schema);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response status code is 201\", function () {\r",
-									"  pm.expect(pm.response.code).to.equal(201);\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response has the required fields - username and password\", function () {\r",
-									"    const responseData = pm.response.json();    \r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData).to.have.property('username');\r",
-									"    pm.expect(responseData).to.have.property('password');\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Username and password are non-empty strings\", function () {\r",
-									"    const responseData = pm.response.json();\r",
-									"\r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData.username).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Username should not be empty\");\r",
-									"    pm.expect(responseData.password).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Password should not be empty\");\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Content-Type header is application/json\", function () {\r",
-									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Save response to environment variables\", function () {\r",
-									"    const response = pm.response.json();\r",
-									"    if (response.username && response.password) {\r",
-									"        pm.globals.set(\"username\", response.username);\r",
-									"        pm.globals.set(\"password\", response.password);\r",
-									"    } else {\r",
-									"        throw new Error(\"Response does not contain 'username' and 'password'.\");\r",
-									"    }\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"firstName\": \"Ron\", \"lastName\": \"Weasley\"}"
-						},
-						"url": {
-							"raw": "{{url}}/api/trainees/register",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"trainees",
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Trainee Profile Dynamic",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const username = pm.globals.get(\"username\");\r",
-									"// const accessToken = pm.globals.get(\"access_token\");\r",
-									"// const refreshToken = pm.globals.get(\"refresh_token\");\r",
-									"// const expiresAt = pm.globals.get(\"expires_at\");\r",
-									"// console.log(accessToken)\r",
-									"// const currentDate = new Date();\r",
-									"// const expirationDate = new Date(expiresAt);\r",
-									"\r",
-									"// if (currentDate >= expirationDate) {\r",
-									"//     console.log(\"Token has expired. Please refresh the token.\");\r",
-									"// }\r",
-									"\r",
-									"// pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
 						},
 						{
 							"listen": "test",
@@ -712,59 +955,54 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Response has the required fields\", function () {\r",
-									"    const responseData = pm.response.json();\r",
-									"    pm.expect(responseData).to.have.property(\"username\");\r",
-									"    pm.expect(responseData).to.have.property(\"profileData\");\r",
-									"});\r",
-									"\r",
 									"pm.test(\"Profile data is correct\", function () {\r",
 									"    const responseData = pm.response.json();\r",
 									"    const expectedUsername = pm.variables.get(\"username\");\r",
 									"    pm.expect(responseData.username).to.eql(expectedUsername);\r",
 									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/api/trainers/{{username}}",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"trainers",
-								"{{username}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Trainee Profile Static",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
+									"\r",
+									"pm.test(\"Response contains required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.have.property(\"firstName\");\r",
+									"    pm.expect(response).to.have.property(\"lastName\");\r",
+									"    pm.expect(response).to.have.property(\"username\");\r",
+									"    pm.expect(response).to.have.property(\"dateOfBirth\");\r",
+									"    pm.expect(response).to.have.property(\"address\");\r",
+									"    pm.expect(response).to.have.property(\"active\");\r",
+									"    pm.expect(response).to.have.property(\"trainers\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response schema validation\", function () {\r",
+									"    pm.response.to.have.jsonSchema({\r",
+									"        type: \"object\",\r",
+									"        properties: {\r",
+									"            username: { type: \"string\" },\r",
+									"            firstName: { type: \"string\" },\r",
+									"            lastName: { type: \"string\" },\r",
+									"            address: { type: \"string\" },\r",
+									"            active: { type: \"boolean\" }\r",
+									"        },\r",
+									"        required: [\"username\", \"firstName\", \"lastName\", \"dateOfBirth\", \"address\", \"active\"]\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the trainers array has a valid structure\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    responseData.trainers.forEach((trainer) => {\r",
+									"        pm.expect(trainer).to.have.property(\"id\");\r",
+									"        pm.expect(trainer).to.have.property(\"name\");\r",
+									"        pm.expect(trainer).to.have.property(\"specialty\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response data length is greater than zero\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(Object.keys(responseData).length).to.be.greaterThan(0, \"Response data should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is within an acceptable range\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.lessThan(1500);\r",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -972,7 +1210,108 @@
 			"name": "Trainer API",
 			"item": [
 				{
-					"name": "Register Trainer",
+					"name": "Add new Trainer OK",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let userProfile = {\r",
+									"  \"firstName\": \"Severus\",\r",
+									"  \"lastName\": \"Snape\",\r",
+									"  \"specialization\": \"POISON\"\r",
+									"};\r",
+									"\r",
+									"pm.request.body.raw = JSON.stringify(userProfile);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response has required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.have.property(\"username\");\r",
+									"    pm.expect(response).to.have.property(\"password\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response schema validation\", function () {\r",
+									"    pm.response.to.have.jsonSchema({\r",
+									"        type: \"object\",\r",
+									"        properties: {\r",
+									"            username: { type: \"string\" },\r",
+									"            password: { type: \"string\" }\r",
+									"        },\r",
+									"        required: [\"username\", \"password\"]\r",
+									"    });\r",
+									"});\r",
+									"pm.test(\"Response has content type application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"pm.test(\"Response schema validation\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.have.property(\"username\").that.is.a('string');\r",
+									"    pm.expect(response).to.have.property(\"password\").that.is.a('string');\r",
+									"});\r",
+									"\r",
+									"const schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"        username: { type: \"string\" },\r",
+									"        password: { type: \"string\" }\r",
+									"    },\r",
+									"    required: [\"username\", \"password\"]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Response schema is valid\", function () {\r",
+									"    pm.response.to.have.jsonSchema(schema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 201\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(201);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields - username and password\", function () {\r",
+									"    const responseData = pm.response.json();    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('username');\r",
+									"    pm.expect(responseData).to.have.property('password');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Username and password are non-empty strings\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.username).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Username should not be empty\");\r",
+									"    pm.expect(responseData.password).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Password should not be empty\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Save response to environment variables\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    if (response.username && response.password) {\r",
+									"        pm.globals.set(\"username\", response.username);\r",
+									"        pm.globals.set(\"password\", response.password);\r",
+									"    } else {\r",
+									"        throw new Error(\"Response does not contain 'username' and 'password'.\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -983,7 +1322,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"username\": \"severus.snape@hogwarts.edu\", \"firstName\": \"Severus\", \"lastName\": \"Snape\", \"password\": \"password123\", \"isActive\": true}"
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{url}}/api/trainers/register",
@@ -1000,19 +1339,201 @@
 					"response": []
 				},
 				{
+					"name": "AuthLogin Trainer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response schema and save tokens\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.have.jsonSchema({\r",
+									"        type: \"object\",\r",
+									"        properties: {\r",
+									"            username: { type: \"string\" },\r",
+									"            access_token: { type: \"string\" },\r",
+									"            refresh_token: { type: \"string\" },\r",
+									"            expires_at: { type: \"string\" }\r",
+									"        },\r",
+									"        required: [\"username\", \"access_token\", \"refresh_token\", \"expires_at\"]\r",
+									"    });\r",
+									"\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.globals.set(\"username\", responseData.username);\r",
+									"    pm.globals.set(\"access_token\", responseData.access_token);\r",
+									"    pm.globals.set(\"refresh_token\", responseData.refresh_token);\r",
+									"    pm.globals.set(\"expires_at\", responseData.expires_at);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Authorization header is set\", function () {\r",
+									"    const accessToken = pm.globals.get(\"access_token\");\r",
+									"    console.log(accessToken)\r",
+									"\r",
+									"    if (accessToken) {\r",
+									"        pm.request.headers.add({\r",
+									"            key: \"Authorization\",\r",
+									"            value: `Bearer ${accessToken}`\r",
+									"        });\r",
+									"    } else {\r",
+									"        throw new Error(\"Access token is not set.\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const password = pm.globals.get(\"password\");\r",
+									"console.log(username)\r",
+									"console.log(password)\r",
+									"if (!username || !password) {\r",
+									"    throw new Error(\"Global variables 'username' and 'password' must be set.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.body.raw = JSON.stringify({\r",
+									"    username: username,\r",
+									"    password: password\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/api/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Trainer Profile",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// let userProfile = {\r",
+									"//   \"firstName\": \"Severus\",\r",
+									"//   \"lastName\": \"Snape\",\r",
+									"//   \"specialization\": \"POISON\"\r",
+									"// };\r",
+									"// const username = pm.globals.set(\"username\", userProfile['firstName'] + \".\"+ userProfile);\r",
+									"\r",
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"\r",
+									"console.log(accessToken)\r",
+									"console.log(username)\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Profile data is correct\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    const expectedUsername = pm.variables.get(\"username\");\r",
+									"    pm.expect(responseData.username).to.eql(expectedUsername);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.have.property(\"firstName\");\r",
+									"    pm.expect(response).to.have.property(\"lastName\");\r",
+									"    pm.expect(response).to.have.property(\"username\");\r",
+									"    pm.expect(response).to.have.property(\"dateOfBirth\");\r",
+									"    pm.expect(response).to.have.property(\"address\");\r",
+									"    pm.expect(response).to.have.property(\"active\");\r",
+									"    pm.expect(response).to.have.property(\"trainers\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response schema validation\", function () {\r",
+									"    pm.response.to.have.jsonSchema({\r",
+									"        type: \"object\",\r",
+									"        properties: {\r",
+									"            username: { type: \"string\" },\r",
+									"            firstName: { type: \"string\" },\r",
+									"            lastName: { type: \"string\" },\r",
+									"            address: { type: \"string\" },\r",
+									"            active: { type: \"boolean\" }\r",
+									"        },\r",
+									"        required: [\"username\", \"firstName\", \"lastName\", \"dateOfBirth\", \"address\", \"active\"]\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the trainers array has a valid structure\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    responseData.trainers.forEach((trainer) => {\r",
+									"        pm.expect(trainer).to.have.property(\"id\");\r",
+									"        pm.expect(trainer).to.have.property(\"name\");\r",
+									"        pm.expect(trainer).to.have.property(\"specialty\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response data length is greater than zero\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(Object.keys(responseData).length).to.be.greaterThan(0, \"Response data should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is within an acceptable range\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.lessThan(1500);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/api/trainers/severus.snape",
+							"raw": "{{url}}/api/trainers/{{username}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
 								"trainers",
-								"severus.snape"
+								"{{username}}"
 							]
 						}
 					},
@@ -1224,6 +1745,98 @@
 							"path": [
 								"api",
 								"trainers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AuthLogin Trainer Static",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response schema and save tokens\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.have.jsonSchema({\r",
+									"        type: \"object\",\r",
+									"        properties: {\r",
+									"            username: { type: \"string\" },\r",
+									"            access_token: { type: \"string\" },\r",
+									"            refresh_token: { type: \"string\" },\r",
+									"            expires_at: { type: \"string\" }\r",
+									"        },\r",
+									"        required: [\"username\", \"access_token\", \"refresh_token\", \"expires_at\"]\r",
+									"    });\r",
+									"\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.globals.set(\"username\", responseData.username);\r",
+									"    pm.globals.set(\"access_token\", responseData.access_token);\r",
+									"    pm.globals.set(\"refresh_token\", responseData.refresh_token);\r",
+									"    pm.globals.set(\"expires_at\", responseData.expires_at);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Authorization header is set\", function () {\r",
+									"    const accessToken = pm.globals.get(\"access_token\");\r",
+									"    console.log(accessToken)\r",
+									"\r",
+									"    if (accessToken) {\r",
+									"        pm.request.headers.add({\r",
+									"            key: \"Authorization\",\r",
+									"            value: `Bearer ${accessToken}`\r",
+									"        });\r",
+									"    } else {\r",
+									"        throw new Error(\"Access token is not set.\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let userProfile = {\r",
+									"  \"firstName\": \"Severus\",\r",
+									"  \"lastName\": \"Snape\",\r",
+									"  \"specialization\": \"POISON\",\r",
+									"  \"password\": \"POISON\"\r",
+									"};\r",
+									"pm.globals.set(\"username\", userProfile['firstName'] + \".\"+ userProfile['lastName']);\r",
+									"pm.globals.set(\"password\", userProfile['password'])\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/api/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
 							]
 						}
 					},
@@ -1477,6 +2090,154 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "BadRequestLogin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Missing password returns 400 Bad Request\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.expect(responseData.message).to.exist;\r",
+							"    pm.expect(responseData.message).to.include(\"Required request parameter 'password' is not present\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const username = pm.globals.get(\"username\");\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"password\": \"Password123\",\"username\": \"Harry.Potter\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/login?username={{username}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"login"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "{{username}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change Login OK",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let updateLogin = {\r",
+							"  \"username\": \"Severus.Snape\",\r",
+							"  \"oldPassword\": \"POISONusername\",\r",
+							"  \"newPassword\": \"POISON\"\r",
+							"};\r",
+							"\r",
+							"for (let key in updateLogin) {\r",
+							"  if (updateLogin.hasOwnProperty(key)) {\r",
+							"    pm.environment.set(key, updateLogin[key]);\r",
+							"  }\r",
+							"}\r",
+							"\r",
+							"const username = pm.environment.get(\"username\");\r",
+							"const oldPassword = pm.environment.get(\"oldPassword\");\r",
+							"const newPassword = pm.environment.get(\"newPassword\");\r",
+							"\r",
+							"pm.request.body.raw = JSON.stringify({\r",
+							"    username: username,\r",
+							"    oldPassword: oldPassword,\r",
+							"    newPassword: newPassword\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response schema is valid\", function () {\r",
+							"  var schema = {\r",
+							"    type: \"object\",\r",
+							"    properties: {\r",
+							"      message: {\r",
+							"        type: \"string\"\r",
+							"      }\r",
+							"    },\r",
+							"    required: [\"message\"],\r",
+							"  };\r",
+							"\r",
+							"  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/api/login/change",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"login",
+						"change"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

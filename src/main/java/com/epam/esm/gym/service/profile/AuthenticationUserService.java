@@ -9,12 +9,12 @@ import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.auth.RegisterRequest;
 import com.epam.esm.gym.dto.auth.UserPrincipal;
-import com.epam.esm.gym.security.JwtProvider;
+import com.epam.esm.gym.exception.InvalidJwtAuthenticationException;
+import com.epam.esm.gym.security.service.JwtProvider;
 import com.epam.esm.gym.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -39,7 +39,6 @@ import static com.epam.esm.gym.domain.RoleType.ROLE_TRAINER;
  * Ensures transactional integrity and handles various aspects of user management
  * including login, logout, and token refresh.
  */
-@Slf4j
 @Service
 @AllArgsConstructor
 public class AuthenticationUserService implements AuthenticationService {
@@ -86,8 +85,6 @@ public class AuthenticationUserService implements AuthenticationService {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         if (authentication.isAuthenticated()) {
             String token = jwtProvider.generateToken(user);
-            log.info(user.toString());
-            log.info(token);
             return ResponseEntity.ok(AuthenticationResponse.builder().accessToken(token)
                     .username(request.getUsername())
                     .refreshToken(token)
@@ -164,7 +161,7 @@ public class AuthenticationUserService implements AuthenticationService {
         try {
             response.getWriter().write("Logout successful");
         } catch (IOException e) {
-            log.error(e.getMessage());
+            throw new InvalidJwtAuthenticationException(authHeader);
         }
     }
 
