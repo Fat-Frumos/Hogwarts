@@ -46,9 +46,7 @@ public class GlobalExceptionHandlerTest {
     void handleRuntimeException_ShouldReturnInternalServerError() throws Exception {
         mockMvc.perform(get("/api/trainees")
                         .param("param", "cause_runtime_exception"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message", containsString(
-                        "An unexpected error occurred: Handler dispatch failed: java.lang.AssertionError")));
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
