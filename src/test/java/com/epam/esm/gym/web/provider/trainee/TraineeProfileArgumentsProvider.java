@@ -1,11 +1,11 @@
 package com.epam.esm.gym.web.provider.trainee;
 
 import com.epam.esm.gym.domain.Specialization;
-import com.epam.esm.gym.domain.TrainingType;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
+import com.epam.esm.gym.dto.trainee.PutTraineeRequest;
+import com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
@@ -32,30 +32,31 @@ import java.util.stream.Stream;
 public class TraineeProfileArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
-        TrainingType herbology = TrainingType.builder()
+        TrainingTypeDto herbology = TrainingTypeDto.builder()
                 .specialization(Specialization.HERBOLOGY)
                 .build();
 
-        TrainingType posions = TrainingType.builder()
+        TrainingTypeDto poison = TrainingTypeDto.builder()
                 .specialization(Specialization.POISON)
                 .build();
 
-        List<SlimTrainerProfile> trainers = List.of(
+        List<TrainerResponse> trainers = List.of(
                 TrainerProfile.builder()
                         .username("Pomona.Sprout")
                         .firstName("Pomona")
                         .lastName("Sprout")
-                        .specialization(herbology)
+                        .specializations(List.of(herbology))
                         .build(),
                 TrainerProfile.builder()
                         .username("Severus.Snape")
                         .firstName("Severus")
                         .lastName("Snape")
-                        .specialization(posions)
+                        .specializations(List.of(poison))
                         .build()
         );
 
-        TraineeProfile profile = TraineeProfile.builder()
+        TraineeProfileResponseResponse profile = TraineeProfileResponseResponse.builder()
+                .username("Harry.Potter")
                 .firstName("Harry")
                 .lastName("Potter")
                 .dateOfBirth(LocalDate.parse("1980-07-31"))
@@ -64,9 +65,11 @@ public class TraineeProfileArgumentsProvider implements ArgumentsProvider {
                 .trainers(trainers)
                 .build();
 
-        TraineeRequest request = TraineeRequest.builder()
+        PutTraineeRequest request = PutTraineeRequest.builder()
+                .username("Harry.Potter")
                 .firstName("Harry")
                 .lastName("Potter")
+                .active(true)
                 .dateOfBirth(LocalDate.parse("1980-07-31"))
                 .address("Hogwarts")
                 .build();

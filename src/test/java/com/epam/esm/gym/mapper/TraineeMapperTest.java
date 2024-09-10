@@ -8,9 +8,12 @@ import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
+import com.epam.esm.gym.dto.trainee.PutTraineeRequest;
+import com.epam.esm.gym.dto.trainee.SlimTraineeProfileResponse;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
 import com.epam.esm.gym.dto.training.TrainingResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,7 +27,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the {@link TraineeMapper} class.
@@ -43,8 +45,102 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 1.0
  */
 class TraineeMapperTest {
+    private final TraineeMapper mapper = Mappers.getMapper(TraineeMapper.class);
+    private PutTraineeRequest dto;
+    private Trainee trainee;
+    private User user;
 
-    private final TraineeMapper traineeMapper = Mappers.getMapper(TraineeMapper.class);
+    @BeforeEach
+    void setUp() {
+
+        user = User.builder()
+                .username("harry.potter")
+                .firstName("Harry")
+                .lastName("Potter")
+                .active(true)
+                .build();
+
+        dto = PutTraineeRequest.builder()
+                .address("Hogwarts")
+                .dateOfBirth(LocalDate.of(2000, 1, 1))
+                .build();
+
+        trainee = Trainee.builder()
+                .user(user)
+                .address("Hogwarts")
+                .dateOfBirth(LocalDate.of(2000, 1, 1))
+                .build();
+    }
+
+    @Test
+    void toTrainee() {
+        Trainee expectedTrainee = Trainee.builder()
+                .user(user)
+                .address("Hogwarts")
+                .dateOfBirth(LocalDate.of(2000, 1, 1))
+                .build();
+
+
+        Trainee actualTrainee = mapper.toTrainee(user, dto);
+        assertEquals(expectedTrainee, actualTrainee);
+    }
+
+    @Test
+    void toSlimDto() {
+        SlimTraineeProfileResponse expectedProfile = SlimTraineeProfileResponse.builder()
+                .username("harry.potter")
+                .firstName("Harry")
+                .lastName("Potter")
+                .address("Hogwarts")
+                .active(true)
+                .build();
+
+
+        SlimTraineeProfileResponse actualProfile = TraineeMapper.toSlimDto(trainee);
+        assertEquals(expectedProfile, actualProfile);
+    }
+
+    @Test
+    void toTrainee_WithNullAddress() {
+        PutTraineeRequest dtoWithNullAddress = PutTraineeRequest.builder()
+                .dateOfBirth(LocalDate.of(2000, 1, 1))
+                .build();
+
+        Trainee expectedTrainee = Trainee.builder()
+                .user(user)
+                .address("")
+                .dateOfBirth(LocalDate.of(2000, 1, 1))
+                .build();
+
+
+        Trainee actualTrainee = mapper.toTrainee(user, dtoWithNullAddress);
+        assertEquals(expectedTrainee, actualTrainee);
+    }
+
+    @Test
+    void toSlimDto_WithNullFields() {
+        Trainee traineeWithNullFields = Trainee.builder()
+                .user(User.builder()
+                        .username("harry.potter")
+                        .firstName(null)
+                        .lastName(null)
+                        .active(true)
+                        .build())
+                .address(null)
+                .dateOfBirth(LocalDate.of(2000, 1, 1))
+                .build();
+
+        SlimTraineeProfileResponse expectedProfile = SlimTraineeProfileResponse.builder()
+                .username("harry.potter")
+                .firstName("")
+                .lastName("")
+                .address("")
+                .active(true)
+                .build();
+
+        SlimTraineeProfileResponse actualProfile = TraineeMapper.toSlimDto(traineeWithNullFields);
+        assertEquals(expectedProfile, actualProfile);
+    }
 
     @Test
     void testToTraineeProfile() {
@@ -60,7 +156,7 @@ class TraineeMapperTest {
                 .trainers(Set.of())
                 .build();
 
-        BaseResponse profile = traineeMapper.toTraineeProfile(trainee);
+        BaseResponse profile = mapper.toTraineeProfile(trainee);
         assertNotNull(profile);
     }
 
@@ -74,7 +170,7 @@ class TraineeMapperTest {
                 .trainingDate(LocalDate.of(2024, 1, 10))
                 .build();
 
-        TrainingResponse response = traineeMapper.toResponse(training);
+        TrainingResponse response = mapper.toResponse(training);
 
         assertNotNull(response);
         assertEquals("Minerva McGonagall", response.getTrainerName());
@@ -91,16 +187,14 @@ class TraineeMapperTest {
                 .username("Harry.Potter")
                 .firstName("Harry")
                 .lastName("Potter")
-                .active(true)
                 .build();
 
-        User user = traineeMapper.toUser(profile);
+        User user = mapper.toUser(profile);
 
         assertNotNull(user);
         assertEquals("Harry", user.getFirstName());
         assertEquals("Potter", user.getLastName());
         assertEquals("Harry.Potter", user.getUsername());
-        assertTrue(user.getActive());
     }
 
     @Test
@@ -115,7 +209,7 @@ class TraineeMapperTest {
                 .trainees(Set.of())
                 .build();
 
-        SlimTrainerProfile profile = traineeMapper.toTrainerProfile(trainer);
+        TrainerResponse profile = mapper.toTrainerProfile(trainer);
 
         assertNotNull(profile);
         assertEquals("Harry", profile.getFirstName());
@@ -150,28 +244,27 @@ class TraineeMapperTest {
     @ParameterizedTest
     @MethodSource("provideTrainerProfileAndExpectedUser")
     @DisplayName("Test toUser method")
-    void testToUser(SlimTrainerProfile profile, User expectedUser) {
+    void testToUser(TrainerResponse profile, User expectedUser) {
         TraineeMapper mapper = Mappers.getMapper(TraineeMapper.class);
         User result = mapper.toUser(profile);
         assertEquals(expectedUser, result);
     }
 
     private static Stream<Arguments> provideTrainerProfileAndExpectedUser() {
-        SlimTrainerProfile profile = new SlimTrainerProfile();
+        TrainerResponse profile = new TrainerResponse();
         profile.setUsername("professor.snape");
         profile.setFirstName("Severus");
         profile.setLastName("Snape");
-        profile.setActive(true);
 
         User expectedUser = User.builder()
                 .username("professor.snape")
                 .firstName("Severus")
                 .lastName("Snape")
-                .active(true)
                 .build();
 
         return Stream.of(
                 Arguments.of(profile, expectedUser)
         );
     }
+
 }

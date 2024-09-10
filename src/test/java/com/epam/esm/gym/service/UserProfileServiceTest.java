@@ -1,9 +1,13 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.dao.UserDao;
+import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.UserProfile;
+import com.epam.esm.gym.dto.trainer.TrainerRequest;
+import com.epam.esm.gym.exception.UserNotFoundException;
 import com.epam.esm.gym.mapper.UserMapper;
 import com.epam.esm.gym.service.profile.UserProfileService;
 import com.epam.esm.gym.web.provider.AuthenticationArgumentsProvider;
@@ -23,6 +27,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -54,7 +59,7 @@ public class UserProfileServiceTest {
     @Mock
     private UserMapper userMapper;
     @Mock
-    private PasswordEncoder encoder;
+    private PasswordEncoder passwordEncoder;
 
     @ParameterizedTest
     @ArgumentsSource(UserArgumentsProvider.class)
@@ -122,9 +127,63 @@ public class UserProfileServiceTest {
             when(userDao.findByUsername(username)).thenReturn(Optional.empty());
         } else {
             when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
-            when(encoder.matches(password, user.getPassword())).thenReturn(expectedStatus == HttpStatus.OK);
+            when(passwordEncoder.matches(password, user.getPassword())).thenReturn(expectedStatus == HttpStatus.OK);
         }
         ResponseEntity<BaseResponse> response = userProfileService.authenticate(username, password);
         assertEquals(expectedStatus, response.getStatusCode());
     }
+
+    @ParameterizedTest
+    @ArgumentsSource(UserArgumentsProvider.class)
+    void testGetUserShouldReturnUserWhenUserExists(String username, User user) {
+        when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
+        User result = userProfileService.getUser(username);
+        assertEquals(user, result);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(UserArgumentsProvider.class)
+    void testGetUserShouldThrowUserNotFoundExceptionWhenUserDoesNotExist(String username, User user) {
+        when(userDao.findByUsername(username)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userProfileService.getUser(username));
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(UserArgumentsProvider.class)
+    void testChangePasswordShouldReturnAcceptedWhenPasswordIsUpdated(String username, User user) {
+        ProfileRequest request = new ProfileRequest(
+                username, "oldPassword123", "newPassword123");
+        when(userDao.findByUsername(request.getUsername())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(request.getOldPassword(), user.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(request.getNewPassword(), user.getPassword())).thenReturn(false);
+        when(passwordEncoder.encode(request.getNewPassword())).thenReturn("encodedNewPassword");
+        ResponseEntity<BaseResponse> response = userProfileService.changePassword(request);
+        assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
+        verify(userDao).save(user);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(UserArgumentsProvider.class)
+    void testAuthenticateShouldReturnOkWhenCredentialsAreValid(String username, User user) {
+        String password = "password456";
+        when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
+        ResponseEntity<BaseResponse> response = userProfileService.authenticate(username, password);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(userDao).save(user);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(UserArgumentsProvider.class)
+    void createTrainerUser_ShouldReturnUser(String username, User user) {
+        TrainerRequest dto = new TrainerRequest("Harry", "POISON", "Potter", null, null);
+        String password = "password123";
+        String name = "Harry.Potter.1";
+        when(userMapper.toUser(dto.getFirstName(), dto.getLastName(), name, password, RoleType.ROLE_TRAINER))
+                .thenReturn(user);
+        User result = userProfileService.createTrainerUser(dto, password);
+        assertEquals(user, result);
+
+    }
+
 }

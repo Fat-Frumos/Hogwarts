@@ -3,7 +3,7 @@ package com.epam.esm.gym.web.provider.trainee;
 import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.User;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
+import com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
@@ -46,7 +46,7 @@ public class TraineeArgumentsProvider implements ArgumentsProvider {
                 .trainings(new HashSet<>())
                 .build();
 
-        TraineeProfile profile1 = TraineeProfile.builder()
+        TraineeProfileResponseResponse profile1 = TraineeProfileResponseResponse.builder()
                 .firstName("Harry")
                 .lastName("Potter")
                 .dateOfBirth(LocalDate.parse("1980-07-31"))
@@ -54,11 +54,11 @@ public class TraineeArgumentsProvider implements ArgumentsProvider {
                 .active(true)
                 .build();
 
-        ResponseEntity<TraineeProfile> response1 = ResponseEntity
+        ResponseEntity<TraineeProfileResponseResponse> response1 = ResponseEntity
                 .status(HttpStatus.OK)
                 .body(profile1);
 
-        TraineeProfile profile2 = TraineeProfile.builder()
+        TraineeProfileResponseResponse profile2 = TraineeProfileResponseResponse.builder()
                 .firstName("Hermione")
                 .lastName("Granger")
                 .dateOfBirth(LocalDate.parse("1979-09-19"))
@@ -66,7 +66,7 @@ public class TraineeArgumentsProvider implements ArgumentsProvider {
                 .active(true)
                 .build();
 
-        ResponseEntity<TraineeProfile> response2 = ResponseEntity
+        ResponseEntity<TraineeProfileResponseResponse> response2 = ResponseEntity
                 .status(HttpStatus.OK)
                 .body(profile2);
 

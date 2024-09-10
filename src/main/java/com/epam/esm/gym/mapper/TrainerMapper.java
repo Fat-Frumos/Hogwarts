@@ -3,8 +3,9 @@ package com.epam.esm.gym.mapper;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
+import com.epam.esm.gym.dto.trainee.SlimTraineeProfileResponse;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
@@ -17,33 +18,35 @@ import java.util.stream.Collectors;
 /**
  * Mapper interface for converting between Trainer entities and related DTOs.
  *
- * <p>This interface includes methods to map {@link Trainer} entities to {@link TrainerProfile} DTOs and vice versa,
+ * <p>This interface includes methods to map {@link Trainer} entities
+ * to {@link com.epam.esm.gym.dto.trainer.TrainerProfile} DTOs and vice versa,
  * as well as methods to convert {@link User} to {@link ProfileResponse} and handle collections of trainers.</p>
  */
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface TrainerMapper {
     /**
-     * Converts a {@link Trainer} entity to a {@link TrainerProfile} DTO.
+     * Converts a {@link Trainer} entity to a {@link com.epam.esm.gym.dto.trainer.TrainerProfile} DTO.
      *
-     * <p>This method maps the details of a {@link Trainer} entity to a {@link TrainerProfile} DTO.</p>
+     * <p>This method maps the details of a {@link Trainer} entity
+     * to a {@link com.epam.esm.gym.dto.trainer.TrainerProfile} DTO.</p>
      *
      * @param trainer the trainer to convert
-     * @return the converted {@link TrainerProfile}
+     * @return the converted {@link com.epam.esm.gym.dto.trainer.TrainerProfile}
      */
-    default TrainerProfile toDto(Trainer trainer) {
+    default BaseResponse toDto(Trainer trainer) {
         if (trainer == null) {
             return null;
         }
 
-        List<TraineeProfile> traineeProfiles = trainer.getTrainees().stream()
-                .map(trainee -> TraineeProfile.builder()
+        List<SlimTraineeProfileResponse> traineeProfiles = trainer.getTrainees()
+                .stream()
+                .map(trainee -> SlimTraineeProfileResponse.builder()
                         .firstName(trainee.getUser().getFirstName())
                         .lastName(trainee.getUser().getLastName())
                         .username(trainee.getUser().getUsername())
                         .address(trainee.getAddress())
                         .active(trainee.getUser().getActive())
                         .dateOfBirth(trainee.getDateOfBirth())
-                        .trainers(null)
                         .build())
                 .collect(Collectors.toList());
 
@@ -52,8 +55,7 @@ public interface TrainerMapper {
                 .username(trainer.getUser().getUsername())
                 .firstName(trainer.getUser().getFirstName())
                 .lastName(trainer.getUser().getLastName())
-                .specialization(trainer.getSpecialization())
-                .active(trainer.getUser().getActive())
+                .specializations(TrainingMapper.toTypesDto(trainer.getTrainingTypes()))
                 .build();
     }
 
@@ -80,7 +82,6 @@ public interface TrainerMapper {
                 .build();
     }
 
-
     /**
      * Converts a {@link User} to a {@link ProfileResponse} DTO.
      *
@@ -96,12 +97,13 @@ public interface TrainerMapper {
     }
 
     /**
-     * Converts a list of {@link Trainer} entities to a list of {@link TrainerProfile} DTOs.
+     * Converts a list of {@link Trainer} entities to a list of {@link com.epam.esm.gym.dto.trainer.TrainerProfile}.
      *
-     * <p>This method maps a list of {@link Trainer} entities to a list of {@link TrainerProfile} DTOs.</p>
+     * <p>This method maps a list of {@link Trainer} entities
+     * to a list of {@link com.epam.esm.gym.dto.trainer.TrainerProfile} DTOs.</p>
      *
      * @param trainers the list of trainers to convert
-     * @return the list of converted {@link TrainerProfile} DTOs
+     * @return the list of converted {@link com.epam.esm.gym.dto.trainer.TrainerProfile} DTOs
      */
     default List<TrainerProfile> toTrainerProfiles(List<Trainer> trainers) {
         if (trainers == null || trainers.isEmpty()) {
@@ -109,14 +111,14 @@ public interface TrainerMapper {
         }
         return trainers.stream().map(trainer -> TrainerProfile.builder()
                         .username(trainer.getUser().getUsername())
-                        .firstName(trainer.getUser().getFirstName() != null ? trainer.getUser().getFirstName() : "")
-                        .lastName(trainer.getUser().getLastName() != null ? trainer.getUser().getLastName() : "")
-                        .active(Boolean.TRUE.equals(trainer.getUser().getActive()))
-                        .specialization(trainer.getSpecialization())
-                        .trainees(trainer.getTrainees() != null ? trainer.getTrainees().stream()
-                                .map(TraineeMapper::toDto)
-                                .toList() : Collections.emptyList())
-                        .build())
+                        .firstName(trainer.getUser().getFirstName())
+                        .lastName(trainer.getUser().getLastName())
+                        .specializations(TrainingMapper.toTypesDto(trainer.getTrainingTypes()))
+                        .trainees(trainer.getTrainees() != null
+                                ? trainer.getTrainees().stream()
+                                .map(TraineeMapper::toSlimDto)
+                                .toList()
+                                : Collections.emptyList()).build())
                 .collect(Collectors.toList());
     }
 
@@ -131,9 +133,9 @@ public interface TrainerMapper {
      * @param user the {@link User} entity to be associated with the trainer.
      * @return a {@link Trainer} entity with the specified user and specialization.
      */
-    default Trainer toTrainer(User user, TrainingType trainingType) {
+    default Trainer toTrainer(User user, List<TrainingType> trainingTypes) {
         return Trainer.builder()
-                .specialization(trainingType)
+                .trainingTypes(trainingTypes)
                 .user(user).build();
     }
 }

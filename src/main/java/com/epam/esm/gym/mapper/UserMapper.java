@@ -3,14 +3,13 @@ package com.epam.esm.gym.mapper;
 import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.UserProfile;
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import org.mapstruct.Mapper;
 
 /**
  * Mapper interface for converting between User entities and related DTOs.
  *
  * <p>This interface includes methods for mapping {@link User} entities
- * to {@link UserProfile} and {@link TrainerProfile} DTOs,
+ * to {@link UserProfile} and {@link com.epam.esm.gym.dto.trainer.TrainerProfile} DTOs,
  * as well as creating a {@link User} entity from basic user data.</p>
  */
 @Mapper(componentModel = "spring")

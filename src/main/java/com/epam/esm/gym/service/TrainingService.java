@@ -1,5 +1,6 @@
 package com.epam.esm.gym.service;
 
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
@@ -61,5 +62,5 @@ public interface TrainingService {
      *
      * @param request the {@link TrainingRequest} containing the details for the new training session
      */
-    void createTraining(TrainingRequest request);
+    ResponseEntity<BaseResponse> createTraining(TrainingRequest request);
 }

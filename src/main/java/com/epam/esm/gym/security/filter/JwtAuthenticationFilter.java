@@ -2,7 +2,6 @@ package com.epam.esm.gym.security.filter;
 
 import com.epam.esm.gym.dto.auth.UserPrincipal;
 import com.epam.esm.gym.exception.InvalidJwtAuthenticationException;
-import com.epam.esm.gym.exception.UnauthorizedAccessException;
 import com.epam.esm.gym.security.service.JwtProvider;
 import com.epam.esm.gym.security.service.SecurityUserDetailsService;
 import io.jsonwebtoken.security.SignatureException;
@@ -11,7 +10,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -32,7 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
 
-    private final ApplicationContext context;
+    //    private final ApplicationContext context;
+    private final SecurityUserDetailsService userDetailsService;
 
     /**
      * This method is called once per request to filter and authenticate the request
@@ -58,12 +57,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 token = authHeader.substring(7);
                 username = jwtProvider.extractUserName(token);
             }
-        } catch (SignatureException exception) {
-            throw new InvalidJwtAuthenticationException(exception.getMessage());
+        } catch (InvalidJwtAuthenticationException ex) {
+            setMessage(response, ex.getMessage());
+            return;
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserPrincipal userDetails = context.getBean(SecurityUserDetailsService.class).loadUserByUsername(username);
+            UserPrincipal userDetails = userDetailsService.loadUserByUsername(username);
             if (jwtProvider.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
@@ -73,8 +73,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         try {
             filterChain.doFilter(request, response);
-        } catch (AuthenticationException e) {
-            throw new UnauthorizedAccessException(e.getMessage());
+        } catch (AuthenticationException | SignatureException e) {
+            setMessage(response, e.getMessage());
         }
+    }
+
+    private void setMessage(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write(String.format("{\"message\":\"%s\"}", message));
     }
 }

@@ -2,7 +2,6 @@ package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dao.TrainerDao;
 import com.epam.esm.gym.domain.Trainer;
-import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
@@ -24,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.stream.Stream;
 
@@ -56,7 +56,7 @@ class ProfileCreationTests {
         when(trainerService.registerTrainer(any(TrainerRequest.class)))
                 .thenReturn(ResponseEntity.ok(new ProfileResponse(firstName + "." + lastName, "Specialization123")));
 
-        Trainer trainer = new Trainer(1L, new User(), new TrainingType(),
+        Trainer trainer = new Trainer(1L, new User(), new ArrayList<>(),
                 new HashSet<>(), new HashSet<>(), new HashSet<>());
         when(trainerDao.save(any(Trainer.class))).thenReturn(trainer);
         String requestBody = String.format(
@@ -81,7 +81,7 @@ class ProfileCreationTests {
                             : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 });
 
-        Trainer trainer = new Trainer(1L, new User(), new TrainingType(),
+        Trainer trainer = new Trainer(1L, new User(), new ArrayList<>(),
                 new HashSet<>(), new HashSet<>(), new HashSet<>());
         when(trainerDao.save(any(Trainer.class))).thenReturn(trainer);
 

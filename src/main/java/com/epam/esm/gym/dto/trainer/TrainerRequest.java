@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -18,15 +19,16 @@ import java.util.Objects;
  */
 @Getter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class TrainerRequest {
-    @NotBlank(message = "FirstName is required")
+    @NotBlank(message = "Required request parameter 'firstName' is not present")
     @Size(min = 1, max = 50, message = "Firstname must be between 1 and 50 characters")
     private String firstName;
-    @NotBlank(message = "LastName is required")
+    @NotBlank(message = "Required request parameter 'lastnameName' is not present")
     @Size(min = 1, max = 50, message = "LastName must be between 1 and 50 characters")
-    @NotNull(message = "Specialization is required")
+    @NotNull(message = "Required request parameter 'specialization' is not present")
     private String specialization;
     private String lastName;
     private LocalDate dateOfBirth;

@@ -62,7 +62,7 @@ public class TrainingControllerTest extends ControllerTest {
         mockMvc.perform(post(base_url + "/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(training)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
     }
 
     @Test

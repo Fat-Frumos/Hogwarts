@@ -61,15 +61,17 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Builder.Default
     @JsonProperty("is_active")
-    @Column(name = "is_active", nullable = false)
-    private Boolean active;
+    @Column(name = "is_active")
+    private Boolean active = false;
 
     @JsonProperty("permission")
     @Enumerated(EnumType.STRING)
     @Column(name = "permission")
     @Fetch(FetchMode.JOIN)
     private RoleType permission;
+
     @Builder.Default
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

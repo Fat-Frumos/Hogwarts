@@ -42,6 +42,6 @@ public abstract class ControllerTest {
     @MockBean
     protected TrainerService trainerService;
     @MockBean
-    protected TraineeService service;
+    protected TraineeService traineeService;
     protected final String password = "Password123";
 }

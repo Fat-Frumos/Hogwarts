@@ -19,7 +19,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TrainingTypeDto {
-    private Specialization trainingType;
+    private Specialization specialization;
     private Long trainingTypeId;
 
     @Override
@@ -31,11 +31,11 @@ public class TrainingTypeDto {
             return false;
         }
         TrainingTypeDto that = (TrainingTypeDto) obj;
-        return trainingType == that.trainingType && Objects.equals(trainingTypeId, that.trainingTypeId);
+        return specialization == that.specialization && Objects.equals(trainingTypeId, that.trainingTypeId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(trainingType, trainingTypeId);
+        return Objects.hash(specialization, trainingTypeId);
     }
 }

@@ -27,7 +27,7 @@ import java.time.LocalDate;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SlimTraineeProfile implements BaseResponse {
+public class SlimTraineeProfileResponse implements BaseResponse {
     protected String firstName;
     protected String lastName;
     protected String username;
@@ -48,7 +48,7 @@ public class SlimTraineeProfile implements BaseResponse {
             return false;
         }
 
-        SlimTraineeProfile that = (SlimTraineeProfile) obj;
+        SlimTraineeProfileResponse that = (SlimTraineeProfileResponse) obj;
         return new EqualsBuilder()
                 .append(firstName, that.firstName)
                 .append(lastName, that.lastName)

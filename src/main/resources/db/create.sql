@@ -7,6 +7,8 @@ DROP TABLE IF EXISTS "users" CASCADE;
 DROP TABLE IF EXISTS "role_authorities" CASCADE;
 DROP TABLE IF EXISTS "roles" CASCADE;
 DROP TABLE IF EXISTS "tokens" CASCADE;
+DROP TABLE IF EXISTS "sessions" CASCADE;
+DROP TABLE IF EXISTS "trainer_training_type" CASCADE;
 
 CREATE TABLE "roles"
 (
@@ -29,9 +31,7 @@ CREATE TABLE "users"
     username   VARCHAR(255) NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
     is_active  BOOLEAN      NOT NULL,
-    permission VARCHAR(255),
-    role_id    BIGINT,
-    FOREIGN KEY (role_id) REFERENCES "roles" (id) ON DELETE SET NULL
+    permission VARCHAR(255)
 );
 
 CREATE TABLE "trainee"
@@ -51,12 +51,20 @@ CREATE TABLE "training_type"
 
 CREATE TABLE "trainer"
 (
-    id                SERIAL PRIMARY KEY,
-    training_type_id BIGINT NOT NULL,
-    user_id           BIGINT NOT NULL,
-    FOREIGN KEY (training_type_id) REFERENCES training_type (id),
+    id               SERIAL PRIMARY KEY,
+    user_id          BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES "users" (id) ON DELETE CASCADE
 );
+
+CREATE TABLE "trainer_training_type"
+(
+    trainer_id       BIGINT NOT NULL,
+    training_type_id BIGINT NOT NULL,
+    PRIMARY KEY (trainer_id, training_type_id),
+    FOREIGN KEY (trainer_id) REFERENCES "trainer" (id) ON DELETE CASCADE,
+    FOREIGN KEY (training_type_id) REFERENCES "training_type" (id) ON DELETE CASCADE
+);
+
 
 CREATE TABLE "training"
 (
@@ -92,3 +100,18 @@ CREATE TABLE "tokens"
     user_id          INTEGER,
     FOREIGN KEY (user_id) REFERENCES "users" (id) ON DELETE SET NULL
 );
+
+CREATE TABLE sessions
+(
+    id          SERIAL PRIMARY KEY,
+    trainer_id  BIGINT,
+    training_id BIGINT,
+    start_time  TIMESTAMP,
+    end_time    TIMESTAMP,
+    FOREIGN KEY (trainer_id) REFERENCES trainer (id),
+    FOREIGN KEY (training_id) REFERENCES training (id)
+);
+
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public';

@@ -7,15 +7,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -41,13 +38,8 @@ import java.util.List;
 @EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfig {
-    public static final String ADMIN = "ADMIN";
-    public static final String TRAINER = "TRAINER";
-    public static final String TRAINEE = "TRAINEE";
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    private final UserDetailsService userDetailsService;
     private final BruteForceProtectionFilter bruteForceProtectionFilter;
 
     /**
@@ -74,7 +66,6 @@ public class SecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable).
                 authorizeHttpRequests(request -> request
                         .requestMatchers(
-                                "login", "register",
                                 "/actuator/**",
                                 "/api/trainers/register",
                                 "/api/trainees/register",
@@ -89,7 +80,7 @@ public class SecurityConfig {
                                 "/index.html"
                         ).permitAll()
 //                        .requestMatchers("/api/trainees/**").hasAnyRole(TRAINEE, TRAINER, ADMIN)
-                        .requestMatchers("/api/trainers/**").hasAnyRole(TRAINER, ADMIN)
+//                        .requestMatchers("/api/trainers/**").hasAnyRole(TRAINER, ADMIN)
 //                        .anyRequest().hasRole(ADMIN))
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
@@ -141,24 +132,6 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    /**
-     * Configures the {@link AuthenticationProvider} bean for authentication in the application.
-     * <p>
-     * This method creates an instance of {@link DaoAuthenticationProvider}, sets up the password encoder
-     * with a BCrypt password encoder (strength of 12), and sets the user details service used for
-     * retrieving user-specific data during authentication.
-     * </p>
-     *
-     * @return the configured {@link AuthenticationProvider} instance
-     */
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
-        provider.setUserDetailsService(userDetailsService);
-        return provider;
     }
 
     /**

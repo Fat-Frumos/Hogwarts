@@ -4,8 +4,8 @@ import com.epam.esm.gym.domain.RoleType;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
+import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
+import com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
@@ -34,7 +34,7 @@ public class TraineeRegistrationArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
 
-        TraineeProfile profile = TraineeProfile.builder()
+        TraineeProfileResponseResponse profile = TraineeProfileResponseResponse.builder()
                 .firstName("Harry")
                 .lastName("Potter")
                 .dateOfBirth(LocalDate.parse("1980-07-31"))
@@ -60,7 +60,7 @@ public class TraineeRegistrationArgumentsProvider implements ArgumentsProvider {
                 .trainings(new HashSet<>())
                 .build();
 
-        TraineeRequest request = TraineeRequest.builder()
+        PostTraineeRequest request = PostTraineeRequest.builder()
                 .firstName("Harry")
                 .lastName("Potter")
                 .dateOfBirth(LocalDate.parse("1980-07-31"))

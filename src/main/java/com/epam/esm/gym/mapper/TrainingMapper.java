@@ -21,6 +21,40 @@ import java.util.List;
  */
 @Mapper(componentModel = "spring")
 public interface TrainingMapper {
+
+    /**
+     * Converts a list of {@link TrainingType} entities to a list of {@link TrainingTypeDto} objects.
+     *
+     * @param trainingTypes a list of {@link TrainingType} entities to be converted
+     * @return a list of {@link TrainingTypeDto} objects
+     */
+    static List<TrainingTypeDto> toTypesDto(List<TrainingType> trainingTypes) {
+        return trainingTypes.stream().map(TrainingMapper::toType).toList();
+    }
+
+    /**
+     * Converts a list of {@link TrainingTypeDto} objects to a list of {@link TrainingType} entities.
+     *
+     * @param specialization a list of {@link TrainingTypeDto} objects to be converted
+     * @return a list of {@link TrainingType} entities
+     */
+    static List<TrainingType> toTypes(List<TrainingTypeDto> specialization) {
+        return specialization.stream().map(TrainingMapper::toEntityType).toList();
+    }
+
+    /**
+     * Converts a {@link TrainingTypeDto} object to a {@link TrainingType} entity.
+     *
+     * @param dto the {@link TrainingTypeDto} object to be converted
+     * @return a {@link TrainingType} entity
+     */
+    static TrainingType toEntityType(TrainingTypeDto dto) {
+        return TrainingType.builder()
+                .specialization(dto.getSpecialization())
+                .id(dto.getTrainingTypeId())
+                .build();
+    }
+
     /**
      * Converts a {@link Training} entity to a {@link TrainingResponse} DTO.
      *
@@ -39,7 +73,7 @@ public interface TrainingMapper {
      * @param trainings the list of training entities to convert
      * @return the list of converted {@link TrainingResponse} DTOs
      */
-    default List<TrainingResponse> toDtos(List<Training> trainings) {
+    default List<TrainingResponse> toResponses(List<Training> trainings) {
         return trainings.stream().map(this::toDto).toList();
     }
 
@@ -52,9 +86,9 @@ public interface TrainingMapper {
      * @param trainingType the training type entity to convert
      * @return the converted {@link com.epam.esm.gym.dto.training.TrainingTypeDto}
      */
-    default TrainingTypeDto toType(TrainingType trainingType) {
+    static TrainingTypeDto toType(TrainingType trainingType) {
         return TrainingTypeDto.builder()
-                .trainingType(trainingType.getSpecialization())
+                .specialization(trainingType.getSpecialization())
                 .trainingTypeId(trainingType.getId())
                 .build();
     }

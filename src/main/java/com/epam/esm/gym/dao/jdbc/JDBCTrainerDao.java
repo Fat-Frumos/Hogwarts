@@ -187,7 +187,8 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
                     SELECT t
                     FROM Trainer t
                     LEFT JOIN FETCH t.user u
-                    LEFT JOIN FETCH t.specialization s
+                    LEFT JOIN FETCH t.trainingTypes tt
+                    LEFT JOIN FETCH t.trainingSessions ts
                     WHERE u.permission = :rolePermission
                 """;
         Query<Trainer> query = session.createQuery(hql, Trainer.class);

@@ -4,8 +4,8 @@ import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.auth.RegisterRequest;
 import com.epam.esm.gym.dto.auth.UserPrincipal;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
+import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
+import com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
@@ -130,14 +130,14 @@ class DtoTest {
     @Test
     void testTraineeProfile() {
         TrainerProfile trainer = new TrainerProfile(
-                "AlbusDumbledore", "Albus", "Dumbledore", null, true, List.of());
-        TraineeProfile trainee1 = new TraineeProfile(
+                "AlbusDumbledore", "Albus", "Dumbledore", List.of());
+        TraineeProfileResponseResponse trainee1 = new TraineeProfileResponseResponse(
                 "Harry", "Potter", "HarryPotter", "Hogwarts", true,
                 LocalDate.of(1980, 7, 31), List.of(trainer));
-        TraineeProfile trainee2 = new TraineeProfile(
+        TraineeProfileResponseResponse trainee2 = new TraineeProfileResponseResponse(
                 "Harry", "Potter", "HarryPotter", "Hogwarts", true,
                 LocalDate.of(1980, 7, 31), List.of(trainer));
-        TraineeProfile trainee3 = new TraineeProfile(
+        TraineeProfileResponseResponse trainee3 = new TraineeProfileResponseResponse(
                 "Hermione", "Granger", "HermioneGranger", "Hogwarts", true,
                 LocalDate.of(1979, 9, 19), List.of());
 
@@ -156,12 +156,12 @@ class DtoTest {
 
     @Test
     void testTraineeRequest() {
-        TraineeRequest request1 = new TraineeRequest(
-                "Harry", "Potter", LocalDate.of(1980, 7, 31), "Hogwarts", true);
-        TraineeRequest request2 = new TraineeRequest(
-                "Harry", "Potter", LocalDate.of(1980, 7, 31), "Hogwarts", true);
-        TraineeRequest request3 = new TraineeRequest(
-                "Hermione", "Granger", LocalDate.of(1979, 9, 19), "Hogwarts", true);
+        PostTraineeRequest request1 = new PostTraineeRequest(
+                "Harry", "Potter", LocalDate.of(1980, 7, 31), "Hogwarts");
+        PostTraineeRequest request2 = new PostTraineeRequest(
+                "Harry", "Potter", LocalDate.of(1980, 7, 31), "Hogwarts");
+        PostTraineeRequest request3 = new PostTraineeRequest(
+                "Hermione", "Granger", LocalDate.of(1979, 9, 19), "Hogwarts");
 
         assertEquals(request1, request2);
         assertNotEquals(request1, request3);
@@ -171,23 +171,19 @@ class DtoTest {
         assertEquals("Potter", request1.getLastName());
         assertEquals(LocalDate.of(1980, 7, 31), request1.getDateOfBirth());
         assertEquals("Hogwarts", request1.getAddress());
-        assertTrue(request1.getActive());
     }
 
     @Test
     void testTrainerProfile() {
-        TraineeProfile trainee = new TraineeProfile(
+        TraineeProfileResponseResponse trainee = new TraineeProfileResponseResponse(
                 "Harry", "Potter", "HarryPotter", "Hogwarts",
                 true, LocalDate.of(1980, 7, 31), List.of());
         TrainerProfile trainer1 = new TrainerProfile(
-                "AlbusDumbledore", "Albus", "Dumbledore",
-                null, true, List.of(trainee));
+                "AlbusDumbledore", "Albus", "Dumbledore", List.of(trainee));
         TrainerProfile trainer2 = new TrainerProfile(
-                "AlbusDumbledore", "Albus", "Dumbledore",
-                null, true, List.of(trainee));
+                "AlbusDumbledore", "Albus", "Dumbledore", List.of(trainee));
         TrainerProfile trainer3 = new TrainerProfile(
-                "SeverusSnape", "Severus", "Snape",
-                null, false, List.of());
+                "SeverusSnape", "Severus", "Snape", List.of());
 
         assertEquals(trainer1, trainer2);
         assertNotEquals(trainer1, trainer3);
@@ -196,7 +192,6 @@ class DtoTest {
         assertEquals("AlbusDumbledore", trainer1.getUsername());
         assertEquals("Albus", trainer1.getFirstName());
         assertEquals("Dumbledore", trainer1.getLastName());
-        assertTrue(trainer1.isActive());
         assertEquals(1, trainer1.getTrainees().size());
     }
 
@@ -255,7 +250,7 @@ class DtoTest {
         assertNotEquals(type1, type3);
         assertEquals(type1.hashCode(), type2.hashCode());
         assertNotEquals(type1.hashCode(), type3.hashCode());
-        assertEquals(Specialization.CARDIO, type1.getTrainingType());
+        assertEquals(Specialization.CARDIO, type1.getSpecialization());
         assertEquals(1L, type1.getTrainingTypeId());
     }
 
@@ -296,9 +291,9 @@ class DtoTest {
         List<SimpleGrantedAuthority> authorities = Collections.emptyList();
         Mockito.when(permission.getGrantedAuthorities()).thenReturn(authorities);
         Mockito.when(user.getPassword()).thenReturn("password123");
-        Mockito.when(user.getUsername()).thenReturn("harrypotter");
+        Mockito.when(user.getUsername()).thenReturn("harry.potter");
         UserPrincipal securityUser = UserPrincipal.builder().user(user).build();
         assertEquals("password123", securityUser.getPassword());
-        assertEquals("harrypotter", securityUser.getUsername());
+        assertEquals("harry.potter", securityUser.getUsername());
     }
 }

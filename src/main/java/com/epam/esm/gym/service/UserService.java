@@ -5,8 +5,7 @@ import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.UserProfile;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import org.springframework.http.ResponseEntity;
 
@@ -30,12 +29,12 @@ public interface UserService {
      * <p>
      * This method processes a {@link TrainerRequest} to create and persist a new trainer profile in the system.
      * The method involves validating the request data and saving the trainer information to the database. T
-     * he saved trainer profile is then returned as a {@link TrainerProfile} object,
+     * he saved trainer profile is then returned as a {@link com.epam.esm.gym.dto.trainer.TrainerProfile} object,
      * which includes all relevant details about the trainer.
      * </p>
      *
      * @param dto the {@link TrainerRequest} containing the details of the trainer to be saved
-     * @return the {@link TrainerProfile} representing the saved trainer
+     * @return the {@link com.epam.esm.gym.dto.trainer.TrainerProfile} representing the saved trainer
      */
     User createTrainerUser(TrainerRequest dto, String password);
 
@@ -131,15 +130,17 @@ public interface UserService {
     /**
      * Saves a new trainee user based on the provided request.
      * <p>
-     * This method processes a {@link TraineeRequest} to create and persist a new trainee user profile in the system.
+     * This method processes a {@link com.epam.esm.gym.dto.trainee.PutTraineeRequest} to create and persist
+     * a new trainee user profile in the system.
      * The method involves validating the request data and saving the trainee information to the database.
      * The saved trainee user is then returned as a {@link User} object.
      * </p>
      *
-     * @param request the {@link TraineeRequest} containing the details of the trainee user to be saved
+     * @param request the {@link com.epam.esm.gym.dto.trainee.PutTraineeRequest}
+     *                containing the details of the trainee user to be saved
      * @return the {@link User} representing the saved trainee
      */
-    User createTraineeUser(TraineeRequest request, String password);
+    User createTraineeUser(PostTraineeRequest request, String password);
 
     /**
      * Retrieves a user profile based on the username.

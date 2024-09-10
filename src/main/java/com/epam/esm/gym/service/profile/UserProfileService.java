@@ -7,8 +7,7 @@ import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.UserProfile;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.exception.UserNotFoundException;
 import com.epam.esm.gym.mapper.UserMapper;
@@ -54,12 +53,12 @@ public class UserProfileService implements UserService {
      * Registers a new trainee user by generating a username and a random password, encoding the password,
      * and saving the user. Returns the saved user with the raw password set for further use.
      *
-     * @param dto The {@link TraineeRequest} containing the trainee's details.
+     * @param dto The {@link com.epam.esm.gym.dto.trainee.PutTraineeRequest} containing the trainee's details.
      * @return The saved {@link User} entity with the raw password set.
      */
     @Override
     @Transactional
-    public User createTraineeUser(TraineeRequest dto, String password) {
+    public User createTraineeUser(PostTraineeRequest dto, String password) {
         String username = generateUsername(dto.getFirstName(), dto.getLastName());
         return mapper.toUser(dto.getFirstName(), dto.getLastName(), username, password, RoleType.ROLE_TRAINEE);
     }
@@ -67,10 +66,10 @@ public class UserProfileService implements UserService {
     /**
      * {@inheritDoc}
      * Registers a new trainer user by generating a username and a random password, encoding the password,
-     * and saving the user. Returns a {@link TrainerProfile} based on the saved user.
+     * and saving the user. Returns a {@link com.epam.esm.gym.dto.trainer.TrainerProfile} based on the saved user.
      *
      * @param dto The {@link TrainerRequest} containing the trainer's details.
-     * @return The {@link TrainerProfile} of the saved trainer.
+     * @return The {@link com.epam.esm.gym.dto.trainer.TrainerProfile} of the saved trainer.
      */
     @Override
     @Transactional

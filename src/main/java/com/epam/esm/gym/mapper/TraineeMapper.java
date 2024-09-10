@@ -6,13 +6,15 @@ import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
+import com.epam.esm.gym.dto.trainee.PutTraineeRequest;
+import com.epam.esm.gym.dto.trainee.SlimTraineeProfileResponse;
+import com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import org.mapstruct.Mapper;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,8 +23,9 @@ import java.util.stream.Collectors;
  * Mapper interface for converting between various DTOs and domain models related to trainees, trainers, and training.
  *
  * <p>This interface provides methods to map between entities and data transfer objects (DTOs),
- * {@link TraineeProfile}, {@link TrainingResponse}, and {@link TrainerProfile}. It uses the {@link UserMapper} and
- * {@link TrainerMapper} components for mappings related to users and trainers.</p>
+ * {@link com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse}, {@link TrainingResponse},
+ * and {@link com.epam.esm.gym.dto.trainer.TrainerProfile}.
+ * It uses the {@link UserMapper} and {@link TrainerMapper} components for mappings related to users and trainers.</p>
  */
 @Mapper(componentModel = "spring", uses = {UserMapper.class, TrainerMapper.class})
 public interface TraineeMapper {
@@ -49,31 +52,32 @@ public interface TraineeMapper {
     }
 
     /**
-     * Updates a {@link Trainee} entity with values from a {@link TraineeRequest}.
+     * Updates a {@link Trainee} entity with values from a {@link com.epam.esm.gym.dto.trainee.PutTraineeRequest}.
      *
      * <p>This method updates the fields of an existing {@link Trainee}
-     * entity based on the provided {@link TraineeRequest}.
+     * entity based on the provided {@link com.epam.esm.gym.dto.trainee.PutTraineeRequest}.
      * It selectively updates fields if the corresponding request values are not null.</p>
      *
      * @param request the request containing update values
      * @param trainee the trainee to update
      * @return the updated {@link Trainee}
      */
-    default Trainee update(TraineeRequest request, Trainee trainee) {
+    default Trainee update(PutTraineeRequest request, Trainee trainee) {
         if (request == null || trainee == null) {
             return trainee;
         }
+        User user = trainee.getUser();
+
+        if (request.getUsername() != null) {
+            user.setUsername(request.getUsername());
+        }
 
         if (request.getFirstName() != null) {
-            trainee.setUser(User.builder()
-                    .firstName(request.getFirstName())
-                    .build());
+            user.setFirstName(request.getFirstName());
         }
 
         if (request.getLastName() != null) {
-            trainee.setUser(User.builder()
-                    .lastName(request.getLastName())
-                    .build());
+            user.setLastName(request.getLastName());
         }
 
         if (request.getDateOfBirth() != null) {
@@ -85,25 +89,25 @@ public interface TraineeMapper {
         }
 
         if (request.getActive() != null) {
-            trainee.setUser(User.builder()
-                    .active(request.getActive())
-                    .build());
+            user.setActive(request.getActive());
         }
 
+        trainee.setUser(user);
         return trainee;
     }
 
     /**
-     * Converts a {@link Trainee} entity to a {@link TraineeProfile}.
+     * Converts a {@link Trainee} entity to a {@link com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse}.
      *
-     * <p>This method transforms a {@link Trainee} entity into a {@link TraineeProfile} DTO,
+     * <p>This method transforms a {@link Trainee} entity
+     * into a {@link com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse} DTO,
      * including nested conversions for associated trainers and user details.</p>
      *
      * @param trainee the trainee to convert
-     * @return the converted {@link TraineeProfile}
+     * @return the converted {@link com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse}
      */
     default BaseResponse toTraineeProfile(Trainee trainee) {
-        return TraineeProfile.builder()
+        return TraineeProfileResponseResponse.builder()
                 .firstName(trainee.getUser().getFirstName())
                 .lastName(trainee.getUser().getLastName())
                 .username(trainee.getUser().getUsername())
@@ -136,72 +140,73 @@ public interface TraineeMapper {
     }
 
     /**
-     * Converts a list of {@link TrainerProfile} to a set of {@link Trainer} entities.
+     * Converts a list of {@link com.epam.esm.gym.dto.trainer.TrainerProfile} to a set of {@link Trainer} entities.
      *
-     * <p>This method creates {@link Trainer} entities from a list of {@link TrainerProfile} DTOs,
+     * <p>This method creates {@link Trainer} entities from a list
+     * of {@link com.epam.esm.gym.dto.trainer.TrainerProfile} DTOs,
      * setting properties based on the profile information.</p>
      *
      * @param trainers the list of trainer profiles
      * @return the set of {@link Trainer} entities
      */
-    default Set<Trainer> toTrainers(List<SlimTrainerProfile> trainers) {
+    default Set<Trainer> toTrainers(List<TrainerResponse> trainers) {
         return trainers.stream()
                 .map(trainerProfile -> Trainer.builder()
-                        .id(null)
                         .user(toUser(trainerProfile))
-                        .specialization(trainerProfile.getSpecialization())
+                        .trainingTypes(TrainingMapper.toTypes(trainerProfile.getSpecializations()))
                         .build())
                 .collect(Collectors.toSet());
     }
 
     /**
-     * Converts a {@link TrainerProfile} to a {@link User} entity.
+     * Converts a {@link com.epam.esm.gym.dto.trainer.TrainerProfile} to a {@link User} entity.
      *
-     * <p>This method creates a {@link User} entity from a {@link TrainerProfile} DTO,
+     * <p>This method creates a {@link User} entity from a {@link com.epam.esm.gym.dto.trainer.TrainerProfile} DTO,
      * setting user-specific details.</p>
      *
      * @param profile the trainer profile to convert
      * @return the converted {@link User}
      */
-    default User toUser(SlimTrainerProfile profile) {
+    default User toUser(TrainerResponse profile) {
         return User.builder()
                 .username(profile.getUsername())
                 .firstName(profile.getFirstName())
                 .lastName(profile.getLastName())
-                .active(profile.isActive())
                 .build();
     }
 
     /**
-     * Converts a {@link Trainer} entity to a {@link TrainerProfile} DTO.
+     * Converts a {@link Trainer} entity to a {@link com.epam.esm.gym.dto.trainer.TrainerProfile} DTO.
      *
-     * <p>This method transforms a {@link Trainer} entity into a {@link TrainerProfile} DTO,
+     * <p>This method transforms a {@link Trainer} entity into a {@link com.epam.esm.gym.dto.trainer.TrainerProfile},
      * including nested conversions for associated trainees.</p>
      *
      * @param trainer the trainer to convert
-     * @return the converted {@link TrainerProfile}
+     * @return the converted {@link com.epam.esm.gym.dto.trainer.TrainerProfile}
      */
-    default SlimTrainerProfile toTrainerProfile(Trainer trainer) {
-        return TrainerProfile.builder()
+    default TrainerResponse toTrainerProfile(Trainer trainer) {
+        return TrainerResponse.builder()
                 .username(trainer.getUser().getUsername())
                 .firstName(trainer.getUser().getFirstName())
                 .lastName(trainer.getUser().getLastName())
-                .specialization(trainer.getSpecialization())
-                .active(trainer.getUser().getActive())
+                .specializations(trainer.getTrainingTypes() == null
+                        ? Collections.emptyList()
+                        : TrainingMapper.toTypesDto(trainer.getTrainingTypes()))
                 .build();
     }
 
+
     /**
-     * Converts a {@link User} and {@link TraineeRequest} to a {@link Trainee} entity.
+     * Converts a {@link User} and {@link com.epam.esm.gym.dto.trainee.PutTraineeRequest} to a {@link Trainee} entity.
      *
-     * <p>This method constructs a {@link Trainee} entity using the provided {@link User} and {@link TraineeRequest}
-     * DTO, setting properties accordingly.</p>
+     * <p>This method constructs a {@link Trainee} entity using the provided {@link User}
+     * and {@link com.epam.esm.gym.dto.trainee.PutTraineeRequest} DTO, setting properties accordingly.</p>
      *
      * @param user the user to associate with the trainee
      * @param dto  the request containing trainee details
      * @return the converted {@link Trainee}
      */
-    default Trainee toTrainee(User user, TraineeRequest dto) {
+    default Trainee toTrainee(User user, PostTraineeRequest dto) {
         String address = dto.getAddress() != null ? dto.getAddress() : "";
         return Trainee.builder()
                 .dateOfBirth(dto.getDateOfBirth())
@@ -210,18 +215,18 @@ public interface TraineeMapper {
     }
 
     /**
-     * Converts a {@link Trainee} entity to a {@link TraineeProfile} DTO.
+     * Converts a {@link Trainee} entity to a {@link com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse} DTO.
      *
      * @param trainee the {@link Trainee} entity to be converted.
-     * @return a {@link TraineeProfile} DTO representing the trainee,
+     * @return a {@link com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse} DTO representing the trainee,
      * or {@code null} if the input entity is {@code null}.
      */
-    static TraineeProfile toDto(Trainee trainee) {
+    static SlimTraineeProfileResponse toSlimDto(Trainee trainee) {
         if (trainee == null) {
             return null;
         }
 
-        return TraineeProfile.builder()
+        return SlimTraineeProfileResponse.builder()
                 .username(trainee.getUser().getUsername())
                 .firstName(trainee.getUser().getFirstName() != null ? trainee.getUser().getFirstName() : "")
                 .lastName(trainee.getUser().getLastName() != null ? trainee.getUser().getLastName() : "")

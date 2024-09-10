@@ -1,7 +1,7 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
@@ -51,7 +51,6 @@ import java.util.List;
 public class TrainerController implements ITrainerController {
 
     private final TrainerService service;
-
     private final TrainingService trainingService;
 
     /**
@@ -96,7 +95,8 @@ public class TrainerController implements ITrainerController {
     @Override
     @PostMapping("/assign")
     @PreAuthorize("hasAuthority('ROLE_TRAINER')")
-    public ResponseEntity<String> assignTraineeToTrainer(@RequestParam String traineeUsername) {
+    public ResponseEntity<String> assignTraineeToTrainer(
+            @RequestParam String traineeUsername) {
         service.assignTraineeToTrainer(traineeUsername);
         return ResponseEntity.ok("Trainee assigned successfully");
     }
@@ -113,9 +113,9 @@ public class TrainerController implements ITrainerController {
     @Override
     @DeleteMapping("/{username}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<String> deleteTrainer(@PathVariable String username) {
-        service.deleteTrainer(username);
-        return ResponseEntity.ok("Trainer deleted successfully");
+    public ResponseEntity<BaseResponse> deleteTrainer(
+            @PathVariable String username) {
+        return service.deleteTrainer(username);
     }
 
     /**
@@ -130,7 +130,7 @@ public class TrainerController implements ITrainerController {
     @Override
     @GetMapping("/{username}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_TRAINER')")
-    public ResponseEntity<SlimTrainerProfile> getTrainerProfile(
+    public ResponseEntity<BaseResponse> getTrainerProfile(
             @PathVariable String username) {
         return service.getTrainerProfileByName(username);
     }
@@ -148,7 +148,7 @@ public class TrainerController implements ITrainerController {
     @Override
     @PutMapping("/{username}")
     @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<TrainerProfile> updateTrainerProfile(
+    public ResponseEntity<BaseResponse> updateTrainerProfile(
             @PathVariable String username,
             @Valid @RequestBody TrainerUpdateRequest request) {
         return service.updateTrainer(username, request);

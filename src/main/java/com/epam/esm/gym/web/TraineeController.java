@@ -1,9 +1,11 @@
 package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
+import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
+import com.epam.esm.gym.dto.trainee.PutTraineeRequest;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.service.TraineeService;
 import jakarta.validation.Valid;
@@ -67,7 +69,7 @@ public class TraineeController implements ITraineeController {
     @Override
     @PostMapping("/register")
     public ResponseEntity<ProfileResponse> registerTrainee(
-            @Valid @RequestBody TraineeRequest request) {
+            @Valid @RequestBody PostTraineeRequest request) {
         return service.register(request);
     }
 
@@ -103,7 +105,7 @@ public class TraineeController implements ITraineeController {
     @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<BaseResponse> updateTraineeProfile(
             @PathVariable String username,
-            @Valid @RequestBody TraineeRequest request) {
+            @Valid @RequestBody PutTraineeRequest request) {
         return service.updateTrainee(username, request);
     }
 
@@ -118,8 +120,8 @@ public class TraineeController implements ITraineeController {
      * Ensures that unauthorized users cannot perform deletions.
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteTraineeProfile(
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<MessageResponse> deleteTraineeProfile(
             @PathVariable String username) {
         return service.deleteTrainee(username);
     }
@@ -138,7 +140,7 @@ public class TraineeController implements ITraineeController {
     @Override
     @PutMapping("/{username}/trainers")
     @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<List<SlimTrainerProfile>> updateTraineeTrainers(
+    public ResponseEntity<List<TrainerResponse>> updateTraineeTrainers(
             @PathVariable String username,
             @Valid @RequestBody List<String> trainersUsernames) {
         return service.updateTraineeTrainersByName(username, trainersUsernames);
@@ -178,7 +180,7 @@ public class TraineeController implements ITraineeController {
     @Override
     @PatchMapping("/{username}/activate")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Void> activateDeactivateTrainee(
+    public ResponseEntity<BaseResponse> activateDeactivateTrainee(
             @PathVariable String username, @RequestParam Boolean active) {
         return service.activateDeactivateProfile(username, active);
     }

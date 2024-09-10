@@ -76,8 +76,8 @@ public class Trainee {
     private String address;
 
     @JsonProperty("user")
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @Builder.Default

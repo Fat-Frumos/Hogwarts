@@ -3,9 +3,10 @@ package com.epam.esm.gym.web;
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
+import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
+import com.epam.esm.gym.dto.trainee.PutTraineeRequest;
+import com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.web.provider.trainee.NotFoundTraineeProfileArgumentsProvider;
@@ -76,10 +77,10 @@ class TraineeControllerTest extends ControllerTest {
     @ParameterizedTest
     @ArgumentsSource(TraineeMissingRegistrationArgumentsProvider.class)
     void testTraineeRegistrationMissingRequiredFields(
-            TraineeRequest traineeRequest, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
+            PutTraineeRequest putTraineeRequest, ResponseEntity<MessageResponse> expectedResponse) throws Exception {
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/trainees/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(traineeRequest)));
+                .content(objectMapper.writeValueAsString(putTraineeRequest)));
         resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()));
         String content = resultActions.andReturn().getResponse().getContentAsString();
         String actualMessage = objectMapper.readValue(content, MessageResponse.class).getMessage();
@@ -89,8 +90,8 @@ class TraineeControllerTest extends ControllerTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeRegistrationArgumentsProvider.class)
-    void testRegisterTrainee(TraineeRequest request, ResponseEntity<ProfileResponse> response) throws Exception {
-        when(service.register(request)).thenReturn(response);
+    void testRegisterTrainee(PostTraineeRequest request, ResponseEntity<ProfileResponse> response) throws Exception {
+        when(traineeService.register(request)).thenReturn(response);
         String result = mockMvc.perform(MockMvcRequestBuilders.post("/api/trainees/register")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -106,7 +107,7 @@ class TraineeControllerTest extends ControllerTest {
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
     void testGetTraineeProfile(
             String username, ResponseEntity<BaseResponse> expectedResponse) throws Exception {
-        when(service.getTraineeProfileByName(username)).thenReturn(expectedResponse);
+        when(traineeService.getTraineeProfileByName(username)).thenReturn(expectedResponse);
 
         String result = mockMvc.perform(get("/api/trainees/{username}", username)
                         .accept(MediaType.APPLICATION_JSON))
@@ -114,11 +115,10 @@ class TraineeControllerTest extends ControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse().getContentAsString();
 
-        TraineeProfile actualProfile = objectMapper.readValue(result, TraineeProfile.class);
-        Assertions.assertThat(actualProfile)
+        Assertions.assertThat(objectMapper.readValue(result, TraineeProfileResponseResponse.class))
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponse.getBody());
-        verify(service).getTraineeProfileByName(username);
+        verify(traineeService).getTraineeProfileByName(username);
     }
 
     @ParameterizedTest
@@ -126,7 +126,7 @@ class TraineeControllerTest extends ControllerTest {
     @ArgumentsSource(NotFoundTraineeProfileArgumentsProvider.class)
     void testGetNotFoundTraineeProfile(
             String username, ResponseEntity<BaseResponse> expectedResponse) throws Exception {
-        when(service.getTraineeProfileByName(username)).thenReturn(expectedResponse);
+        when(traineeService.getTraineeProfileByName(username)).thenReturn(expectedResponse);
         mockMvc.perform(get("/api/trainees/{username}", username))
                 .andExpect(status().isNotFound());
     }
@@ -136,8 +136,8 @@ class TraineeControllerTest extends ControllerTest {
     @ArgumentsSource(TraineeTrainersResponseEntityProfileArgumentsProvider.class)
     void testUpdateTraineeTrainers(
             String username, List<String> trainersUsernames,
-            ResponseEntity<List<SlimTrainerProfile>> expectedResponse) throws Exception {
-        when(service.updateTraineeTrainersByName(username, trainersUsernames)).thenReturn(expectedResponse);
+            ResponseEntity<List<TrainerResponse>> expectedResponse) throws Exception {
+        when(traineeService.updateTraineeTrainersByName(username, trainersUsernames)).thenReturn(expectedResponse);
         ResultActions resultActions = mockMvc.perform(put("/api/trainees/{username}/trainers", username)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(trainersUsernames)));
@@ -152,7 +152,7 @@ class TraineeControllerTest extends ControllerTest {
     void testGetTraineeTrainings(
             String username, TrainingProfile request,
             ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
-        when(service.getTraineeTrainingsByName(username, params)).thenReturn(expectedResponse);
+        when(traineeService.getTraineeTrainingsByName(username, params)).thenReturn(expectedResponse);
 
         ResultActions resultActions = mockMvc.perform(get("/api/trainees/{username}/trainings", username)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -181,7 +181,7 @@ class TraineeControllerTest extends ControllerTest {
         mockMvc.perform(patch(base_url + "/" + username + "/activate")
                         .param("active", active.toString()))
                 .andExpect(status().isOk());
-        verify(service).activateDeactivateProfile(username, active);
+        verify(traineeService).activateDeactivateProfile(username, active);
     }
 
     @ParameterizedTest
@@ -189,7 +189,7 @@ class TraineeControllerTest extends ControllerTest {
     @ArgumentsSource(TraineeTrainingsNotFoundArgumentsProvider.class)
     void testTraineeTrainingsNotFound(
             String username, ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
-        when(service.getTraineeProfileByName(username)).thenReturn(ResponseEntity.status(NOT_FOUND).build());
+        when(traineeService.getTraineeProfileByName(username)).thenReturn(ResponseEntity.status(NOT_FOUND).build());
         mockMvc.perform(get("/api/trainees/{username}/trainings", username))
                 .andExpect(status().is(expectedResponse.getStatusCode().value()));
     }
@@ -198,7 +198,7 @@ class TraineeControllerTest extends ControllerTest {
     @WithMockUser(roles = "ADMIN")
     @ArgumentsSource(TraineeTrainingsNotFoundArgumentsProvider.class)
     void testTraineeProfileNotFound(String username) throws Exception {
-        when(service.getTraineeProfileByName(username)).thenReturn(ResponseEntity.status(NOT_FOUND).build());
+        when(traineeService.getTraineeProfileByName(username)).thenReturn(ResponseEntity.status(NOT_FOUND).build());
         mockMvc.perform(get("/api/trainees/{username}", username)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
     }
@@ -207,7 +207,7 @@ class TraineeControllerTest extends ControllerTest {
     @WithMockUser(roles = "ADMIN")
     @ArgumentsSource(TraineeTrainingsNotFoundArgumentsProvider.class)
     void testTraineeProfileNotFoundWhenDelete(String username) throws Exception {
-        when(service.deleteTrainee(username)).thenReturn(ResponseEntity.status(NOT_FOUND).build());
+        when(traineeService.deleteTrainee(username)).thenReturn(ResponseEntity.status(NOT_FOUND).build());
         ResultActions resultActions = mockMvc.perform(delete("/api/trainees/{username}", username));
         resultActions.andExpect(status().isNotFound());
     }
@@ -216,8 +216,8 @@ class TraineeControllerTest extends ControllerTest {
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
     void testUpdateTraineeProfile(
-            String username, ResponseEntity<BaseResponse> response, TraineeRequest request) throws Exception {
-        when(service.updateTrainee(username, request)).thenReturn(response);
+            String username, ResponseEntity<BaseResponse> response, PutTraineeRequest request) throws Exception {
+        when(traineeService.updateTrainee(username, request)).thenReturn(response);
 
         ResultActions resultActions = mockMvc.perform(put("/api/trainees/{username}", username)
                 .contentType(MediaType.APPLICATION_JSON)

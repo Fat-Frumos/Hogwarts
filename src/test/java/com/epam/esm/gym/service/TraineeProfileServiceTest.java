@@ -6,13 +6,15 @@ import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.profile.UserProfile;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
+import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
+import com.epam.esm.gym.dto.trainee.PutTraineeRequest;
+import com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.mapper.TraineeMapper;
 import com.epam.esm.gym.service.profile.TraineeProfileService;
@@ -63,7 +65,7 @@ class TraineeProfileServiceTest {
 
     @ParameterizedTest
     @ArgumentsSource(TraineeRegistrationArgumentsProvider.class)
-    void register(TraineeRequest request,
+    void register(PostTraineeRequest request,
                   ResponseEntity<ProfileResponse> expectedResponse,
                   Trainee trainee) {
 
@@ -97,7 +99,7 @@ class TraineeProfileServiceTest {
     @ArgumentsSource(TraineeArgumentsProvider.class)
     void deleteTraineeWhenTraineeExists(String username, Trainee trainee) {
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
-        ResponseEntity<Void> response = service.deleteTrainee(username);
+        ResponseEntity<MessageResponse> response = service.deleteTrainee(username);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(dao).delete(trainee);
     }
@@ -106,7 +108,7 @@ class TraineeProfileServiceTest {
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
     void deleteTraineeWhenTraineeDoesNotExist(String username) {
         when(dao.findByUsername(username)).thenReturn(Optional.empty());
-        ResponseEntity<Void> response = service.deleteTrainee(username);
+        ResponseEntity<MessageResponse> response = service.deleteTrainee(username);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         verify(dao, never()).delete(any());
     }
@@ -115,7 +117,7 @@ class TraineeProfileServiceTest {
     @ArgumentsSource(TraineeArgumentsProvider.class)
     void getTraineeProfileByNameWhenTraineeExists(
             String username, Trainee trainee,
-            ResponseEntity<TraineeProfile> profile) {
+            ResponseEntity<TraineeProfileResponseResponse> profile) {
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
         when(mapper.toTraineeProfile(trainee)).thenReturn(profile.getBody());
         ResponseEntity<BaseResponse> response = service.getTraineeProfileByName(username);
@@ -133,8 +135,8 @@ class TraineeProfileServiceTest {
 
     @Test
     void updateTrainee() {
-        String username = "Harry.Potter";
-        TraineeRequest request = TraineeRequest.builder()
+        String username = "Harry.Potter.123";
+        PutTraineeRequest request = PutTraineeRequest.builder()
                 .firstName("Harry")
                 .lastName("Potter")
                 .dateOfBirth(LocalDate.parse("1980-07-31"))
@@ -142,8 +144,9 @@ class TraineeProfileServiceTest {
                 .build();
         Trainee trainee = new Trainee();
         Trainee updatedTrainee = new Trainee();
-        TraineeProfile updatedProfile = new TraineeProfile();
+        TraineeProfileResponseResponse updatedProfile = new TraineeProfileResponseResponse();
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
+        when(dao.findByUsername(request.getUsername())).thenReturn(Optional.empty());
         when(mapper.update(request, trainee)).thenReturn(updatedTrainee);
         when(dao.update(updatedTrainee)).thenReturn(updatedTrainee);
         when(mapper.toTraineeProfile(updatedTrainee)).thenReturn(updatedProfile);
@@ -151,6 +154,7 @@ class TraineeProfileServiceTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(updatedProfile, response.getBody());
     }
+
 
     @Test
     void validateUserWhenValid() {
@@ -196,12 +200,12 @@ class TraineeProfileServiceTest {
         List<String> trainerUsernames = List.of("Trainer1", "Trainer2");
         List<TrainerProfile> profiles = List.of(new TrainerProfile(), new TrainerProfile());
         Trainee trainee = new Trainee();
-        when(trainerService.getTrainer(anyString())).thenReturn(new Trainer());
+        when(trainerService.getTrainer(anyString())).thenReturn(Optional.of(new Trainer()));
         when(mapper.toTrainerProfile(any())).thenReturn(new TrainerProfile());
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
         when(mapper.toTrainers(anyList())).thenReturn(new HashSet<>());
 
-        ResponseEntity<List<SlimTrainerProfile>> response =
+        ResponseEntity<List<TrainerResponse>> response =
                 service.updateTraineeTrainersByName(username, trainerUsernames);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -226,11 +230,9 @@ class TraineeProfileServiceTest {
     @Test
     void activateDeactivateProfile() {
         String username = "Harry.Potter";
-        Trainee trainee = new Trainee();
-        trainee.setUser(new User());
+        Trainee trainee = Trainee.builder().user(new User()).build();
         when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
-        ResponseEntity<Void> response = service.activateDeactivateProfile(username, true);
-
+        ResponseEntity<BaseResponse> response = service.activateDeactivateProfile(username, true);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(trainee.getUser().getActive());
     }
@@ -242,15 +244,15 @@ class TraineeProfileServiceTest {
         List<TrainerProfile> trainerProfiles = List.of(new TrainerProfile(), new TrainerProfile());
         when(dao.findNotAssignedTrainers(username)).thenReturn(trainers);
         when(mapper.toTrainerProfile(any())).thenReturn(new TrainerProfile());
-        ResponseEntity<List<SlimTrainerProfile>> response = service.getNotAssignedTrainers(username);
+        ResponseEntity<List<TrainerResponse>> response = service.getNotAssignedTrainers(username);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(trainerProfiles, response.getBody());
     }
 
     @Test
     void register() {
-        TraineeRequest request = new TraineeRequest("Hermione", "Granger",
-                LocalDate.of(1990, 1, 1), "Hogwarts", true);
+        PostTraineeRequest request = new PostTraineeRequest(
+                "Hermione", "Granger", LocalDate.of(1990, 1, 1), "Hogwarts");
         String rawPassword = "rawPassword";
         String encodedPassword = "encodedPassword";
         User user = User.builder()

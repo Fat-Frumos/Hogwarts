@@ -1,6 +1,6 @@
 package com.epam.esm.gym.dto.trainee;
 
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,12 +23,12 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TraineeProfile extends SlimTraineeProfile {
+public class TraineeProfileResponseResponse extends SlimTraineeProfileResponse {
 
-    private List<SlimTrainerProfile> trainers;
+    private List<TrainerResponse> trainers;
 
     /**
-     * Constructs a new {@link TraineeProfile} with the specified details.
+     * Constructs a new {@link TraineeProfileResponseResponse} with the specified details.
      *
      * @param firstName   the first name of the trainee.
      * @param lastName    the last name of the trainee.
@@ -38,10 +38,10 @@ public class TraineeProfile extends SlimTraineeProfile {
      * @param dateOfBirth the date of birth of the trainee.
      * @param trainers    the list of trainers associated with the trainee.
      */
-    public TraineeProfile(
+    public TraineeProfileResponseResponse(
             String firstName, String lastName,
             String username, String address, Boolean active,
-            LocalDate dateOfBirth, List<SlimTrainerProfile> trainers) {
+            LocalDate dateOfBirth, List<TrainerResponse> trainers) {
         super(firstName, lastName, username, address, active, dateOfBirth);
         this.trainers = trainers;
     }
@@ -57,7 +57,7 @@ public class TraineeProfile extends SlimTraineeProfile {
         if (!super.equals(obj)) {
             return false;
         }
-        TraineeProfile profile = (TraineeProfile) obj;
+        TraineeProfileResponseResponse profile = (TraineeProfileResponseResponse) obj;
         return new EqualsBuilder()
                 .append(trainers, profile.trainers)
                 .isEquals();

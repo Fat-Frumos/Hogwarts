@@ -5,6 +5,8 @@ import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingType;
+import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
@@ -15,11 +17,13 @@ import com.epam.esm.gym.service.TrainerService;
 import com.epam.esm.gym.service.TrainingService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Implementation of TrainingService for managing training profiles.
@@ -49,7 +53,7 @@ public class TrainingProfileService implements TrainingService {
     public List<TrainingTypeDto> getTrainingTypes() {
         List<TrainingType> trainingTypes = dao.findAllTrainingTypes();
         return trainingTypes.stream()
-                .map(mapper::toType)
+                .map(TrainingMapper::toType)
                 .toList();
     }
 
@@ -65,7 +69,7 @@ public class TrainingProfileService implements TrainingService {
     public ResponseEntity<List<TrainingResponse>> getTrainerTrainingsByName(
             String username, TrainingProfile request) {
         List<Training> trainings = dao.findTrainingsByTrainerUsername(username);
-        return ResponseEntity.ok(mapper.toDtos(trainings));
+        return ResponseEntity.ok(mapper.toResponses(trainings));
     }
 
     /**
@@ -73,16 +77,23 @@ public class TrainingProfileService implements TrainingService {
      * Creates a new training session based on the provided request.
      *
      * @param request The {@link TrainingRequest} object containing details of the training to be created.
-     * @throws RuntimeException If there is an error while saving the training entity.
      */
     @Override
     @Transactional
-    public void createTraining(TrainingRequest request) {
-        log.debug("Received createTraining request: {}", request);
-        Trainee trainee = traineeService.getTrainee(request.getTraineeUsername());
-        Trainer trainer = trainerService.getTrainer(request.getTrainerUsername());
-        Training training = mapper.toEntity(request, trainee, trainer);
-        Training saved = dao.save(training);
-        log.info("Training entity saved successfully: {}", saved);
+    public ResponseEntity<BaseResponse> createTraining(TrainingRequest request) {
+        Optional<Trainee> traineeOptional = traineeService.getTrainee(request.getTraineeUsername());
+        if (traineeOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Trainee not found for username: " + request.getTraineeUsername()));
+        }
+        Optional<Trainer> trainerOptional = trainerService.getTrainer(request.getTrainerUsername());
+        if (trainerOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Trainer not found for username: " + request.getTrainerUsername()));
+        }
+
+        Training savedTraining = dao.save(mapper.toEntity(request, traineeOptional.get(), trainerOptional.get()));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new MessageResponse("Training saved successfully: " + savedTraining));
     }
 }

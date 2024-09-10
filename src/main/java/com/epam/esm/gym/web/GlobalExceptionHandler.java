@@ -38,7 +38,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private static final String INTERNAL_MESSAGE = "An unexpected error occurred";
+    private static final String INTERNAL_MESSAGE = "An unexpected error occurred: %s";
     private static final String MISSING_MESSAGE = "Required request parameter '%s' is not present";
     private static final String NOT_SUPPORTED_MESSAGE = "Request method '%s' not supported";
 
@@ -109,8 +109,11 @@ public class GlobalExceptionHandler {
         String message = ex.getBindingResult()
                 .getAllErrors()
                 .stream()
-                .map(error -> String.format(MISSING_MESSAGE,
-                        ((FieldError) error).getField()))
+                .map(error -> {
+                    String fieldName = ((FieldError) error).getField();
+                    String errorMessage = error.getDefaultMessage();
+                    return String.format("%s: %s", fieldName, errorMessage);
+                })
                 .collect(Collectors.joining(", "));
         return ResponseEntity.badRequest().body(new MessageResponse(message));
     }
@@ -128,7 +131,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     @ExceptionHandler({RuntimeException.class, Exception.class})
     public ResponseEntity<MessageResponse> handleRuntimeException(Exception ex) {
-        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new MessageResponse(INTERNAL_MESSAGE));
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse(String.format(INTERNAL_MESSAGE, ex.getMessage())));
     }
 
     /**
@@ -182,9 +186,11 @@ public class GlobalExceptionHandler {
      * @return a {@link ResponseEntity} containing a {@link MessageResponse} with an error message and
      * HTTP status {@link HttpStatus#UNAUTHORIZED}.
      */
+    @ResponseBody
     @ExceptionHandler({
             InvalidJwtAuthenticationException.class,
             TokenNotFoundException.class,
+            SignatureException.class,
             AuthenticationException.class})
     public ResponseEntity<MessageResponse> handleSignatureException(RuntimeException ex) {
         MessageResponse response = new MessageResponse(ex.getMessage());

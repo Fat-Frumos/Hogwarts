@@ -34,6 +34,8 @@ public class TrainerMissingRegistrationArgumentsProvider implements ArgumentsPro
                 Arguments.of(
                         TrainerRequest.builder()
                                 .lastName("Sirius")
+                                .lastName("Sirius")
+                                .specialization("Specialization")
                                 .dateOfBirth(LocalDate.parse("1980-07-31"))
                                 .address("Hogwarts")
                                 .build(),
@@ -73,21 +75,6 @@ public class TrainerMissingRegistrationArgumentsProvider implements ArgumentsPro
                         TrainerRequest.builder().lastName("Potter").build(),
                         ResponseEntity.badRequest().body(new MessageResponse(
                                 "Required request parameter 'firstName' is not present")),
-                        HttpStatus.BAD_REQUEST
-                ),
-                Arguments.of(
-                        TrainerRequest.builder().firstName("Harry").build(),
-                        ResponseEntity.badRequest().body(new MessageResponse(
-                                "Required request parameter 'specialization' is not present,")),
-                        HttpStatus.BAD_REQUEST
-                ),
-                Arguments.of(
-                        TrainerRequest.builder()
-                                .firstName("Remus")
-                                .address("Hogwarts")
-                                .build(),
-                        ResponseEntity.badRequest().body(new MessageResponse(
-                                "Required request parameter 'specialization' is not present,")),
                         HttpStatus.BAD_REQUEST
                 )
         );

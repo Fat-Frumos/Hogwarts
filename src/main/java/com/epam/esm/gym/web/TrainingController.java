@@ -1,11 +1,11 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import com.epam.esm.gym.service.TrainingService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -66,9 +66,8 @@ public class TrainingController implements ITrainingController {
      */
     @Override
     @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Void> addTraining(
+    public ResponseEntity<BaseResponse> addTraining(
             @Valid @RequestBody TrainingRequest request) {
-        trainingService.createTraining(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return trainingService.createTraining(request);
     }
 }

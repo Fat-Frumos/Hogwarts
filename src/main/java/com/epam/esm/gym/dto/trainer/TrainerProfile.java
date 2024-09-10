@@ -1,7 +1,6 @@
 package com.epam.esm.gym.dto.trainer;
 
-import com.epam.esm.gym.domain.TrainingType;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
+import com.epam.esm.gym.dto.trainee.SlimTraineeProfileResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,24 +24,20 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrainerProfile extends SlimTrainerProfile {
-    private List<TraineeProfile> trainees;
+public class TrainerProfile extends TrainerResponse {
+    private List<SlimTraineeProfileResponse> trainees;
 
     /**
-     * Constructs a new {@link TrainerProfile} with the specified details.
+     * Constructs a new {@code TrainerProfile} with the specified username, first name, last name, and list of trainees.
      *
-     * @param username       the username of the trainer.
-     * @param firstName      the first name of the trainer.
-     * @param lastName       the last name of the trainer.
-     * @param specialization the specialization of the trainer.
-     * @param active         the status indicating whether the trainer is active.
-     * @param trainees       the list of trainees associated with the trainer.
+     * @param username the username of the trainer
+     * @param first    the first name of the trainer
+     * @param last     the last name of the trainer
+     * @param trainees a list of {@link com.epam.esm.gym.dto.trainee.SlimTraineeProfileResponse}
+     *                 representing the trainees associated with the trainer
      */
-    public TrainerProfile(
-            String username, String firstName,
-            String lastName, TrainingType specialization,
-            boolean active, List<TraineeProfile> trainees) {
-        super(username, firstName, lastName, specialization, active);
+    public TrainerProfile(String username, String first, String last, List<SlimTraineeProfileResponse> trainees) {
+        super(username, first, last);
         this.trainees = trainees;
     }
 
@@ -58,8 +53,10 @@ public class TrainerProfile extends SlimTrainerProfile {
             return false;
         }
         TrainerProfile profile = (TrainerProfile) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj))
-                .append(trainees, profile.trainees).isEquals();
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(trainees, profile.trainees)
+                .isEquals();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,6 +75,6 @@ public interface ITrainingController {
                     @ApiResponse(responseCode = "403", description = "Forbidden access")
             }
     )
-    ResponseEntity<Void> addTraining(
+    ResponseEntity<BaseResponse> addTraining(
             @Valid @RequestBody TrainingRequest request);
 }

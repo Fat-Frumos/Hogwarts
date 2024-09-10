@@ -3,67 +3,67 @@ VALUES (1, 'ROLE_TRAINEE'),
        (2, 'ROLE_TRAINER'),
        (3, 'ROLE_ADMIN');
 
-INSERT INTO "users" (first_name, last_name, username, password, is_active, role_id, permission)
+INSERT INTO "users" (first_name, last_name, username, password, is_active, permission)
 VALUES ('Ginevra', 'Granger', 'Ginevra.Granger', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        'ROLE_TRAINER'),
        ('Theodore', 'Nott', 'Theodore.Nott', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        'ROLE_TRAINER'),
        ('Daphne', 'Greengrass', 'Daphne.Greengrass', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6',
-        TRUE, (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        TRUE, 'ROLE_TRAINER'),
        ('Pansy', 'Parkinson', 'Pansy.Parkinson', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Tracey', 'Davis', 'Tracey.Davis', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Millicent', 'Bulstrode', 'Millicent.Bulstrode', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6',
-        TRUE, (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        TRUE, 'ROLE_TRAINEE'),
        ('Gregory', 'Goyle', 'Gregory.Goyle', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Vincent', 'Crabbe', 'Vincent.Crabbe', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Padma', 'Patil', 'Padma.Patil', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Parvati', 'Patil', 'Parvati.Patil', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Harry', 'Potter', 'Harry.Potter', '$2a$10$AMs1YehIdq.7OBLM09E4ZuzUYvvB.VsvQVX6hfBxZN1N9qOPOAERe', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Hermione', 'Granger', 'Hermione.Granger', '$2a$10$0Vn9yPlu7/QJAzaC/xX/h.i6KmuKdpA9bcMtmvHYTE6fZmXbL.dJ6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Ron', 'Weasley', 'Ron.Weasley', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Luna', 'Lovegood', 'Luna.Lovegood', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Ginny', 'Weasley', 'Ginny.Weasley', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINEE'), 'ROLE_TRAINEE'),
+        'ROLE_TRAINEE'),
        ('Albus', 'Dumbledore', 'Albus.Dumbledore', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        'ROLE_TRAINER'),
        ('Severus', 'Snape', 'Severus.Snape', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        'ROLE_TRAINER'),
        ('Minerva', 'McGonagall', 'Minerva.McGonagall', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6',
-        TRUE, (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        TRUE, 'ROLE_TRAINER'),
        ('Rubeus', 'Hagrid', 'Rubeus.Hagrid', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        'ROLE_TRAINER'),
        ('Sybill', 'Trelawney', 'Sybill.Trelawney', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6',
-        FALSE, (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        FALSE, 'ROLE_TRAINER'),
        ('Sirius', 'Black', 'Sirius.Black', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        'ROLE_TRAINER'),
        ('Argus', 'Filch', 'Argus.Filch', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        'ROLE_TRAINER'),
        ('Filius', 'Flitwick', 'Filius.Flitwick', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        'ROLE_TRAINER'),
        ('Gilderoy', 'Lockhart', 'Gilderoy.Lockhart', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6',
-        TRUE, (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        TRUE, 'ROLE_TRAINER'),
        ('Poppy', 'Pomfrey', 'Poppy.Pomfrey', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        'ROLE_TRAINER'),
        ('Horace', 'Slughorn', 'Horace.Slughorn', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_TRAINER'), 'ROLE_TRAINER'),
+        'ROLE_TRAINER'),
        ('Godric', 'Gryffindor', 'Godric.Gryffindor', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6',
-        TRUE, (SELECT id FROM "roles" WHERE permission = 'ROLE_ADMIN'), 'ROLE_ADMIN'),
+        TRUE, 'ROLE_ADMIN'),
        ('Helga', 'Hufflepuff', 'Helga.Hufflepuff', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_ADMIN'), 'ROLE_ADMIN'),
+        'ROLE_ADMIN'),
        ('Rowena', 'Ravenclaw', 'Rowena.Ravenclaw', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6', TRUE,
-        (SELECT id FROM "roles" WHERE permission = 'ROLE_ADMIN'), 'ROLE_ADMIN'),
+        'ROLE_ADMIN'),
        ('Salazar', 'Slytherin', 'Salazar.Slytherin', '$2a$10$Uz2nz5i1Ez27py80kBQo/OrdGyi972CjukUj4sQGgtPPxT7atQOU6',
-        TRUE, (SELECT id FROM "roles" WHERE permission = 'ROLE_ADMIN'), 'ROLE_ADMIN');
+        TRUE, 'ROLE_ADMIN');
 
 
 INSERT INTO "training_type" (training_type_name)
@@ -81,29 +81,54 @@ VALUES ('CARDIO'),
        ('TRANSFIGURATION');
 
 
-INSERT INTO "trainer" (training_type_id, user_id)
-VALUES ((SELECT id FROM "training_type" WHERE training_type_name = 'POISONS'),
-        (SELECT id FROM "users" WHERE username = 'Severus.Snape')),
-       ((SELECT id FROM "training_type" WHERE training_type_name = 'CARE'),
-        (SELECT id FROM "users" WHERE username = 'Rubeus.Hagrid')),
-       ((SELECT id FROM "training_type" WHERE training_type_name = 'TRANSFIGURATION'),
-        (SELECT id FROM "users" WHERE username = 'Minerva.McGonagall')),
-       ((SELECT id FROM "training_type" WHERE training_type_name = 'QUIDDITCH'),
-        (SELECT id FROM "users" WHERE username = 'Albus.Dumbledore')),
-       ((SELECT id FROM "training_type" WHERE training_type_name = 'CARDIO'),
-        (SELECT id FROM "users" WHERE username = 'Argus.Filch')),
-       ((SELECT id FROM "training_type" WHERE training_type_name = 'STRENGTH'),
-        (SELECT id FROM "users" WHERE username = 'Filius.Flitwick')),
-       ((SELECT id FROM "training_type" WHERE training_type_name = 'FLEXIBILITY'),
-        (SELECT id FROM "users" WHERE username = 'Gilderoy.Lockhart')),
-       ((SELECT id FROM "training_type" WHERE training_type_name = 'BALANCE'),
-        (SELECT id FROM "users" WHERE username = 'Poppy.Pomfrey')),
-       ((SELECT id FROM "training_type" WHERE training_type_name = 'COORDINATION'),
-        (SELECT id FROM "users" WHERE username = 'Horace.Slughorn')),
-       ((SELECT id FROM "training_type" WHERE training_type_name = 'HERBOLOGY'),
-        (SELECT id FROM "users" WHERE username = 'Godric.Gryffindor')),
-       ((SELECT id FROM "training_type" WHERE training_type_name = 'DIVINATION'),
-        (SELECT id FROM "users" WHERE username = 'Salazar.Slytherin'));
+INSERT INTO "trainer" (user_id)
+VALUES
+    ((SELECT id FROM "users" WHERE username = 'Severus.Snape')),
+    ((SELECT id FROM "users" WHERE username = 'Rubeus.Hagrid')),
+    ((SELECT id FROM "users" WHERE username = 'Minerva.McGonagall')),
+    ((SELECT id FROM "users" WHERE username = 'Albus.Dumbledore')),
+    ((SELECT id FROM "users" WHERE username = 'Argus.Filch')),
+    ((SELECT id FROM "users" WHERE username = 'Filius.Flitwick')),
+    ((SELECT id FROM "users" WHERE username = 'Gilderoy.Lockhart')),
+    ((SELECT id FROM "users" WHERE username = 'Poppy.Pomfrey')),
+    ((SELECT id FROM "users" WHERE username = 'Horace.Slughorn')),
+    ((SELECT id FROM "users" WHERE username = 'Godric.Gryffindor')),
+    ((SELECT id FROM "users" WHERE username = 'Salazar.Slytherin'));
+
+INSERT INTO "trainer_training_type" (trainer_id, training_type_id)
+VALUES
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Severus.Snape')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'DEFENSE')),
+
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Rubeus.Hagrid')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'CARE')),
+
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Minerva.McGonagall')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'TRANSFIGURATION')),
+
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Albus.Dumbledore')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'QUIDDITCH')),
+
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Argus.Filch')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'CARDIO')),
+
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Filius.Flitwick')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'STRENGTH')),
+
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Gilderoy.Lockhart')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'FLEXIBILITY')),
+
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Poppy.Pomfrey')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'BALANCE')),
+
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Horace.Slughorn')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'COORDINATION')),
+
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Godric.Gryffindor')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'HERBOLOGY')),
+
+    ((SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Salazar.Slytherin')),
+     (SELECT id FROM "training_type" WHERE training_type_name = 'DIVINATION'));
 
 
 INSERT INTO "trainee" (date_of_birth, address, user_id)
@@ -128,7 +153,7 @@ INSERT INTO "training" (trainee_id, trainer_id, training_name, training_type_id,
 VALUES ((SELECT id FROM "trainee" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Harry.Potter')),
         (SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Severus.Snape')),
         'Poisons 101',
-        (SELECT id FROM "training_type" WHERE training_type_name = 'POISONS'),
+        (SELECT id FROM "training_type" WHERE training_type_name = 'POISON'),
         '2024-09-01',
         120),
 
@@ -155,8 +180,3 @@ VALUES ((SELECT id FROM "trainee" WHERE user_id = (SELECT id FROM "users" WHERE 
 
        ((SELECT id FROM "trainee" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Ron.Weasley')),
         (SELECT id FROM "trainer" WHERE user_id = (SELECT id FROM "users" WHERE username = 'Gilderoy.Lockhart')));
-
-INSERT INTO "roles" (id, permission)
-VALUES (1, 'ROLE_TRAINEE'),
-       (2, 'ROLE_TRAINER'),
-       (3, 'ROLE_ADMIN');

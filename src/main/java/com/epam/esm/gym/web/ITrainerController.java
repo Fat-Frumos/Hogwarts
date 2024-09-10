@@ -1,7 +1,7 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
@@ -42,7 +42,7 @@ public interface ITrainerController {
      * <p>This endpoint is accessible by users with roles ADMIN or TRAINER. It returns a list of all trainer
      * profiles available in the system.</p>
      *
-     * @return A {@link ResponseEntity} containing a list of {@link TrainerProfile}.
+     * @return A {@link ResponseEntity} containing a list of {@link com.epam.esm.gym.dto.trainer.TrainerProfile}.
      */
     @Operation(
             summary = "Get All Trainers",
@@ -117,7 +117,7 @@ public interface ITrainerController {
                     @ApiResponse(responseCode = "404", description = "Trainer not found")
             }
     )
-    ResponseEntity<String> deleteTrainer(@PathVariable String username);
+    ResponseEntity<BaseResponse> deleteTrainer(@PathVariable String username);
 
     /**
      * Retrieves a trainer profile by username.
@@ -126,7 +126,7 @@ public interface ITrainerController {
      * the trainer identified by the specified username.</p>
      *
      * @param username The username of the trainer whose profile is to be retrieved.
-     * @return A {@link ResponseEntity} containing the {@link TrainerProfile} if found.
+     * @return A {@link ResponseEntity} containing the {@link com.epam.esm.gym.dto.trainer.TrainerProfile} if found.
      */
     @Operation(
             summary = "Get Trainer Profile",
@@ -138,7 +138,7 @@ public interface ITrainerController {
                     @ApiResponse(responseCode = "404", description = "Trainer not found")
             }
     )
-    ResponseEntity<SlimTrainerProfile> getTrainerProfile(@PathVariable String username);
+    ResponseEntity<BaseResponse> getTrainerProfile(@PathVariable String username);
 
     /**
      * Updates an existing trainer profile by username.
@@ -148,7 +148,7 @@ public interface ITrainerController {
      *
      * @param username The username of the trainer to be updated.
      * @param request  A {@link TrainerUpdateRequest} object containing updated trainer details.
-     * @return A {@link ResponseEntity} containing the updated {@link TrainerProfile}.
+     * @return A {@link ResponseEntity} containing the updated {@link com.epam.esm.gym.dto.trainer.TrainerProfile}.
      */
     @Operation(
             summary = "Update Trainer Profile",
@@ -162,7 +162,7 @@ public interface ITrainerController {
                     @ApiResponse(responseCode = "405", description = "Method not allowed")
             }
     )
-    ResponseEntity<TrainerProfile> updateTrainerProfile(
+    ResponseEntity<BaseResponse> updateTrainerProfile(
             @PathVariable String username, @Valid @RequestBody TrainerUpdateRequest request);
 
     /**
@@ -221,7 +221,7 @@ public interface ITrainerController {
      * currently assigned to any trainees.</p>
      *
      * @param username The username of the requesting user, typically used for authentication/authorization checks.
-     * @return A {@link ResponseEntity} containing a list of {@link TrainerProfile}.
+     * @return A {@link ResponseEntity} containing a list of {@link com.epam.esm.gym.dto.trainer.TrainerProfile}.
      */
     @Operation(
             summary = "Get Not Assigned Active Trainers",

@@ -1,5 +1,6 @@
 package com.epam.esm.gym.actuator;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
@@ -21,8 +22,12 @@ import org.springframework.web.client.RestTemplate;
  */
 @Component
 class ExternalServiceHealthIndicator implements HealthIndicator {
-    private static final String PROMETHEUS_URL = "http://localhost:8080/actuator/prometheus";
-    private static final String INFO_URL = "http://localhost:8080/actuator/info";
+
+    @Value("${actuator.prometheus.url}")
+    private String prometheusUrl;
+
+    @Value("${actuator.info.url}")
+    private String infoUrl;
     private static final String PROMETHEUS = "prometheus";
     private final RestTemplate restTemplate;
 
@@ -91,7 +96,7 @@ class ExternalServiceHealthIndicator implements HealthIndicator {
     private boolean checkPrometheusMetrics() {
         try {
             return restTemplate
-                    .getForEntity(PROMETHEUS_URL, String.class)
+                    .getForEntity(prometheusUrl, String.class)
                     .getStatusCode()
                     .is2xxSuccessful();
         } catch (Exception e) {
@@ -119,7 +124,7 @@ class ExternalServiceHealthIndicator implements HealthIndicator {
     private boolean checkInfoEndpoint() {
         try {
             return restTemplate
-                    .getForEntity(INFO_URL, String.class)
+                    .getForEntity(infoUrl, String.class)
                     .getStatusCode()
                     .is2xxSuccessful();
         } catch (Exception e) {

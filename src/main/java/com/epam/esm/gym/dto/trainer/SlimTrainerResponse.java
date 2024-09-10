@@ -1,6 +1,6 @@
 package com.epam.esm.gym.dto.trainer;
 
-import com.epam.esm.gym.domain.TrainingType;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,11 +11,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * Represents a slim version of a trainee profile with essential details.
- * This class contains basic information about a trainee, including personal details and
- * contact information. It is intended for scenarios where a full profile is not needed.
- * The class uses Lombok annotations to automatically generate getters,
- * a toString() method, a builder, a no-args constructor, and an all-args constructor.
+ * Represents a request to create or update a trainer, containing details required for such operations.
+ *
+ * <p>This class is used to encapsulate the data necessary to create or update a trainer.</p>
  */
 @Getter
 @Setter
@@ -23,12 +21,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SlimTrainerProfile {
+public class SlimTrainerResponse implements BaseResponse {
     private String username;
     private String firstName;
     private String lastName;
-    private TrainingType specialization;
-    private boolean active;
 
     @Override
     public boolean equals(Object obj) {
@@ -40,13 +36,12 @@ public class SlimTrainerProfile {
             return false;
         }
 
-        SlimTrainerProfile that = (SlimTrainerProfile) obj;
+        SlimTrainerResponse that = (SlimTrainerResponse) obj;
 
-        return new EqualsBuilder().append(active, that.active)
+        return new EqualsBuilder()
                 .append(username, that.username)
                 .append(firstName, that.firstName)
                 .append(lastName, that.lastName)
-                .append(specialization, that.specialization)
                 .isEquals();
     }
 
@@ -54,7 +49,6 @@ public class SlimTrainerProfile {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(username).append(firstName)
-                .append(lastName).append(specialization)
-                .append(active).toHashCode();
+                .append(lastName).toHashCode();
     }
 }

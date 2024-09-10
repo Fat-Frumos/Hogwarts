@@ -1,8 +1,8 @@
 package com.epam.esm.gym.web.provider.trainee;
 
 import com.epam.esm.gym.domain.Specialization;
-import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
@@ -30,11 +30,11 @@ import java.util.stream.Stream;
 public class TraineeTrainersResponseEntityProfileArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
-        TrainingType transfiguration = TrainingType.builder()
+        TrainingTypeDto transfiguration = TrainingTypeDto.builder()
                 .specialization(Specialization.TRANSFIGURATION)
                 .build();
 
-        TrainingType defense = TrainingType.builder()
+        TrainingTypeDto defense = TrainingTypeDto.builder()
                 .specialization(Specialization.DEFENSE)
                 .build();
 
@@ -43,13 +43,13 @@ public class TraineeTrainersResponseEntityProfileArgumentsProvider implements Ar
                         .username("Minerva.McGonagall")
                         .firstName("Minerva")
                         .lastName("McGonagall")
-                        .specialization(transfiguration)
+                        .specializations(List.of(transfiguration))
                         .build(),
                 TrainerProfile.builder()
                         .username("Remus.Lupin")
                         .firstName("Remus")
                         .lastName("Lupin")
-                        .specialization(defense)
+                        .specializations(List.of(defense))
                         .build()
         );
 

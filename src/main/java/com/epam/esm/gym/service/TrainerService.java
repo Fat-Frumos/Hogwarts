@@ -1,15 +1,16 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.domain.Trainer;
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Provides operations for managing trainer profiles and related tasks.
@@ -47,7 +48,7 @@ public interface TrainerService {
      *
      * @param username the username of the trainer to be deleted
      */
-    void deleteTrainer(String username);
+    ResponseEntity<BaseResponse> deleteTrainer(String username);
 
     /**
      * Registers a new trainer using the provided registration details.
@@ -73,9 +74,10 @@ public interface TrainerService {
      * </p>
      *
      * @param username the username of the trainer whose profile is to be retrieved
-     * @return a {@link ResponseEntity} containing the {@link TrainerProfile} of the requested trainer
+     * @return a {@link ResponseEntity} containing the
+     * {@link com.epam.esm.gym.dto.trainer.TrainerProfile} of the requested trainer
      */
-    ResponseEntity<SlimTrainerProfile> getTrainerProfileByName(String username);
+    ResponseEntity<BaseResponse> getTrainerProfileByName(String username);
 
     /**
      * Updates the profile details of an existing trainer.
@@ -88,9 +90,9 @@ public interface TrainerService {
      *
      * @param username the username of the trainer to be updated
      * @param request  the details to update the trainer's profile
-     * @return a {@link ResponseEntity} containing the updated {@link TrainerProfile}
+     * @return a {@link ResponseEntity} containing the updated {@link com.epam.esm.gym.dto.trainer.TrainerProfile}
      */
-    ResponseEntity<TrainerProfile> updateTrainer(String username, TrainerUpdateRequest request);
+    ResponseEntity<BaseResponse> updateTrainer(String username, TrainerUpdateRequest request);
 
     /**
      * Retrieves trainers who are not assigned to the specified trainee.
@@ -102,7 +104,8 @@ public interface TrainerService {
      * </p>
      *
      * @param traineeUsername the username of the trainee for whom to find not assigned trainers
-     * @return a {@link ResponseEntity} containing a list of {@link TrainerProfile} for not assigned trainers
+     * @return a {@link ResponseEntity} containing a list of
+     * {@link com.epam.esm.gym.dto.trainer.TrainerProfile} for not assigned trainers
      */
     ResponseEntity<List<TrainerProfile>> getNotAssigned(String traineeUsername);
 
@@ -133,7 +136,7 @@ public interface TrainerService {
      * @param trainerUsername the username of the trainer to retrieve
      * @return the {@link Trainer} object associated with the provided username
      */
-    Trainer getTrainer(String trainerUsername);
+    Optional<Trainer> getTrainer(String trainerUsername);
 
     /**
      * Retrieves a list of all trainers in the system.
@@ -143,7 +146,8 @@ public interface TrainerService {
      * The result includes all trainers without any filtering or pagination.
      * </p>
      *
-     * @return a {@link ResponseEntity} containing a list of {@link TrainerProfile} for all trainers
+     * @return a {@link ResponseEntity} containing a list of
+     * {@link com.epam.esm.gym.dto.trainer.TrainerProfile} for all trainers
      */
     ResponseEntity<List<TrainerProfile>> findAll();
 
@@ -158,5 +162,4 @@ public interface TrainerService {
      * @param traineeUsername the username of the trainee to be assigned to a trainer
      */
     void assignTraineeToTrainer(String traineeUsername);
-
 }

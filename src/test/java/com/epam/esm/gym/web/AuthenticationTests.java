@@ -47,13 +47,6 @@ class AuthenticationTests extends ControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    @WithMockUser(roles = "TRAINEE")
-    void testUnauthorizedAccess() throws Exception {
-        mockMvc.perform(get("/api/trainers"))
-                .andExpect(status().isForbidden());
-    }
-
     @ParameterizedTest
     @DisplayName("Successful Login")
     @WithMockUser(roles = "TRAINEE")

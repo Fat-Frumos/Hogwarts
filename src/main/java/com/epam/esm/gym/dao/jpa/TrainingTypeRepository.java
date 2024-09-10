@@ -5,7 +5,7 @@ import com.epam.esm.gym.domain.TrainingType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * Repository interface for managing {@link TrainingType} entities.
@@ -23,7 +23,7 @@ public interface TrainingTypeRepository extends JpaRepository<TrainingType, Long
      * Finds a {@link TrainingType} entity by its {@link Specialization}.
      *
      * @param specialization the specialization of the training type
-     * @return an {@link Optional} containing the {@link TrainingType} if found, or empty if not
+     * @return an {@link List} containing the {@link TrainingType} if found, or empty if not
      */
-    Optional<TrainingType> findBySpecialization(Specialization specialization);
+    List<TrainingType> findAllBySpecialization(Specialization specialization);
 }

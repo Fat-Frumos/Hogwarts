@@ -1,9 +1,11 @@
 package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
+import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
+import com.epam.esm.gym.dto.trainee.PutTraineeRequest;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -74,7 +76,7 @@ public interface ITraineeController {
             }
     )
     ResponseEntity<ProfileResponse> registerTrainee(
-            @Valid @RequestBody TraineeRequest request);
+            @Valid @RequestBody PostTraineeRequest request);
 
     /**
      * Retrieves a specific trainee profile by username.
@@ -119,7 +121,7 @@ public interface ITraineeController {
     )
     ResponseEntity<BaseResponse> updateTraineeProfile(
             @PathVariable String username,
-            @Valid @RequestBody TraineeRequest request);
+            @Valid @RequestBody PutTraineeRequest request);
 
     /**
      * Deletes the profile of a specific trainee. Requires the username of the trainee to be deleted.
@@ -139,8 +141,7 @@ public interface ITraineeController {
                     @ApiResponse(responseCode = "403", description = "Forbidden access")
             }
     )
-    ResponseEntity<Void> deleteTraineeProfile(
-            @PathVariable String username);
+    ResponseEntity<MessageResponse> deleteTraineeProfile(@PathVariable String username);
 
     /**
      * Updates the list of trainers assigned to a specific trainee.
@@ -161,7 +162,7 @@ public interface ITraineeController {
                     @ApiResponse(responseCode = "403", description = "Forbidden access")
             }
     )
-    ResponseEntity<List<SlimTrainerProfile>> updateTraineeTrainers(
+    ResponseEntity<List<TrainerResponse>> updateTraineeTrainers(
             @PathVariable String username,
             @Valid @RequestBody List<String> trainersUsernames);
 
@@ -205,6 +206,6 @@ public interface ITraineeController {
                     @ApiResponse(responseCode = "403", description = "Forbidden access")
             }
     )
-    ResponseEntity<Void> activateDeactivateTrainee(
+    ResponseEntity<BaseResponse> activateDeactivateTrainee(
             @PathVariable String username, @RequestParam Boolean active);
 }

@@ -6,11 +6,13 @@ import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.training.TrainingRequest;
+import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 class TrainingMapperTest {
 
-    private final TrainingMapper trainingMapper = Mappers.getMapper(TrainingMapper.class);
+    private final TrainingMapper mapper = Mappers.getMapper(TrainingMapper.class);
 
     @Test
     void testToEntity() {
@@ -46,7 +48,7 @@ class TrainingMapperTest {
         Trainee trainee = Trainee.builder().build();
         Trainer trainer = Trainer.builder().build();
 
-        Training training = trainingMapper.toEntity(dto, trainee, trainer);
+        Training training = mapper.toEntity(dto, trainee, trainer);
 
         assertNotNull(training);
         assertEquals("Basic Charms", training.getTrainingName());
@@ -63,10 +65,58 @@ class TrainingMapperTest {
                 .specialization(Specialization.TRANSFIGURATION)
                 .build();
 
-        TrainingTypeDto response = trainingMapper.toType(trainingType);
+        TrainingTypeDto response = TrainingMapper.toType(trainingType);
 
         assertNotNull(response);
-        assertEquals(Specialization.TRANSFIGURATION, response.getTrainingType());
+        assertEquals(Specialization.TRANSFIGURATION, response.getSpecialization());
         assertEquals(1L, response.getTrainingTypeId());
+    }
+
+    @Test
+    void testToEntityType() {
+        TrainingTypeDto dto = TrainingTypeDto.builder()
+                .specialization(Specialization.TRANSFIGURATION)
+                .build();
+        TrainingType entity = TrainingMapper.toEntityType(dto);
+
+        assertEquals(Specialization.TRANSFIGURATION, entity.getSpecialization());
+    }
+
+    @Test
+    void testToTypes() {
+        TrainingTypeDto dto1 = TrainingTypeDto.builder()
+                .specialization(Specialization.TRANSFIGURATION)
+                .build();
+
+        TrainingTypeDto dto2 = TrainingTypeDto.builder()
+                .specialization(Specialization.TRANSFIGURATION)
+                .build();
+
+        List<TrainingTypeDto> dtos = List.of(dto1, dto2);
+
+        List<TrainingType> entities = TrainingMapper.toTypes(dtos);
+
+        assertEquals(2, entities.size());
+
+        TrainingType entity1 = entities.get(0);
+        assertEquals(Specialization.TRANSFIGURATION, entity1.getSpecialization());
+
+        TrainingType entity2 = entities.get(1);
+        assertEquals(Specialization.TRANSFIGURATION, entity2.getSpecialization());
+    }
+
+    @Test
+    void testToResponses() {
+        Training training1 = new Training();
+        TrainingResponse response1 = new TrainingResponse();
+        Training training2 = new Training();
+        TrainingResponse response2 = new TrainingResponse();
+
+        List<Training> trainings = List.of(training1, training2);
+        List<TrainingResponse> responses = mapper.toResponses(trainings);
+
+        assertEquals(2, responses.size());
+        assertEquals(response1, responses.get(0));
+        assertEquals(response2, responses.get(1));
     }
 }

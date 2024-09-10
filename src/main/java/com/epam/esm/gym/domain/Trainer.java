@@ -1,13 +1,14 @@
 package com.epam.esm.gym.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
@@ -18,7 +19,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -41,7 +44,7 @@ import java.util.Set;
         name = "Trainer.trainees.specialization",
         attributeNodes = {
                 @NamedAttributeNode("trainees"),
-                @NamedAttributeNode("specialization")
+                @NamedAttributeNode("trainingTypes")
         }
 )
 @Table(name = "trainer")
@@ -50,13 +53,19 @@ public class Trainer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @JsonProperty("user")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "training_type_id", nullable = false)
-    private TrainingType specialization;
+    @Builder.Default
+    @ManyToMany
+    @JoinTable(
+            name = "trainer_training_type",
+            joinColumns = @JoinColumn(name = "trainer_id"),
+            inverseJoinColumns = @JoinColumn(name = "training_type_id")
+    )
+    private List<TrainingType> trainingTypes = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "trainer")
@@ -104,13 +113,13 @@ public class Trainer {
         Trainer trainer = (Trainer) obj;
         return Objects.equals(id, trainer.id)
                 && Objects.equals(user, trainer.user)
-                && Objects.equals(specialization, trainer.specialization)
+                && Objects.equals(trainingTypes, trainer.trainingTypes)
                 && Objects.equals(trainings, trainer.trainings)
                 && Objects.equals(trainees, trainer.trainees);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, user, specialization, trainings, trainees);
+        return Objects.hash(id, user, trainingTypes, trainings, trainees);
     }
 }

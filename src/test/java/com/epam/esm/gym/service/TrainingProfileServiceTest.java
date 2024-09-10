@@ -4,15 +4,12 @@ import com.epam.esm.gym.dao.TrainingDao;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
-import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
-import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import com.epam.esm.gym.mapper.TrainingMapper;
 import com.epam.esm.gym.service.profile.TrainingProfileService;
 import com.epam.esm.gym.web.provider.trainee.TraineeTrainingArgumentsProvider;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
@@ -23,9 +20,9 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,19 +44,6 @@ class TrainingProfileServiceTest {
     @InjectMocks
     private TrainingProfileService service;
 
-    @Test
-    void testGetTrainingTypes() {
-        TrainingType trainingType = mock(TrainingType.class);
-        TrainingTypeDto response = mock(TrainingTypeDto.class);
-        when(dao.findAllTrainingTypes()).thenReturn(List.of(trainingType));
-        when(mapper.toType(trainingType)).thenReturn(response);
-        List<TrainingTypeDto> result = service.getTrainingTypes();
-
-        assertEquals(List.of(response), result);
-        verify(dao).findAllTrainingTypes();
-        verify(mapper).toType(trainingType);
-    }
-
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainingArgumentsProvider.class)
     void testGetTrainerTrainingsByName(
@@ -67,11 +51,11 @@ class TrainingProfileServiceTest {
             Training training, TrainingResponse response) {
         String name = "Severus.Snape";
         when(dao.findTrainingsByTrainerUsername(name)).thenReturn(List.of(training));
-        when(mapper.toDtos(List.of(training))).thenReturn(List.of(response));
+        when(mapper.toResponses(List.of(training))).thenReturn(List.of(response));
         ResponseEntity<List<TrainingResponse>> result = service.getTrainerTrainingsByName(name, new TrainingProfile());
         assertEquals(ResponseEntity.ok(List.of(response)), result);
         verify(dao).findTrainingsByTrainerUsername(name);
-        verify(mapper).toDtos(List.of(training));
+        verify(mapper).toResponses(List.of(training));
     }
 
     @ParameterizedTest
@@ -81,8 +65,8 @@ class TrainingProfileServiceTest {
         TrainingRequest request = new TrainingRequest(
                 "Harry.Potter", "Minerva.McGonagall",
                 "Advanced Transfiguration", "2024-22-08", 60);
-        when(traineeService.getTrainee(request.getTraineeUsername())).thenReturn(trainee);
-        when(trainerService.getTrainer(request.getTrainerUsername())).thenReturn(trainer);
+        when(traineeService.getTrainee(request.getTraineeUsername())).thenReturn(Optional.of(trainee));
+        when(trainerService.getTrainer(request.getTrainerUsername())).thenReturn(Optional.of(trainer));
         when(mapper.toEntity(request, trainee, trainer)).thenReturn(training);
 
         service.createTraining(request);

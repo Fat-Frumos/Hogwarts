@@ -1,7 +1,7 @@
 package com.epam.esm.gym.web.provider.trainee;
 
 import com.epam.esm.gym.dto.auth.MessageResponse;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
+import com.epam.esm.gym.dto.trainee.PutTraineeRequest;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
@@ -27,7 +27,7 @@ public class TraineeMissingRegistrationArgumentsProvider implements ArgumentsPro
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
         return Stream.of(
                 Arguments.of(
-                        TraineeRequest.builder()
+                        PutTraineeRequest.builder()
                                 .lastName("Potter")
                                 .dateOfBirth(LocalDate.parse("1980-07-31"))
                                 .address("Hogwarts")
@@ -37,7 +37,7 @@ public class TraineeMissingRegistrationArgumentsProvider implements ArgumentsPro
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
-                        TraineeRequest.builder()
+                        PutTraineeRequest.builder()
                                 .dateOfBirth(LocalDate.parse("1980-07-31"))
                                 .address("Hogwarts")
                                 .build(),
@@ -47,7 +47,7 @@ public class TraineeMissingRegistrationArgumentsProvider implements ArgumentsPro
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
-                        TraineeRequest.builder()
+                        PutTraineeRequest.builder()
                                 .lastName("Potter")
                                 .dateOfBirth(LocalDate.parse("1980-07-31"))
                                 .build(),
@@ -56,26 +56,26 @@ public class TraineeMissingRegistrationArgumentsProvider implements ArgumentsPro
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
-                        TraineeRequest.builder().build(),
+                        PutTraineeRequest.builder().build(),
                         ResponseEntity.badRequest().body(new MessageResponse(
                                 "Required request parameter 'firstName' is not present, " +
                                         "Required request parameter 'lastName' is not present")),
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
-                        TraineeRequest.builder().lastName("Potter").build(),
+                        PutTraineeRequest.builder().lastName("Potter").build(),
                         ResponseEntity.badRequest().body(new MessageResponse(
                                 "Required request parameter 'firstName' is not present")),
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
-                        TraineeRequest.builder().firstName("Harry").build(),
+                        PutTraineeRequest.builder().firstName("Harry").build(),
                         ResponseEntity.badRequest().body(new MessageResponse(
                                 "Required request parameter 'lastName' is not present")),
                         HttpStatus.BAD_REQUEST
                 ),
                 Arguments.of(
-                        TraineeRequest.builder()
+                        PutTraineeRequest.builder()
                                 .firstName("Harry")
                                 .address("Hogwarts")
                                 .build(),

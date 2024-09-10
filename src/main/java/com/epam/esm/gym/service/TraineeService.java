@@ -2,17 +2,18 @@ package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.dto.auth.BaseResponse;
+import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
-import com.epam.esm.gym.dto.trainee.TraineeProfile;
-import com.epam.esm.gym.dto.trainee.TraineeRequest;
-import com.epam.esm.gym.dto.trainer.SlimTrainerProfile;
-import com.epam.esm.gym.dto.trainer.TrainerProfile;
+import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
+import com.epam.esm.gym.dto.trainee.PutTraineeRequest;
+import com.epam.esm.gym.dto.trainer.TrainerResponse;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Service interface for managing trainee profiles and related operations.
@@ -42,7 +43,7 @@ public interface TraineeService {
      * @param request the details of the trainee to be registered
      * @return a {@link ResponseEntity} containing the {@link ProfileResponse} of the newly registered trainee
      */
-    ResponseEntity<ProfileResponse> register(TraineeRequest request);
+    ResponseEntity<ProfileResponse> register(PostTraineeRequest request);
 
     /**
      * Deletes a trainee profile identified by the provided username.
@@ -57,7 +58,7 @@ public interface TraineeService {
      * @param username the username of the trainee to be deleted
      * @return a {@link ResponseEntity} with no content if the deletion is successful
      */
-    ResponseEntity<Void> deleteTrainee(String username);
+    ResponseEntity<MessageResponse> deleteTrainee(String username);
 
     /**
      * Retrieves the profile of a trainee by their username.
@@ -69,7 +70,8 @@ public interface TraineeService {
      * </p>
      *
      * @param username the username of the trainee whose profile is to be retrieved
-     * @return a {@link ResponseEntity} containing the {@link TraineeProfile} of the requested trainee
+     * @return a {@link ResponseEntity} containing t
+     * he {@link com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse} of the requested trainee
      */
     ResponseEntity<BaseResponse> getTraineeProfileByName(String username);
 
@@ -84,10 +86,11 @@ public interface TraineeService {
      *
      * @param username the username of the trainee whose profile is to be updated
      * @param request  the updated details of the trainee
-     * @return a {@link ResponseEntity} containing the updated {@link TraineeProfile}
+     * @return a {@link ResponseEntity} containing the updated
+     * {@link com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse}
      */
     ResponseEntity<BaseResponse> updateTrainee(
-            String username, TraineeRequest request);
+            String username, PutTraineeRequest request);
 
     /**
      * Validates the provided user profile request for correctness and completeness.
@@ -127,9 +130,10 @@ public interface TraineeService {
      *
      * @param username          the username of the trainee whose trainers are to be updated
      * @param trainersUsernames the list of usernames of the trainers to be assigned
-     * @return a {@link ResponseEntity} containing the updated list of {@link TrainerProfile}
+     * @return a {@link ResponseEntity} containing the updated list of
+     * {@link com.epam.esm.gym.dto.trainer.TrainerProfile}
      */
-    ResponseEntity<List<SlimTrainerProfile>> updateTraineeTrainersByName(
+    ResponseEntity<List<TrainerResponse>> updateTraineeTrainersByName(
             String username, List<String> trainersUsernames);
 
     /**
@@ -161,7 +165,7 @@ public interface TraineeService {
      * @param active   the desired active status of the profile
      * @return a {@link ResponseEntity} with no content if the operation is successful
      */
-    ResponseEntity<Void> activateDeactivateProfile(String username, Boolean active);
+    ResponseEntity<BaseResponse> activateDeactivateProfile(String username, Boolean active);
 
     /**
      * Retrieves a list of trainers who are not currently assigned to a specific trainee.
@@ -173,9 +177,9 @@ public interface TraineeService {
      * </p>
      *
      * @param username the username of the trainee for whom the unassigned trainers are to be retrieved
-     * @return a {@link ResponseEntity} containing the list of {@link TrainerProfile}
+     * @return a {@link ResponseEntity} containing the list of {@link com.epam.esm.gym.dto.trainer.TrainerProfile}
      */
-    ResponseEntity<List<SlimTrainerProfile>> getNotAssignedTrainers(String username);
+    ResponseEntity<List<TrainerResponse>> getNotAssignedTrainers(String username);
 
 
     /**
@@ -189,7 +193,7 @@ public interface TraineeService {
      * @param traineeUsername the username of the trainee to be retrieved
      * @return the {@link Trainee} object if found
      */
-    Trainee getTrainee(String traineeUsername);
+    Optional<Trainee> getTrainee(String traineeUsername);
 
     /**
      * Retrieves a list of all trainees.
@@ -200,7 +204,8 @@ public interface TraineeService {
      * This method is useful for obtaining a comprehensive list of all trainees.
      * </p>
      *
-     * @return a {@link ResponseEntity} containing the list of {@link TraineeProfile}
+     * @return a {@link ResponseEntity} containing the list of
+     * {@link com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse}
      */
     ResponseEntity<List<BaseResponse>> findAll();
 }

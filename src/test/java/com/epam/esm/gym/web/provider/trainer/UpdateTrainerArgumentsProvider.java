@@ -2,14 +2,15 @@ package com.epam.esm.gym.web.provider.trainer;
 
 
 import com.epam.esm.gym.domain.Specialization;
-import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
+import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -31,7 +32,7 @@ import java.util.stream.Stream;
 public class UpdateTrainerArgumentsProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
-        TrainingType transfiguration = TrainingType.builder()
+        TrainingTypeDto transfiguration = TrainingTypeDto.builder()
                 .specialization(Specialization.TRANSFIGURATION)
                 .build();
 
@@ -45,8 +46,7 @@ public class UpdateTrainerArgumentsProvider implements ArgumentsProvider {
                 .username("Minerva.McGonagall")
                 .firstName("Minerva")
                 .lastName("McGonagall")
-                .specialization(transfiguration)
-                .active(true)
+                .specializations(List.of(transfiguration))
                 .build();
 
         return Stream.of(
