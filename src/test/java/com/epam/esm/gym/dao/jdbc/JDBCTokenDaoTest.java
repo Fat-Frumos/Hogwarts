@@ -57,7 +57,7 @@ class JDBCTokenDaoTest {
         when(session.createQuery(anyString(), eq(Token.class))).thenReturn(query);
         when(query.setParameter(anyString(), any())).thenReturn(query);
         when(query.uniqueResultOptional()).thenReturn(Optional.of(token));
-        Optional<Token> result = jdbcTokenDao.findByUsername("testUser");
+        Optional<Token> result = jdbcTokenDao.findByName("testUser");
         assertTrue(result.isPresent());
         assertEquals(token, result.get());
     }
@@ -69,7 +69,7 @@ class JDBCTokenDaoTest {
                 .thenReturn(query);
         when(query.setParameter(anyString(), any())).thenReturn(query);
         when(query.uniqueResultOptional()).thenReturn(Optional.empty());
-        Optional<Token> result = jdbcTokenDao.findByUsername("testUser");
+        Optional<Token> result = jdbcTokenDao.findByName("testUser");
         assertFalse(result.isPresent());
     }
 

@@ -2,8 +2,8 @@ package com.epam.esm.gym.web.provider.trainer;
 
 
 import com.epam.esm.gym.domain.Specialization;
+import com.epam.esm.gym.dto.trainer.PutTrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
-import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.dto.training.TrainingTypeDto;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
@@ -36,7 +36,8 @@ public class UpdateTrainerArgumentsProvider implements ArgumentsProvider {
                 .specialization(Specialization.TRANSFIGURATION)
                 .build();
 
-        TrainerUpdateRequest updateRequest = TrainerUpdateRequest.builder()
+        PutTrainerRequest updateRequest = PutTrainerRequest.builder()
+                .username("Minerva.McGonagall")
                 .firstName("Minerva")
                 .lastName("McGonagall")
                 .active(true)

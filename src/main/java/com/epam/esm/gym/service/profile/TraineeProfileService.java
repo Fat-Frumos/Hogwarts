@@ -13,6 +13,7 @@ import com.epam.esm.gym.dto.profile.UserProfile;
 import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
 import com.epam.esm.gym.dto.trainee.PutTraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerResponse;
+import com.epam.esm.gym.dto.trainer.TrainerResponseDto;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.exception.UserNotFoundException;
@@ -64,6 +65,25 @@ public class TraineeProfileService implements TraineeService {
 
     /**
      * {@inheritDoc}
+     * This method retrieves a list of active trainers that are not assigned to a specific trainee.
+     * It looks up a trainee by their username, and if the trainee is found, it fetches a list of trainers
+     * who are not assigned to this trainee and returns the information as a list of {@link TrainerResponseDto} objects.
+     *
+     * @param username the username of the trainee for whom active trainers need to be retrieved.
+     * @return a {@link ResponseEntity} containing a list of {@link TrainerResponseDto} objects representing
+     * the active trainers who are not assigned to the specified trainee. Returns {@code 200 OK} if trainers are found,
+     * or {@code 404 Not Found} if the trainee is not found.
+     * @throws UserNotFoundException if no trainee is found with the provided username.
+     */
+    @Override
+    public ResponseEntity<List<TrainerResponseDto>> getActiveTrainersForTrainee(String username) {
+        Trainee trainee = traineeDao.findByName(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+        return trainerService.getActiveTrainersForTrainee(trainee);
+    }
+
+    /**
+     * {@inheritDoc}
      * Registers a new trainee based on the provided request and returns the profile response.
      */
     @Override
@@ -84,7 +104,7 @@ public class TraineeProfileService implements TraineeService {
     @Override
     @Transactional
     public ResponseEntity<MessageResponse> deleteTrainee(String username) {
-        Optional<Trainee> traineeOptional = traineeDao.findByUsername(username);
+        Optional<Trainee> traineeOptional = traineeDao.findByName(username);
         if (traineeOptional.isPresent()) {
             traineeDao.delete(traineeOptional.get());
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new MessageResponse(
@@ -102,7 +122,7 @@ public class TraineeProfileService implements TraineeService {
      */
     @Override
     public ResponseEntity<BaseResponse> getTraineeProfileByName(String username) {
-        return traineeDao.findByUsername(username)
+        return traineeDao.findByName(username)
                 .map(trainee -> ResponseEntity.status(HttpStatus.OK).body(mapper.toTraineeProfile(trainee)))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(new MessageResponse(String.format("User by name: %s not found", username))));
@@ -114,20 +134,20 @@ public class TraineeProfileService implements TraineeService {
      */
     @Override
     public ResponseEntity<BaseResponse> updateTrainee(String username, PutTraineeRequest request) {
-        if (traineeDao.findByUsername(request.getUsername()).isPresent()) {
+        Optional<Trainee> optional = traineeDao.findByName(username);
+        if (optional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Trainee not found for username: " + username));
+        }
+        if (traineeDao.findByName(request.getUsername()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new MessageResponse("Username already in use: " + request.getUsername()));
         }
-        Optional<Trainee> optional = traineeDao.findByUsername(username);
-        if (optional.isPresent()) {
-            Trainee trainee = optional.get();
-            Trainee updatedTrainee = mapper.update(request, trainee);
-            userService.saveUser(updatedTrainee.getUser());
-            Trainee updated = traineeDao.update(updatedTrainee);
-            return ResponseEntity.ok(mapper.toTraineeProfile(updated));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new MessageResponse("Trainee not found for username: " + username));
+
+        Trainee updatedTrainee = mapper.update(request, optional.get());
+        userService.saveUser(updatedTrainee.getUser());
+        Trainee updated = traineeDao.update(updatedTrainee);
+        return ResponseEntity.ok(mapper.toTraineeProfile(updated));
     }
 
     /**
@@ -179,7 +199,7 @@ public class TraineeProfileService implements TraineeService {
     @Override
     public ResponseEntity<List<TrainingResponse>> getTraineeTrainingsByName(
             String username, Map<String, String> params) {
-        return traineeDao.findByUsername(username)
+        return traineeDao.findByName(username)
                 .map(trainee -> ResponseEntity.ok(trainee.getTrainings()
                         .stream()
                         .filter(training -> matches(training, getProfile(params)))
@@ -225,7 +245,7 @@ public class TraineeProfileService implements TraineeService {
      */
     @Override
     public Optional<Trainee> getTrainee(String username) {
-        return traineeDao.findByUsername(username);
+        return traineeDao.findByName(username);
     }
 
     /**

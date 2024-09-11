@@ -85,7 +85,7 @@ public class JDBCTrainerDaoTest {
     /**
      * Tests finding a trainer by username.
      *
-     * <p>This method verifies that {@link JDBCTrainerDao#findByUsername(String)} correctly retrieves
+     * <p>This method verifies that {@link JDBCTrainerDao#findByName(String)} correctly retrieves
      * a trainer based on the provided username. It ensures that the result matches the expected trainer
      * when a valid username is given.</p>
      *
@@ -98,7 +98,7 @@ public class JDBCTrainerDaoTest {
         when(query.setParameter("username", username)).thenReturn(query);
         when(query.uniqueResultOptional()).thenReturn(Optional.of(trainer));
 
-        Optional<Trainer> result = dao.findByUsername(username);
+        Optional<Trainer> result = dao.findByName(username);
 
         assertTrue(result.isPresent());
         assertEquals(trainer, result.get());

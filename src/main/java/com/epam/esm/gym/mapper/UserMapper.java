@@ -22,7 +22,7 @@ public interface UserMapper {
      * @param user the user entity to convert
      * @return the converted {@link UserProfile}
      */
-    default UserProfile toDto(User user) {
+    static UserProfile toDto(User user) {
         if (user == null) {
             return null;
         }

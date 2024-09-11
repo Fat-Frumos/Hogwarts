@@ -60,7 +60,7 @@ public class JDBCTokenDao extends AbstractDao<Token> implements TokenDao {
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<Token> findByUsername(String username) {
+    public Optional<Token> findByName(String username) {
         String hql = """
                 select t
                 from Token t

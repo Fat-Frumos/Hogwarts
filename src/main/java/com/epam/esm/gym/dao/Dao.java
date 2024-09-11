@@ -34,7 +34,7 @@ public interface Dao<T> {
      * @return an {@link Optional} containing the found entity, or an empty {@link Optional}
      * if no entity is found with the given username.
      */
-    Optional<T> findByUsername(String username);
+    Optional<T> findByName(String username);
 
     /**
      * Saves a new entity to the data source.

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -34,19 +35,23 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void handleMethodNotSupported_ShouldReturnMethodNotAllowed() throws Exception {
-        mockMvc.perform(post("/api/trainees"))
-                .andExpect(status().isMethodNotAllowed())
-                .andExpect(jsonPath("$.message", containsString(
-                        "Request method 'POST' not supported")));
+    void handleMissingRequestBodyShouldReturnBadRequests() throws Exception {
+        mockMvc.perform(post("/api/trainees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("")
+                        .param("param", "invalid_request_body"))
+                .andExpect(status().is4xxClientError());
     }
+
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void handleRuntimeException_ShouldReturnInternalServerError() throws Exception {
+    void handleExceptionShouldReturnInternalServerError() throws Exception {
         mockMvc.perform(get("/api/trainees")
                         .param("param", "cause_runtime_exception"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message", containsString(
+                        "An unexpected error occurred ")));
     }
 
     @Test
@@ -54,5 +59,15 @@ public class GlobalExceptionHandlerTest {
         mockMvc.perform(get("/api/trainees")
                         .param("param", "exception"))
                 .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void handleRuntimeExceptionShouldReturnInternalServerError() throws Exception {
+        mockMvc.perform(get("/api/trainees")
+                        .param("param", "cause_runtime_exception"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message", containsString(
+                        "An unexpected error occurred")));
     }
 }

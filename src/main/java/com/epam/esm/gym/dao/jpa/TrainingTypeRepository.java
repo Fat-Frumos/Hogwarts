@@ -26,4 +26,16 @@ public interface TrainingTypeRepository extends JpaRepository<TrainingType, Long
      * @return an {@link List} containing the {@link TrainingType} if found, or empty if not
      */
     List<TrainingType> findAllBySpecialization(Specialization specialization);
+
+    /**
+     * Finds a {@link TrainingType} by its specialization.
+     * This method queries the repository to retrieve a {@link TrainingType} entity based on the provided
+     * {@link Specialization} value. The returned value is an instance of {@link TrainingType} that matches
+     * the given specialization.
+     *
+     * @param specialization the specialization of the training type to find.
+     * @return the {@link TrainingType} associated with the given specialization, or {@code null} if no
+     * matching training type is found.
+     */
+    TrainingType findBySpecialization(Specialization specialization);
 }

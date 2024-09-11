@@ -79,9 +79,6 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/index.html"
                         ).permitAll()
-//                        .requestMatchers("/api/trainees/**").hasAnyRole(TRAINEE, TRAINER, ADMIN)
-//                        .requestMatchers("/api/trainers/**").hasAnyRole(TRAINER, ADMIN)
-//                        .anyRequest().hasRole(ADMIN))
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .exceptionHandling(exception -> exception

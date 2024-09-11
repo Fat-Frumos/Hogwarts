@@ -68,7 +68,7 @@ public class TrainingSessionService implements SessionService {
         for (Map.Entry<String, Long> entry : weeklyReport.entrySet()) {
             String username = entry.getKey();
             Long totalMinutes = entry.getValue();
-            Trainer trainer = trainerDao.findByUsername(username).orElse(null);
+            Trainer trainer = trainerDao.findByName(username).orElse(null);
             if (trainer != null) {
                 String message = """
                         Dear %s,%n%nYour total training duration for the week is %d minutes.%n%n
@@ -100,7 +100,7 @@ public class TrainingSessionService implements SessionService {
      * @param subject the subject of the email
      * @param text    the body text of the email
      */
-    private void sendEmail(String to, String subject, String text) {
+    public void sendEmail(String to, String subject, String text) {
         log.info("Starting weekly report email sending process: {} {} {}", to, subject, text);
     }
 }

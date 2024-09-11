@@ -9,6 +9,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -38,7 +39,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private static final String INTERNAL_MESSAGE = "An unexpected error occurred: %s";
+    private static final String INTERNAL_MESSAGE = "An unexpected error occurred ";
     private static final String MISSING_MESSAGE = "Required request parameter '%s' is not present";
     private static final String NOT_SUPPORTED_MESSAGE = "Request method '%s' not supported";
 
@@ -129,10 +130,43 @@ public class GlobalExceptionHandler {
      */
     @ResponseBody
     @ResponseStatus(INTERNAL_SERVER_ERROR)
-    @ExceptionHandler({RuntimeException.class, Exception.class})
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<MessageResponse> handleException(Exception ex) {
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse(String.format(INTERNAL_MESSAGE)));
+    }
+
+    /**
+     * Handles runtime exceptions that occur during request processing.
+     * This method captures any {@link RuntimeException} thrown during request handling and returns
+     * a standardized error response with an HTTP status of {@code 500 Internal Server Error}.
+     *
+     * @param ex the exception that was thrown
+     * @return a {@link ResponseEntity} containing a {@link MessageResponse} with an error message
+     */
+    @ResponseBody
+    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<MessageResponse> handleRuntimeException(Exception ex) {
         return ResponseEntity.status(INTERNAL_SERVER_ERROR)
-                .body(new MessageResponse(String.format(INTERNAL_MESSAGE, ex.getMessage())));
+                .body(new MessageResponse(String.format(INTERNAL_MESSAGE)));
+    }
+
+
+    /**
+     * Handles cases where the request body is missing or invalid.
+     * This method captures {@link HttpMessageNotReadableException} and returns a standardized error response
+     * with an HTTP status of {@code 400 Bad Request}.
+     *
+     * @param ex the exception that was thrown
+     * @return a {@link ResponseEntity} containing a {@link MessageResponse} with an error message
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<MessageResponse> handleMissingRequestBody(HttpMessageNotReadableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new MessageResponse("Request body is missing or invalid."));
     }
 
     /**

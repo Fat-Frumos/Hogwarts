@@ -20,7 +20,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class TrainingTypeDto {
     private Specialization specialization;
-    private Long trainingTypeId;
+    private Long id;
 
     @Override
     public boolean equals(Object obj) {
@@ -31,11 +31,11 @@ public class TrainingTypeDto {
             return false;
         }
         TrainingTypeDto that = (TrainingTypeDto) obj;
-        return specialization == that.specialization && Objects.equals(trainingTypeId, that.trainingTypeId);
+        return specialization == that.specialization && Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(specialization, trainingTypeId);
+        return Objects.hash(specialization, id);
     }
 }

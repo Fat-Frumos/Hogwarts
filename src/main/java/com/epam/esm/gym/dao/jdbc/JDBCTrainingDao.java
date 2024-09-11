@@ -4,7 +4,9 @@ import com.epam.esm.gym.dao.TrainingDao;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingSession;
 import com.epam.esm.gym.domain.TrainingType;
+import com.epam.esm.gym.dto.training.TrainingProfile;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,11 +55,11 @@ public class JDBCTrainingDao extends AbstractDao<Training> implements TrainingDa
      * ensure that all relevant data is loaded in a single query. The method returns an {@link Optional}
      * containing the result, which may be empty if no matching training is found.</p>
      *
-     * @param username the username of the trainer or trainee.
+     * @param trainingName the username of the trainer or trainee.
      * @return an {@link Optional} containing the {@link Training} if found, otherwise an empty {@link Optional}.
      */
     @Override
-    public Optional<Training> findByUsername(String username) {
+    public Optional<Training> findByName(String trainingName) {
         String hql = """
                 SELECT tr
                 FROM Training tr
@@ -65,11 +67,10 @@ public class JDBCTrainingDao extends AbstractDao<Training> implements TrainingDa
                 LEFT JOIN FETCH tr.trainee trainee
                 LEFT JOIN FETCH trainer.user trainerUser
                 LEFT JOIN FETCH trainee.user traineeUser
-                WHERE trainerUser.username = :username
-                   OR traineeUser.username = :username
+                WHERE tr.trainingName = :trainingName
                 """;
         return getSession().createQuery(hql, Training.class)
-                .setParameter(USERNAME, username)
+                .setParameter("trainingName", trainingName)
                 .uniqueResultOptional();
     }
 
@@ -95,27 +96,79 @@ public class JDBCTrainingDao extends AbstractDao<Training> implements TrainingDa
      * trainer's username matches the provided username. The method joins with the trainer's user entity
      * to filter by username and returns a list of matching {@link Training} entities.</p>
      *
-     * @param username the username of the trainer.
+     * @param profile the username of the trainer.
      * @return a {@link List} of {@link Training} entities associated with the specified trainer.
      */
     @Override
-    public List<Training> findTrainingsByTrainerUsername(String username) {
-        String hql = """
-                    SELECT t
-                    FROM Training t
-                    JOIN t.trainer tr
-                    JOIN tr.user u
-                    WHERE u.username = :username
-                """;
-        return getSession().createQuery(hql, Training.class)
-                .setParameter(USERNAME, username)
-                .getResultList();
+    @Transactional
+    public List<Training> findTrainingsBy(TrainingProfile profile) {
+        StringBuilder sql = getStringBuilder(profile);
+        Query<Training> query = getSession().createNativeQuery(sql.toString(), Training.class)
+                .setParameter("trainerUsername", profile.getTrainerName());
+
+        if (profile.getTrainingType() != null) {
+            query.setParameter("trainingType", profile.getTrainingType());
+        }
+        if (profile.getPeriodFrom() != null) {
+            query.setParameter("periodFrom", profile.getPeriodFrom());
+        }
+        if (profile.getPeriodTo() != null) {
+            query.setParameter("periodTo", profile.getPeriodTo());
+        }
+        if (profile.getTraineeName() != null) {
+            query.setParameter("traineeName", "%" + profile.getTraineeName() + "%");
+        }
+
+        return query.getResultList();
     }
 
+    private StringBuilder getStringBuilder(TrainingProfile profile) {
+        StringBuilder sql = new StringBuilder("""
+                SELECT t.*
+                FROM training t
+                LEFT JOIN trainee trn ON t.trainee_id = trn.id
+                LEFT JOIN trainer tr ON t.trainer_id = tr.id
+                LEFT JOIN users u ON tr.user_id = u.id
+                LEFT JOIN training_type tt ON t.training_type_id = tt.id
+                WHERE u.username = :trainerUsername
+                """);
+
+        if (profile.getTrainingType() != null) {
+            sql.append(" AND tt.training_type_name = :trainingType");
+        }
+        if (profile.getPeriodFrom() != null) {
+            sql.append(" AND t.training_date >= :periodFrom");
+        }
+        if (profile.getPeriodTo() != null) {
+            sql.append(" AND t.training_date <= :periodTo");
+        }
+        if (profile.getTraineeName() != null) {
+            sql.append(" AND trn.user_id IN (SELECT u2.id FROM users u2 WHERE u2.username LIKE :traineeName)");
+        }
+        return sql;
+    }
+
+    /**
+     * Retrieves all training records from the database along with their associated entities.
+     * This method performs an HQL query to fetch all {@link Training} entities and eagerly loads
+     * their associated {@link com.epam.esm.gym.domain.Trainer},
+     * {@link com.epam.esm.gym.domain.Trainee}, and {@link TrainingType} entities.
+     * The use of LEFT JOIN FETCH ensures that related entities are loaded in the same query,
+     * avoiding the N+1 select problem and reducing the number of queries needed to load the data.
+     *
+     * @return a {@link List} of {@link Training} entities with their associated entities fully initialized.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Training> findAll() {
-        String hql = "FROM Training";
+        String hql = """
+                SELECT tr
+                FROM Training tr
+                LEFT JOIN FETCH tr.trainer trainer
+                LEFT JOIN FETCH tr.trainee trainee
+                LEFT JOIN FETCH tr.type trainingType
+                """;
+
         return getSession()
                 .createQuery(hql, Training.class)
                 .getResultList();

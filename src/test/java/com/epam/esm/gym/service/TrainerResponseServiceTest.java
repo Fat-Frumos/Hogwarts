@@ -9,9 +9,9 @@ import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.PutTrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
-import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.mapper.TrainerMapper;
 import com.epam.esm.gym.service.profile.TrainerProfileService;
 import com.epam.esm.gym.service.profile.UserProfileService;
@@ -102,7 +102,7 @@ class TrainerResponseServiceTest {
     @ArgumentsSource(TrainerRequestArgumentsProvider.class)
     void testDeleteTrainer(Trainer trainer) {
         String username = trainer.getUser().getUsername();
-        when(trainerDao.findByUsername(username)).thenReturn(Optional.of(trainer));
+        when(trainerDao.findByName(username)).thenReturn(Optional.of(trainer));
         doNothing().when(trainerDao).delete(trainer);
         service.deleteTrainer(username);
         verify(trainerDao).delete(trainer);
@@ -112,7 +112,7 @@ class TrainerResponseServiceTest {
     @ArgumentsSource(TrainerRequestArgumentsProvider.class)
     void testGetTrainerProfileByName(Trainer trainer, TrainerProfile profile) {
         String username = trainer.getUser().getUsername();
-        when(trainerDao.findByUsername(username)).thenReturn(Optional.of(trainer));
+        when(trainerDao.findByName(username)).thenReturn(Optional.of(trainer));
         when(mapper.toDto(trainer)).thenReturn(profile);
         ResponseEntity<BaseResponse> result = service.getTrainerProfileByName(username);
         assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -122,20 +122,13 @@ class TrainerResponseServiceTest {
     @ParameterizedTest
     @ArgumentsSource(TrainerRequestArgumentsProvider.class)
     void testUpdateTrainer(Trainer trainer, TrainerProfile profile) {
-        TrainerUpdateRequest request = TrainerUpdateRequest.builder()
+        PutTrainerRequest request = PutTrainerRequest.builder()
                 .firstName(trainer.getUser().getFirstName())
                 .lastName(trainer.getUser().getLastName())
                 .active(trainer.getUser().getActive())
                 .build();
-        when(mapper.toEntity(request)).thenReturn(trainer);
-        when(trainerDao.save(trainer)).thenReturn(trainer);
-        when(mapper.toDto(trainer)).thenReturn(profile);
         ResponseEntity<BaseResponse> actual = service.updateTrainer(trainer.getUser().getUsername(), request);
-        assertEquals(HttpStatus.OK, actual.getStatusCode());
-        assertEquals(profile, actual.getBody());
-        verify(mapper).toEntity(request);
-        verify(trainerDao).save(trainer);
-        verify(mapper).toDto(trainer);
+        assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
     }
 
     @ParameterizedTest
@@ -165,7 +158,7 @@ class TrainerResponseServiceTest {
     @ArgumentsSource(TrainerRequestArgumentsProvider.class)
     void testGetTrainerThrowsEntityNotFoundException(Trainer trainer) {
         String username = trainer.getUser().getUsername();
-        when(trainerDao.findByUsername(username)).thenReturn(Optional.empty());
+        when(trainerDao.findByName(username)).thenReturn(Optional.empty());
         assertTrue(service.getTrainer(username).isEmpty());
     }
 

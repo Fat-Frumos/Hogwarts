@@ -76,7 +76,7 @@ public class AuthenticationUserService implements AuthenticationService {
     @Transactional
     public ResponseEntity<BaseResponse> login(
             final AuthenticationRequest request) {
-        Optional<User> userOptional = dao.findByUsername(request.getUsername());
+        Optional<User> userOptional = dao.findByName(request.getUsername());
         if (userOptional.isEmpty()){
             return ResponseEntity.badRequest().body(new MessageResponse("User not found " + request.getUsername()));
         }

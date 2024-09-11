@@ -14,6 +14,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -58,12 +59,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 username = jwtProvider.extractUserName(token);
             }
         } catch (InvalidJwtAuthenticationException ex) {
-            setMessage(response, ex.getMessage());
+            setMessage(response, "Invalid JWT Token: " + ex.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        } catch (Exception ex) {
+            setMessage(response, "Error processing token: " + ex.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserPrincipal userDetails = userDetailsService.loadUserByUsername(username);
+
+            UserPrincipal userDetails;
+            try {
+                userDetails = userDetailsService.loadUserByUsername(username);
+            } catch (UsernameNotFoundException e){
+                setMessage(response, "User not found by " + username);
+                return;
+            }
+
             if (jwtProvider.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());

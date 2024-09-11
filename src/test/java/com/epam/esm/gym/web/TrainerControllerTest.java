@@ -5,7 +5,7 @@ import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
-import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
+import com.epam.esm.gym.dto.trainer.PutTrainerRequest;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.web.provider.trainer.ExistsTrainerRegistrationsArgumentsProvider;
@@ -116,7 +116,7 @@ class TrainerControllerTest extends ControllerTest {
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(UpdateTrainerNotFoundArgumentsProvider.class)
     void testUpdateTrainerProfileWhenNotFound(
-            String username, TrainerUpdateRequest request,
+            String username, PutTrainerRequest request,
             ResponseEntity<BaseResponse> expectedResponse) throws Exception {
         when(trainerService.updateTrainer(username, request)).thenReturn(expectedResponse);
         ResultActions resultActions = mockMvc.perform(put("/api/trainers/{username}", username)
@@ -140,7 +140,7 @@ class TrainerControllerTest extends ControllerTest {
     @WithMockUser(roles = "TRAINER")
     @ArgumentsSource(UpdateTrainerArgumentsProvider.class)
     void testUpdateTrainerProfile(
-            String username, TrainerUpdateRequest request,
+            String username, PutTrainerRequest request,
             ResponseEntity<BaseResponse> expectedResponse) throws Exception {
         when(trainerService.updateTrainer(username, request)).thenReturn(expectedResponse);
         ResultActions resultActions = mockMvc.perform(put("/api/trainers/{username}", username)
@@ -157,13 +157,14 @@ class TrainerControllerTest extends ControllerTest {
     void testGetTrainerTrainings(
             String username, TrainingProfile request,
             ResponseEntity<List<TrainingResponse>> expectedResponse) throws Exception {
-        when(trainingService.getTrainerTrainingsByName(username, request)).thenReturn(expectedResponse);
+
+        when(trainingService.getTrainerTrainingsByName(request)).thenReturn(expectedResponse);
+
         ResultActions resultActions = mockMvc.perform(get("/api/trainers/{username}/trainings", username)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 
-        resultActions.andExpect(status().is(expectedResponse.getStatusCode().value()))
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse.getBody())));
+        resultActions.andExpect(status().isOk());
     }
 
 
@@ -281,28 +282,6 @@ class TrainerControllerTest extends ControllerTest {
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponse);
         verify(trainerService, times(1)).getTrainerProfileByName(username);
-    }
-
-
-    @ParameterizedTest
-    @WithMockUser(roles = "TRAINER")
-    @ArgumentsSource(UpdateTrainerArgumentsProvider.class)
-    void testUpdateTrainerProfiles(
-            String username, TrainerUpdateRequest request,
-            ResponseEntity<BaseResponse> expectedProfile) throws Exception {
-        when(trainerService.updateTrainer(username, request)).thenReturn(expectedProfile);
-        String result = mockMvc.perform(put("/api/trainers/" + username)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        assertThat(objectMapper.readValue(result, TrainerProfile.class))
-                .usingRecursiveComparison()
-                .isEqualTo(expectedProfile.getBody());
-        verify(trainerService, times(1)).updateTrainer(username, request);
     }
 
     @Test

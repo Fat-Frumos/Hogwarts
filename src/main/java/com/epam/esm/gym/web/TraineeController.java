@@ -1,5 +1,6 @@
 package com.epam.esm.gym.web;
 
+import com.epam.esm.gym.dto.trainer.TrainerResponseDto;
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
@@ -120,7 +121,7 @@ public class TraineeController implements ITraineeController {
      * Ensures that unauthorized users cannot perform deletions.
      */
     @Override
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<MessageResponse> deleteTraineeProfile(
             @PathVariable String username) {
         return service.deleteTrainee(username);
@@ -183,5 +184,22 @@ public class TraineeController implements ITraineeController {
     public ResponseEntity<BaseResponse> activateDeactivateTrainee(
             @PathVariable String username, @RequestParam Boolean active) {
         return service.activateDeactivateProfile(username, active);
+    }
+
+    /**
+     * Retrieves a list of active trainers based on the specified username.
+     * <p>
+     * This endpoint is accessible to users with any of the following roles: TRAINER, ADMIN, or TRAINEE.
+     * It returns a list of trainers who are active and associated with the given username.
+     * </p>
+     *
+     * @param username the username of the trainee requesting the list of active trainers.
+     * @return a {@link ResponseEntity} containing a list of {@link TrainerResponseDto}
+     * objects representing the active trainers.
+     */
+    @GetMapping("/{username}/active")
+    @PreAuthorize("hasAnyAuthority('ROLE_TRAINER', 'ROLE_ADMIN', 'ROLE_TRAINEE')")
+    public ResponseEntity<List<TrainerResponseDto>> getActiveTrainers(@PathVariable String username) {
+        return service.getActiveTrainersForTrainee(username);
     }
 }

@@ -1,5 +1,6 @@
 package com.epam.esm.gym.dto.training;
 
+import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -25,7 +26,7 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrainingResponse {
+public class TrainingResponse implements BaseResponse {
     private String trainerName;
     private String trainingName;
     private String trainingType;

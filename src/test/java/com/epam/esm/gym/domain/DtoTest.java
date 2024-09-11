@@ -251,7 +251,7 @@ class DtoTest {
         assertEquals(type1.hashCode(), type2.hashCode());
         assertNotEquals(type1.hashCode(), type3.hashCode());
         assertEquals(Specialization.CARDIO, type1.getSpecialization());
-        assertEquals(1L, type1.getTrainingTypeId());
+        assertEquals(1L, type1.getId());
     }
 
     @Test

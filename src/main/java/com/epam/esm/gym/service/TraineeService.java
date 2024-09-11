@@ -1,6 +1,7 @@
 package com.epam.esm.gym.service;
 
 import com.epam.esm.gym.domain.Trainee;
+import com.epam.esm.gym.dto.trainer.TrainerResponseDto;
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
@@ -208,4 +209,17 @@ public interface TraineeService {
      * {@link com.epam.esm.gym.dto.trainee.TraineeProfileResponseResponse}
      */
     ResponseEntity<List<BaseResponse>> findAll();
+
+    /**
+     * Retrieves a list of active trainers that are not assigned to a trainee based on the provided username.
+     *
+     * <p>This method first fetches the trainee details using the provided username. If the trainee is found, it then
+     * delegates the request to the {@link TrainerService} to get the list of active trainers for the trainee.</p>
+     *
+     * @param username the username of the trainee. Must not be {@code null}.
+     * @return a {@link ResponseEntity} containing a list of {@link TrainerResponseDto} representing
+     * the active trainers that are not assigned to the trainee.
+     * @see TrainerService#getActiveTrainersForTrainee(Trainee)
+     */
+    ResponseEntity<List<TrainerResponseDto>> getActiveTrainersForTrainee(String username);
 }

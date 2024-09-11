@@ -27,7 +27,7 @@ class UserMapperTest {
                 .permission(RoleType.ROLE_GUEST)
                 .build();
 
-        UserProfile dto = userProfileMapper.toDto(user);
+        UserProfile dto = UserMapper.toDto(user);
         assertNotNull(dto);
         assertEquals(user.getFirstName(), dto.getFirstName());
         assertEquals(user.getLastName(), dto.getLastName());
@@ -38,7 +38,7 @@ class UserMapperTest {
 
     @Test
     void testToDtoNullUser() {
-        UserProfile dto = userProfileMapper.toDto(null);
+        UserProfile dto = UserMapper.toDto(null);
         assertNull(dto);
     }
 

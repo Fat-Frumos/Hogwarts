@@ -109,7 +109,7 @@ public class JDBCUserDao extends AbstractDao<User> implements UserDao {
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> findByUsername(String username) {
+    public Optional<User> findByName(String username) {
         String sql = "SELECT u FROM User u WHERE username = :username";
         Query<User> query = getSession().createQuery(sql, User.class);
         query.setParameter(USERNAME, username);

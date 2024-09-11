@@ -65,7 +65,7 @@ public class JDBCTrainerDao extends AbstractDao<Trainer> implements TrainerDao {
      * @throws IllegalArgumentException if the username is null.
      */
     @Override
-    public Optional<Trainer> findByUsername(String username) {
+    public Optional<Trainer> findByName(String username) {
         String hql = """
                     SELECT t
                     FROM Trainer t

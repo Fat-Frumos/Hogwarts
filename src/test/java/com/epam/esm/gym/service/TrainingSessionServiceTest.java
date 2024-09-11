@@ -1,5 +1,6 @@
 package com.epam.esm.gym.service;
 
+import com.epam.esm.gym.dao.TrainerDao;
 import com.epam.esm.gym.dao.jpa.TrainingSessionRepository;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.TrainingSession;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -25,10 +27,15 @@ import static org.mockito.Mockito.when;
 class TrainingSessionServiceTest {
 
     @Mock
+    private TrainerDao trainerDao;
+    @Mock
     private TrainingSessionRepository trainingRepository;
 
     @InjectMocks
     private TrainingSessionService trainingSessionService;
+
+    @Mock
+    private Logger log;
 
     @Test
     void testGenerateWeeklyReport() {
@@ -52,5 +59,4 @@ class TrainingSessionServiceTest {
         Map<String, Long> actualReport = trainingSessionService.generateWeeklyReport();
         assertEquals(expectedReport, actualReport);
     }
-
 }

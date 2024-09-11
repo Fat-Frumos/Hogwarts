@@ -26,7 +26,7 @@ class UserPrincipalDetailsServiceTest {
 
     @Test
     void testLoadUserByUsernameUserNotFound() {
-        when(userRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
+        when(userRepository.findByName("nonexistent")).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () ->
                 securityUserDetailsService.loadUserByUsername("nonexistent")

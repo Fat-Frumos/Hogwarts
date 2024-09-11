@@ -3,12 +3,13 @@ package com.epam.esm.gym.mapper;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.trainer.TrainerResponseDto;
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainee.SlimTraineeProfileResponse;
+import com.epam.esm.gym.dto.trainer.PutTrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
-import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import org.mapstruct.Mapper;
 
 import java.util.Collections;
@@ -60,26 +61,37 @@ public interface TrainerMapper {
     }
 
     /**
-     * Converts a {@link TrainerUpdateRequest} DTO to a {@link Trainer} entity.
+     * Converts a {@link com.epam.esm.gym.dto.trainer.PutTrainerRequest} DTO to a {@link Trainer} entity.
      *
-     * <p>This method creates a {@link Trainer} entity from a {@link TrainerUpdateRequest} DTO.
+     * <p>The method creates a {@link Trainer} entity from a {@link com.epam.esm.gym.dto.trainer.PutTrainerRequest} DTO.
      * The password field is ignored during conversion.</p>
      *
-     * @param dto the update request containing trainer details
+     * @param request the update request containing trainer details
      * @return the converted {@link Trainer}
      */
-    default Trainer toEntity(TrainerUpdateRequest dto) {
-        if (dto == null) {
+    default Trainer toEntity(PutTrainerRequest request, Trainer trainer) {
+        if (request == null || trainer == null) {
             return null;
         }
+        User user = trainer.getUser();
 
-        return Trainer.builder()
-                .user(User.builder()
-                        .firstName(dto.getFirstName())
-                        .lastName(dto.getLastName())
-                        .active(dto.getActive())
-                        .build())
-                .build();
+        if (request.getUsername() != null) {
+            user.setUsername(request.getUsername());
+        }
+
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+
+        if (request.getActive() != null) {
+            user.setActive(request.getActive());
+        }
+        trainer.setUser(user);
+        return trainer;
     }
 
     /**
@@ -137,5 +149,26 @@ public interface TrainerMapper {
         return Trainer.builder()
                 .trainingTypes(trainingTypes)
                 .user(user).build();
+    }
+
+    /**
+     * Converts a {@link Trainer} entity to a {@link TrainerResponseDto}.
+     *
+     * <p>This method extracts the relevant details from the provided {@link Trainer} object
+     * and maps them to a {@link TrainerResponseDto}.
+     * It assumes that the trainer has at least one associated training type to retrieve the specialization from.</p>
+     *
+     * @param trainer the {@link Trainer} entity to convert. Must not be {@code null}.
+     * @return a {@link TrainerResponseDto} containing the trainer's username, firstname, lastname, and specialization.
+     * @throws IllegalArgumentException if the {@code trainer} is {@code null}
+     *                                  or if the trainer has no associated training types.
+     */
+    default TrainerResponseDto toResponseDto(Trainer trainer) {
+        return TrainerResponseDto.builder()
+                .username(trainer.getUser().getUsername())
+                .firstName(trainer.getUser().getFirstName())
+                .lastName(trainer.getUser().getLastName())
+                .specialization(trainer.getTrainingTypes().get(0).getSpecialization().name())
+                .build();
     }
 }

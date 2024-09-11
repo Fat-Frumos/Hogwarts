@@ -1,5 +1,6 @@
 package com.epam.esm.gym.mapper;
 
+import com.epam.esm.gym.domain.Specialization;
 import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
@@ -51,7 +52,7 @@ public interface TrainingMapper {
     static TrainingType toEntityType(TrainingTypeDto dto) {
         return TrainingType.builder()
                 .specialization(dto.getSpecialization())
-                .id(dto.getTrainingTypeId())
+                .id(dto.getId())
                 .build();
     }
 
@@ -63,7 +64,26 @@ public interface TrainingMapper {
      * @param training the training entity to convert
      * @return the converted {@link TrainingResponse}
      */
-    TrainingResponse toDto(Training training);
+    default TrainingResponse toDto(Training training) {
+        if (training == null) {
+            return null;
+        }
+
+        String trainerName = training.getTrainer() != null
+                ? training.getTrainer().getUser().getUsername() : null;
+        String trainingType = training.getType() != null
+                ? training.getType().getSpecialization().name()
+                : Specialization.DEFAULT.name();
+        Integer trainingDuration = training.getTrainingDuration() != null
+                ? training.getTrainingDuration() : 0;
+
+        return TrainingResponse.builder()
+                .trainerName(trainerName)
+                .trainingName(training.getTrainingName())
+                .trainingType(trainingType)
+                .trainingDuration(trainingDuration)
+                .build();
+    }
 
     /**
      * Converts a list of {@link Training} entities to a list of {@link TrainingResponse} DTOs.
@@ -89,7 +109,7 @@ public interface TrainingMapper {
     static TrainingTypeDto toType(TrainingType trainingType) {
         return TrainingTypeDto.builder()
                 .specialization(trainingType.getSpecialization())
-                .trainingTypeId(trainingType.getId())
+                .id(trainingType.getId())
                 .build();
     }
 

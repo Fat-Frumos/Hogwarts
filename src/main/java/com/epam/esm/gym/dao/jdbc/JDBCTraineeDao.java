@@ -60,7 +60,7 @@ public class JDBCTraineeDao extends AbstractDao<Trainee> implements TraineeDao {
      * @throws IllegalArgumentException if the username is null.
      */
     @Override
-    public Optional<Trainee> findByUsername(String username) {
+    public Optional<Trainee> findByName(String username) {
         String hql = """
                 SELECT t
                 FROM Trainee t

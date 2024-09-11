@@ -2,10 +2,9 @@ package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.PutTrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
-import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
-import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -144,10 +144,10 @@ public interface ITrainerController {
      * Updates an existing trainer profile by username.
      *
      * <p>This endpoint allows ADMIN or the trainer themselves to update the profile. The request body
-     * must be valid as per the {@link TrainerUpdateRequest} constraints.</p>
+     * must be valid as per the {@link com.epam.esm.gym.dto.trainer.PutTrainerRequest} constraints.</p>
      *
      * @param username The username of the trainer to be updated.
-     * @param request  A {@link TrainerUpdateRequest} object containing updated trainer details.
+     * @param request  A {@link com.epam.esm.gym.dto.trainer.PutTrainerRequest} containing updated trainer details.
      * @return A {@link ResponseEntity} containing the updated {@link com.epam.esm.gym.dto.trainer.TrainerProfile}.
      */
     @Operation(
@@ -163,7 +163,7 @@ public interface ITrainerController {
             }
     )
     ResponseEntity<BaseResponse> updateTrainerProfile(
-            @PathVariable String username, @Valid @RequestBody TrainerUpdateRequest request);
+            @PathVariable String username, @Valid @RequestBody PutTrainerRequest request);
 
     /**
      * Retrieves a list of trainings associated with a trainer by username.
@@ -172,7 +172,6 @@ public interface ITrainerController {
      * sessions associated with the trainer identified by the specified username.</p>
      *
      * @param username The username of the trainer whose trainings are to be retrieved.
-     * @param request  A {@link TrainingProfile} object containing filtering details for the request.
      * @return A {@link ResponseEntity} containing a list of {@link TrainingResponse}.
      */
     @Operation(
@@ -188,7 +187,10 @@ public interface ITrainerController {
             }
     )
     ResponseEntity<List<TrainingResponse>> getTrainerTrainings(
-            @PathVariable String username, @Valid @RequestBody TrainingProfile request);
+            @PathVariable String username,
+            @RequestParam(required = false) LocalDate periodFrom,
+            @RequestParam(required = false) LocalDate periodTo,
+            @RequestParam(required = false) String traineeName);
 
     /**
      * Activates or deactivates a trainer profile.

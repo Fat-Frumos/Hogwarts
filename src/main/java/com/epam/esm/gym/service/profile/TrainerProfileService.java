@@ -3,16 +3,18 @@ package com.epam.esm.gym.service.profile;
 import com.epam.esm.gym.dao.TrainerDao;
 import com.epam.esm.gym.dao.jpa.TrainingTypeRepository;
 import com.epam.esm.gym.domain.Specialization;
+import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.trainer.TrainerResponseDto;
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.auth.MessageResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.PutTrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
-import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.exception.UserNotFoundException;
 import com.epam.esm.gym.mapper.TrainerMapper;
 import com.epam.esm.gym.service.TrainerService;
@@ -117,8 +119,18 @@ public class TrainerProfileService implements TrainerService {
      */
     @Override
     public ResponseEntity<BaseResponse> updateTrainer(
-            String username, TrainerUpdateRequest request) {
-        Trainer trainer = mapper.toEntity(request);
+            String username, PutTrainerRequest request) {
+        Optional<Trainer> user = trainerDao.findByName(username);
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Trainer not found for username: " + username));
+        }
+        if (trainerDao.findByName(request.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Username already in use: " + request.getUsername()));
+        }
+
+        Trainer trainer = mapper.toEntity(request, user.get());
         BaseResponse profile = mapper.toDto(trainerDao.save(trainer));
         return ResponseEntity.ok(profile);
     }
@@ -153,7 +165,7 @@ public class TrainerProfileService implements TrainerService {
      */
     @Override
     public Optional<Trainer> getTrainer(String username) {
-        return trainerDao.findByUsername(username);
+        return trainerDao.findByName(username);
     }
 
     /**
@@ -175,5 +187,17 @@ public class TrainerProfileService implements TrainerService {
     public void assignTraineeToTrainer(String traineeUsername) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         trainerDao.assignTraineeToTrainer(authentication.getName(), traineeUsername);
+    }
+
+    /**
+     * {@inheritDoc}
+     * Retrieves a list of active trainers who are not yet assigned to the given trainee.
+     */
+    @Override
+    public ResponseEntity<List<TrainerResponseDto>> getActiveTrainersForTrainee(Trainee trainee) {
+        return ResponseEntity.ok(trainerDao.findNotAssigned(trainee.getUsername())
+                .stream()
+                .map(mapper::toResponseDto)
+                .toList());
     }
 }

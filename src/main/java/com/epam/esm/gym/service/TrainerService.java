@@ -1,12 +1,14 @@
 package com.epam.esm.gym.service;
 
+import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
+import com.epam.esm.gym.dto.trainer.TrainerResponseDto;
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileRequest;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
-import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
+import com.epam.esm.gym.dto.trainer.PutTrainerRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -92,7 +94,7 @@ public interface TrainerService {
      * @param request  the details to update the trainer's profile
      * @return a {@link ResponseEntity} containing the updated {@link com.epam.esm.gym.dto.trainer.TrainerProfile}
      */
-    ResponseEntity<BaseResponse> updateTrainer(String username, TrainerUpdateRequest request);
+    ResponseEntity<BaseResponse> updateTrainer(String username, PutTrainerRequest request);
 
     /**
      * Retrieves trainers who are not assigned to the specified trainee.
@@ -162,4 +164,19 @@ public interface TrainerService {
      * @param traineeUsername the username of the trainee to be assigned to a trainer
      */
     void assignTraineeToTrainer(String traineeUsername);
+
+    /**
+     * Retrieves a list of trainers who are not assigned to the specified trainee and are active.
+     *
+     * @param trainee the trainee whose unassigned active trainers are to be retrieved.
+     *                Must not be {@code null}. The username of the trainee is used to
+     *                find trainers who are not assigned to this trainee.
+     * @return a {@link ResponseEntity} containing a list of {@link TrainerResponseDto} objects
+     * representing the active trainers who are not assigned to the trainee.
+     * Each {@link TrainerResponseDto} includes the trainer's username, first name,
+     * last name, and specialization.
+     * The response will have an HTTP status code of 200 (OK) if the request is successful.
+     * If no trainers are found, the response will still be 200 but with an empty list.
+     */
+    ResponseEntity<List<TrainerResponseDto>> getActiveTrainersForTrainee(Trainee trainee);
 }

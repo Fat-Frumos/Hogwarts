@@ -44,11 +44,10 @@ public interface TrainingService {
      * displaying the trainings associated with a  trainer, along with details like training dates and durations.
      * </p>
      *
-     * @param username the username of the trainer whose trainings are to be retrieved
-     * @param request  the {@link TrainingProfile} criteria for filtering the trainings, such as date ranges or types
+     * @param request the {@link TrainingProfile} criteria for filtering the trainings, such as date ranges or types
      * @return a {@link ResponseEntity} containing a list of {@link TrainingResponse}
      */
-    ResponseEntity<List<TrainingResponse>> getTrainerTrainingsByName(String username, TrainingProfile request);
+    ResponseEntity<List<TrainingResponse>> getTrainerTrainingsByName(TrainingProfile request);
 
     /**
      * Creates a new training session in the system.
@@ -63,4 +62,15 @@ public interface TrainingService {
      * @param request the {@link TrainingRequest} containing the details for the new training session
      */
     ResponseEntity<BaseResponse> createTraining(TrainingRequest request);
+
+    /**
+     * Retrieves a list of all training sessions.
+     * This method fetches all available training sessions from the system and returns them as a list
+     * of {@link TrainingResponse} objects. The list is encapsulated in a {@link ResponseEntity}
+     * which allows for additional HTTP response details to be included.
+     *
+     * @return a {@link ResponseEntity} containing a list of {@link TrainingResponse} objects.
+     * The HTTP status code is typically {@code 200 OK} if the request is successful.
+     */
+    ResponseEntity<List<TrainingResponse>> getAllTrainings();
 }

@@ -13,7 +13,6 @@ import com.epam.esm.gym.exception.UserNotFoundException;
 import com.epam.esm.gym.mapper.UserMapper;
 import com.epam.esm.gym.service.UserService;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,7 +36,6 @@ import java.util.stream.IntStream;
  * and deactivating users, as well as for password changes and authentication.
  * </p>
  */
-@Slf4j
 @Service
 @AllArgsConstructor
 public class UserProfileService implements UserService {
@@ -86,8 +84,7 @@ public class UserProfileService implements UserService {
      */
     @Override
     public void updateUser(User user) {
-        User save = dao.save(user);
-        log.info("Updated user: {}", save);
+        dao.save(user);
     }
 
     /**
@@ -98,10 +95,10 @@ public class UserProfileService implements UserService {
      */
     @Override
     @Transactional
-    public void deleteUser(String username) {
+    public ResponseEntity<Void> deleteUser(String username) {
         User user = getUser(username);
         dao.delete(user);
-        log.info("Deleted user: {}", user);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -113,7 +110,7 @@ public class UserProfileService implements UserService {
      */
     @Override
     public UserProfile getUserByUsername(String username) {
-        return mapper.toDto(getUser(username));
+        return UserMapper.toDto(getUser(username));
     }
 
     /**
@@ -125,7 +122,7 @@ public class UserProfileService implements UserService {
      */
     @Override
     public User getUser(String username) {
-        return dao.findByUsername(username).orElseThrow(
+        return dao.findByName(username).orElseThrow(
                 () -> new UserNotFoundException(username));
     }
 
@@ -165,7 +162,7 @@ public class UserProfileService implements UserService {
      */
     @Override
     public ResponseEntity<BaseResponse> changePassword(ProfileRequest request) {
-        Optional<User> userOptional = dao.findByUsername(request.getUsername());
+        Optional<User> userOptional = dao.findByName(request.getUsername());
         if (userOptional.isEmpty()) {
             return getResponseEntity(HttpStatus.NOT_FOUND);
         }
@@ -195,7 +192,7 @@ public class UserProfileService implements UserService {
      */
     @Override
     public ResponseEntity<BaseResponse> authenticate(String username, String password) {
-        Optional<User> userOptional = dao.findByUsername(username);
+        Optional<User> userOptional = dao.findByName(username);
         HttpStatus status;
         if (userOptional.isEmpty()) {
             status = HttpStatus.NOT_FOUND;
@@ -292,5 +289,10 @@ public class UserProfileService implements UserService {
     @Override
     public User saveUser(User user) {
         return dao.save(user);
+    }
+
+    @Override
+    public List<UserProfile> findAll() {
+        return dao.findAll().stream().map(UserMapper::toDto).toList();
     }
 }

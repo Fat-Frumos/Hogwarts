@@ -21,4 +21,12 @@ class NotFoundExceptionTest {
         assertEquals(message, exception.getMessage());
         assertInstanceOf(RuntimeException.class, exception);
     }
+
+    @Test
+    void testExceptionMessage() {
+        String message = "InvalidJwtAuthenticationException";
+        InvalidJwtAuthenticationException exception = new InvalidJwtAuthenticationException(message);
+        assertEquals(message, exception.getMessage());
+        assertInstanceOf(RuntimeException.class, exception);
+    }
 }

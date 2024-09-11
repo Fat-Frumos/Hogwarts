@@ -5,6 +5,7 @@ import com.epam.esm.gym.domain.Trainee;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingType;
+import com.epam.esm.gym.domain.User;
 import com.epam.esm.gym.dto.training.TrainingRequest;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.dto.training.TrainingTypeDto;
@@ -69,7 +70,7 @@ class TrainingMapperTest {
 
         assertNotNull(response);
         assertEquals(Specialization.TRANSFIGURATION, response.getSpecialization());
-        assertEquals(1L, response.getTrainingTypeId());
+        assertEquals(1L, response.getId());
     }
 
     @Test
@@ -107,16 +108,47 @@ class TrainingMapperTest {
 
     @Test
     void testToResponses() {
-        Training training1 = new Training();
-        TrainingResponse response1 = new TrainingResponse();
-        Training training2 = new Training();
-        TrainingResponse response2 = new TrainingResponse();
+        Training training1 = Training.builder()
+                .trainer(Trainer.builder()
+                        .user(User.builder()
+                                .username("trainer1")
+                                .build())
+                        .build())
+                .type(TrainingType.builder()
+                        .specialization(Specialization.DEFENSE)
+                        .build())
+                .trainingName("Training1")
+                .trainingDuration(60)
+                .build();
+
+        Training training2 = Training.builder()
+                .trainer(Trainer.builder()
+                        .user(User.builder()
+                                .username("trainer2")
+                                .build())
+                        .build())
+                .type(TrainingType.builder()
+                        .specialization(Specialization.DEFAULT)
+                        .build())
+                .trainingName("Training2")
+                .trainingDuration(90)
+                .build();
 
         List<Training> trainings = List.of(training1, training2);
         List<TrainingResponse> responses = mapper.toResponses(trainings);
 
         assertEquals(2, responses.size());
-        assertEquals(response1, responses.get(0));
-        assertEquals(response2, responses.get(1));
+        assertEquals(TrainingResponse.builder()
+                .trainerName("trainer1")
+                .trainingName("Training1")
+                .trainingType("DEFENSE")
+                .trainingDuration(60)
+                .build(), responses.get(0));
+        assertEquals(TrainingResponse.builder()
+                .trainerName("trainer2")
+                .trainingName("Training2")
+                .trainingType("DEFAULT")
+                .trainingDuration(90)
+                .build(), responses.get(1));
     }
 }

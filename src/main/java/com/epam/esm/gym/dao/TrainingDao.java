@@ -2,6 +2,7 @@ package com.epam.esm.gym.dao;
 
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingType;
+import com.epam.esm.gym.dto.training.TrainingProfile;
 
 import java.util.List;
 
@@ -24,8 +25,8 @@ public interface TrainingDao extends Dao<Training> {
     /**
      * Finds all trainings associated with a specific trainer's username.
      *
-     * @param username the username of the trainer
+     * @param profile the Training Profile
      * @return a list of {@link Training} objects
      */
-    List<Training> findTrainingsByTrainerUsername(String username);
+    List<Training> findTrainingsBy(TrainingProfile profile);
 }

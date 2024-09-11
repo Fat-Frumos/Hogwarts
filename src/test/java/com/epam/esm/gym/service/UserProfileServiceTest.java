@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -73,7 +74,7 @@ public class UserProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(UserArgumentsProvider.class)
     void deleteUser(String username, User user) {
-        when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userDao.findByName(username)).thenReturn(Optional.of(user));
         doNothing().when(userDao).delete(user);
         userProfileService.deleteUser(username);
         verify(userDao).delete(user);
@@ -82,18 +83,19 @@ public class UserProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(UserArgumentsProvider.class)
     void getUserByUsername(String username, User user, UserProfile profile) {
-        when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(profile);
-        UserProfile result = userProfileService.getUserByUsername(username);
-        assertNotNull(result);
-        assertEquals(profile, result);
-        verify(userMapper).toDto(user);
+        try (var mockedUserMapper = mockStatic(UserMapper.class)) {
+            when(userDao.findByName(username)).thenReturn(Optional.of(user));
+            mockedUserMapper.when(() -> UserMapper.toDto(user)).thenReturn(profile);
+            UserProfile result = userProfileService.getUserByUsername(username);
+            assertNotNull(result);
+            assertEquals(profile, result);
+        }
     }
 
     @ParameterizedTest
     @ArgumentsSource(UserArgumentsProvider.class)
     void activateUser(String username, User user) {
-        when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userDao.findByName(username)).thenReturn(Optional.of(user));
         doAnswer(invocation -> {
             User arg = invocation.getArgument(0);
             arg.setActive(true);
@@ -101,14 +103,14 @@ public class UserProfileServiceTest {
         }).when(userDao).save(user);
         userProfileService.activateUser(username);
         assertTrue(user.getActive(), "User should be active after activation");
-        verify(userDao).findByUsername(username);
+        verify(userDao).findByName(username);
         verify(userDao).save(user);
     }
 
     @ParameterizedTest
     @ArgumentsSource(UserArgumentsProvider.class)
     void deactivateUser(String username, User user) {
-        when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userDao.findByName(username)).thenReturn(Optional.of(user));
         doAnswer(invocation -> {
             User argument = invocation.getArgument(0);
             argument.setActive(false);
@@ -116,7 +118,7 @@ public class UserProfileServiceTest {
         }).when(userDao).save(user);
         userProfileService.deactivateUser(username);
         assertFalse(user.getActive(), "User should be inactive after deactivation");
-        verify(userDao).findByUsername(username);
+        verify(userDao).findByName(username);
         verify(userDao).save(user);
     }
 
@@ -124,9 +126,9 @@ public class UserProfileServiceTest {
     @ArgumentsSource(AuthenticationArgumentsProvider.class)
     void authenticate(String username, String password, User user, HttpStatus expectedStatus) {
         if (user == null) {
-            when(userDao.findByUsername(username)).thenReturn(Optional.empty());
+            when(userDao.findByName(username)).thenReturn(Optional.empty());
         } else {
-            when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
+            when(userDao.findByName(username)).thenReturn(Optional.of(user));
             when(passwordEncoder.matches(password, user.getPassword())).thenReturn(expectedStatus == HttpStatus.OK);
         }
         ResponseEntity<BaseResponse> response = userProfileService.authenticate(username, password);
@@ -136,7 +138,7 @@ public class UserProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(UserArgumentsProvider.class)
     void testGetUserShouldReturnUserWhenUserExists(String username, User user) {
-        when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userDao.findByName(username)).thenReturn(Optional.of(user));
         User result = userProfileService.getUser(username);
         assertEquals(user, result);
     }
@@ -144,7 +146,7 @@ public class UserProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(UserArgumentsProvider.class)
     void testGetUserShouldThrowUserNotFoundExceptionWhenUserDoesNotExist(String username, User user) {
-        when(userDao.findByUsername(username)).thenReturn(Optional.empty());
+        when(userDao.findByName(username)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> userProfileService.getUser(username));
     }
 
@@ -153,7 +155,7 @@ public class UserProfileServiceTest {
     void testChangePasswordShouldReturnAcceptedWhenPasswordIsUpdated(String username, User user) {
         ProfileRequest request = new ProfileRequest(
                 username, "oldPassword123", "newPassword123");
-        when(userDao.findByUsername(request.getUsername())).thenReturn(Optional.of(user));
+        when(userDao.findByName(request.getUsername())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(request.getOldPassword(), user.getPassword())).thenReturn(true);
         when(passwordEncoder.matches(request.getNewPassword(), user.getPassword())).thenReturn(false);
         when(passwordEncoder.encode(request.getNewPassword())).thenReturn("encodedNewPassword");
@@ -166,7 +168,7 @@ public class UserProfileServiceTest {
     @ArgumentsSource(UserArgumentsProvider.class)
     void testAuthenticateShouldReturnOkWhenCredentialsAreValid(String username, User user) {
         String password = "password456";
-        when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userDao.findByName(username)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
         ResponseEntity<BaseResponse> response = userProfileService.authenticate(username, password);
         assertEquals(HttpStatus.OK, response.getStatusCode());

@@ -59,7 +59,7 @@ class JDBCTraineeDaoTest {
     }
 
     /**
-     * Tests the {@link JDBCTraineeDao#findByUsername(String)} method.
+     * Tests the {@link JDBCTraineeDao#findByName(String)} method.
      *
      * <p>This method tests that the DAO correctly retrieves a {@link Trainee} by username. It mocks the
      * query execution and verifies that the returned trainee matches the expected result.</p>
@@ -80,7 +80,7 @@ class JDBCTraineeDaoTest {
         when(session.createQuery(hql, Trainee.class)).thenReturn(traineeQuery);
         when(traineeQuery.setParameter("username", username)).thenReturn(traineeQuery);
         when(traineeQuery.uniqueResultOptional()).thenReturn(expectedTrainee);
-        Optional<Trainee> actualTrainee = jdbcTraineeDao.findByUsername(username);
+        Optional<Trainee> actualTrainee = jdbcTraineeDao.findByName(username);
         assertEquals(expectedTrainee, actualTrainee);
     }
 

@@ -98,7 +98,7 @@ class TraineeProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(TraineeArgumentsProvider.class)
     void deleteTraineeWhenTraineeExists(String username, Trainee trainee) {
-        when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
+        when(dao.findByName(username)).thenReturn(Optional.of(trainee));
         ResponseEntity<MessageResponse> response = service.deleteTrainee(username);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(dao).delete(trainee);
@@ -107,7 +107,7 @@ class TraineeProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(TraineeProfileArgumentsProvider.class)
     void deleteTraineeWhenTraineeDoesNotExist(String username) {
-        when(dao.findByUsername(username)).thenReturn(Optional.empty());
+        when(dao.findByName(username)).thenReturn(Optional.empty());
         ResponseEntity<MessageResponse> response = service.deleteTrainee(username);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         verify(dao, never()).delete(any());
@@ -118,7 +118,7 @@ class TraineeProfileServiceTest {
     void getTraineeProfileByNameWhenTraineeExists(
             String username, Trainee trainee,
             ResponseEntity<TraineeProfileResponseResponse> profile) {
-        when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
+        when(dao.findByName(username)).thenReturn(Optional.of(trainee));
         when(mapper.toTraineeProfile(trainee)).thenReturn(profile.getBody());
         ResponseEntity<BaseResponse> response = service.getTraineeProfileByName(username);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -128,7 +128,7 @@ class TraineeProfileServiceTest {
     @ParameterizedTest
     @ArgumentsSource(TraineeArgumentsProvider.class)
     void getTraineeProfileByNameWhenTraineeDoesNotExist(String username) {
-        when(dao.findByUsername(username)).thenReturn(Optional.empty());
+        when(dao.findByName(username)).thenReturn(Optional.empty());
         ResponseEntity<BaseResponse> response = service.getTraineeProfileByName(username);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
@@ -145,8 +145,8 @@ class TraineeProfileServiceTest {
         Trainee trainee = new Trainee();
         Trainee updatedTrainee = new Trainee();
         TraineeProfileResponseResponse updatedProfile = new TraineeProfileResponseResponse();
-        when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
-        when(dao.findByUsername(request.getUsername())).thenReturn(Optional.empty());
+        when(dao.findByName(username)).thenReturn(Optional.of(trainee));
+        when(dao.findByName(request.getUsername())).thenReturn(Optional.empty());
         when(mapper.update(request, trainee)).thenReturn(updatedTrainee);
         when(dao.update(updatedTrainee)).thenReturn(updatedTrainee);
         when(mapper.toTraineeProfile(updatedTrainee)).thenReturn(updatedProfile);
@@ -202,7 +202,7 @@ class TraineeProfileServiceTest {
         Trainee trainee = new Trainee();
         when(trainerService.getTrainer(anyString())).thenReturn(Optional.of(new Trainer()));
         when(mapper.toTrainerProfile(any())).thenReturn(new TrainerProfile());
-        when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
+        when(dao.findByName(username)).thenReturn(Optional.of(trainee));
         when(mapper.toTrainers(anyList())).thenReturn(new HashSet<>());
 
         ResponseEntity<List<TrainerResponse>> response =
@@ -217,7 +217,7 @@ class TraineeProfileServiceTest {
     void getTraineeTrainingsByName(
             Map<String, String> params, Trainee trainee,
             Training training, TrainingResponse trainingResponse) {
-        when(dao.findByUsername(trainee.getUser().getUsername())).thenReturn(Optional.of(trainee));
+        when(dao.findByName(trainee.getUser().getUsername())).thenReturn(Optional.of(trainee));
         when(mapper.toResponse(training)).thenReturn(trainingResponse);
         ResponseEntity<List<TrainingResponse>> response =
                 service.getTraineeTrainingsByName(trainee.getUser().getUsername(), params);
@@ -231,7 +231,7 @@ class TraineeProfileServiceTest {
     void activateDeactivateProfile() {
         String username = "Harry.Potter";
         Trainee trainee = Trainee.builder().user(new User()).build();
-        when(dao.findByUsername(username)).thenReturn(Optional.of(trainee));
+        when(dao.findByName(username)).thenReturn(Optional.of(trainee));
         ResponseEntity<BaseResponse> response = service.activateDeactivateProfile(username, true);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(trainee.getUser().getActive());

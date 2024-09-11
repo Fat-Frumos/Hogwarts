@@ -1,12 +1,14 @@
 package com.epam.esm.gym.dao.jdbc;
 
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.exception.UserNotFoundException;
 import com.epam.esm.gym.web.provider.UserDaoArgumentsProvider;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
@@ -14,10 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -149,7 +153,7 @@ class JDBCUserDaoTest {
     }
 
     /**
-     * Tests the {@link JDBCUserDao#findByUsername(String)} method to ensure it correctly retrieves a user by username.
+     * Tests the {@link JDBCUserDao#findByName(String)} method to ensure it correctly retrieves a user by username.
      *
      * <p>This test uses parameterized {@link User} and username values to verify that the method
      * correctly interacts with the Hibernate {@link Session} to find a user by username.
@@ -166,7 +170,7 @@ class JDBCUserDaoTest {
         doReturn(query).when(session).createQuery(sql, User.class);
         doReturn(query).when(query).setParameter("username", username);
         doReturn(expectedUser).when(query).uniqueResultOptional();
-        Optional<User> actualUser = userDao.findByUsername(username);
+        Optional<User> actualUser = userDao.findByName(username);
         assertEquals(expectedUser, actualUser);
     }
 
@@ -216,5 +220,42 @@ class JDBCUserDaoTest {
         when(mocked.executeUpdate()).thenReturn(1);
         userDao.update(user);
         verify(mocked).executeUpdate();
+    }
+
+    @Test
+    void testGetUserBy_userExists() {
+        String username = "testUser";
+        User expectedUser = new User();
+        when(session.createQuery("SELECT u FROM User u WHERE username = :username", User.class))
+                .thenReturn(query);
+        when(query.setParameter("username", username)).thenReturn(query);
+        when(query.uniqueResultOptional()).thenReturn(Optional.of(expectedUser));
+        User actualUser = userDao.getUserBy(username);
+        assertEquals(expectedUser, actualUser);
+    }
+
+    @Test
+    void testGetUserBy_userNotFound() {
+        String username = "testUser";
+        when(session.createQuery("SELECT u FROM User u WHERE username = :username", User.class))
+                .thenReturn(query);
+        when(query.setParameter("username", username)).thenReturn(query);
+        when(query.uniqueResultOptional()).thenReturn(Optional.empty());
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class, () -> userDao.getUserBy(username));
+        assertEquals("User not found: testUser", thrown.getMessage());
+    }
+
+    @Test
+    void testFindUsernamesByBaseName() {
+        String baseUser = "baseUser";
+        User user = new User();
+        List<User> expectedUsers = Collections.singletonList(user);
+        when(session.createQuery(
+                "SELECT u FROM User u WHERE u.username LIKE :baseUsernamePattern", User.class))
+                .thenReturn(query);
+        when(query.setParameter("baseUsernamePattern", baseUser + "%")).thenReturn(query);
+        when(query.getResultList()).thenReturn(expectedUsers);
+        List<User> actualUsers = userDao.findUsernamesByBaseName(baseUser);
+        assertEquals(expectedUsers, actualUsers);
     }
 }

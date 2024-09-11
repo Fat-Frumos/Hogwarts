@@ -9,6 +9,8 @@ import com.epam.esm.gym.dto.trainee.PostTraineeRequest;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 /**
  * Service interface for managing user accounts and operations related to users.
  * <p>
@@ -61,7 +63,7 @@ public interface UserService {
      *
      * @param username the username of the user to be deleted
      */
-    void deleteUser(String username);
+    ResponseEntity<Void> deleteUser(String username);
 
     /**
      * Retrieves a user profile based on the username.
@@ -188,4 +190,13 @@ public interface UserService {
      * @return the saved {@link User} entity.
      */
     User saveUser(User user);
+
+    /**
+     * Retrieves a list of all users.
+     * This method returns a list of `UserProfile` objects representing all users.
+     *
+     * @return a {@link List} containing a list of
+     * {@link com.epam.esm.gym.dto.profile.UserProfile} for all trainers
+     */
+    List<UserProfile> findAll();
 }

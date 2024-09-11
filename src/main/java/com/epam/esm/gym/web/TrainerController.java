@@ -2,9 +2,9 @@ package com.epam.esm.gym.web;
 
 import com.epam.esm.gym.dto.auth.BaseResponse;
 import com.epam.esm.gym.dto.profile.ProfileResponse;
+import com.epam.esm.gym.dto.trainer.PutTrainerRequest;
 import com.epam.esm.gym.dto.trainer.TrainerProfile;
 import com.epam.esm.gym.dto.trainer.TrainerRequest;
-import com.epam.esm.gym.dto.trainer.TrainerUpdateRequest;
 import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.dto.training.TrainingResponse;
 import com.epam.esm.gym.service.TrainerService;
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -140,7 +141,7 @@ public class TrainerController implements ITrainerController {
      * Updates an existing trainer profile by username.
      *
      * @param username The username of the trainer whose profile is to be updated.
-     * @param request  The {@link TrainerUpdateRequest} object with updated profile details.
+     * @param request  The {@link com.epam.esm.gym.dto.trainer.PutTrainerRequest} object with updated profile details.
      * @return {@link ResponseEntity} with status 200 if profile is updated,
      * or status 400 for bad request due to validation errors, 401 for unauthorized access,
      * 403 for forbidden access, 404 if trainer is not found, and 405 if method is not allowed.
@@ -150,7 +151,7 @@ public class TrainerController implements ITrainerController {
     @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<BaseResponse> updateTrainerProfile(
             @PathVariable String username,
-            @Valid @RequestBody TrainerUpdateRequest request) {
+            @Valid @RequestBody PutTrainerRequest request) {
         return service.updateTrainer(username, request);
     }
 
@@ -159,7 +160,6 @@ public class TrainerController implements ITrainerController {
      * Retrieves a list of trainings associated with a trainer by username.
      *
      * @param username The username of the trainer whose trainings are to be retrieved.
-     * @param request  The {@link TrainingProfile} object with filtering criteria.
      * @return {@link ResponseEntity} with status 200 if trainings are retrieved,
      * or status 400 for bad request, 401 for unauthorized access,
      * 403 for forbidden access, and 404 if trainer or training is not found.
@@ -169,8 +169,12 @@ public class TrainerController implements ITrainerController {
     @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<List<TrainingResponse>> getTrainerTrainings(
             @PathVariable String username,
-            @Valid @RequestBody TrainingProfile request) {
-        return trainingService.getTrainerTrainingsByName(username, request);
+            @RequestParam(required = false) LocalDate periodFrom,
+            @RequestParam(required = false) LocalDate periodTo,
+            @RequestParam(required = false) String traineeName) {
+
+        TrainingProfile request = new TrainingProfile(username, traineeName, "", periodFrom, periodTo);
+        return trainingService.getTrainerTrainingsByName(request);
     }
 
     /**
@@ -185,7 +189,7 @@ public class TrainerController implements ITrainerController {
      */
     @Override
     @PatchMapping("/{username}/activate")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> activateTrainer(
             @PathVariable String username, @RequestParam Boolean active) {
         return service.activateDeactivateProfile(username, active);
@@ -202,7 +206,7 @@ public class TrainerController implements ITrainerController {
      */
     @Override
     @GetMapping("/{username}/unassigned")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_TRAINER') or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<List<TrainerProfile>> getNotAssignedActiveTrainers(
             @PathVariable String username) {
         return !username.matches("^[a-zA-Z0-9._-]+$")

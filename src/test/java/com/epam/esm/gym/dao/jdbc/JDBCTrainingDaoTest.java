@@ -5,9 +5,11 @@ import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingType;
 import com.epam.esm.gym.domain.User;
+import com.epam.esm.gym.dto.training.TrainingProfile;
 import com.epam.esm.gym.web.provider.trainee.TraineeTrainerNameArgumentsProvider;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,6 +63,9 @@ public class JDBCTrainingDaoTest {
     private Session session;
 
     @Mock
+    NativeQuery<Training> nativeQuery;
+
+    @Mock
     private Query<Training> trainingQuery;
 
     @Mock
@@ -82,7 +88,7 @@ public class JDBCTrainingDaoTest {
     /**
      * Tests finding training records by trainer and trainee usernames.
      *
-     * <p>This method verifies that {@link JDBCTrainingDao#findByUsername(String)} correctly retrieves
+     * <p>This method verifies that {@link JDBCTrainingDao#findByName(String)} correctly retrieves
      * training records where either the trainer or trainee's username matches the provided value.
      * It checks that the result contains the expected usernames.</p>
      *
@@ -95,46 +101,58 @@ public class JDBCTrainingDaoTest {
         Training mockTraining = Training.builder()
                 .trainee(Trainee.builder().user(User.builder().username(traineeUsername).build()).build())
                 .trainer(Trainer.builder().user(User.builder().username(trainerUsername).build()).build()).build();
-
         when(session.createQuery(anyString(), eq(Training.class))).thenReturn(trainingQuery);
-        when(trainingQuery.setParameter("username", trainerUsername)).thenReturn(trainingQuery);
+        when(trainingQuery.setParameter("trainingName", trainerUsername)).thenReturn(trainingQuery);
         when(trainingQuery.uniqueResultOptional()).thenReturn(Optional.of(mockTraining));
-
-        Optional<Training> result = jdbcTrainingDao.findByUsername(trainerUsername);
-
+        Optional<Training> result = jdbcTrainingDao.findByName(trainerUsername);
         assertTrue(result.isPresent());
         assertEquals(trainerUsername, result.get().getTrainer().getUser().getUsername());
         assertEquals(traineeUsername, result.get().getTrainee().getUser().getUsername());
+
+        verify(session).createQuery(anyString(), eq(Training.class));
+        verify(trainingQuery).setParameter("trainingName", trainerUsername);
+        verify(trainingQuery).uniqueResultOptional();
     }
 
-    /**
-     * Tests finding all training records by trainer username.
-     *
-     * <p>This method verifies that {@link JDBCTrainingDao#findTrainingsByTrainerUsername(String)} correctly
-     * retrieves a list of trainings associated with the given trainer username.</p>
-     *
-     * @param trainerUsername the username of the trainer to search for.
-     */
-    @ParameterizedTest
-    @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
-    void testFindTrainingsByTrainerUsername(String trainerUsername) {
-        Training training = Training.builder().trainer(Trainer.builder()
-                        .user(User.builder().username(trainerUsername)
-                                .build())
+    @Test
+    void testFindTrainingsByTrainerUsername() {
+        String trainerUsername = "Albus Dumbledore";
+        TrainingProfile profile = new TrainingProfile();
+        profile.setTrainerName(trainerUsername);
+
+        Training training = Training.builder()
+                .trainer(Trainer.builder()
+                        .user(User.builder().username(trainerUsername).build())
                         .build())
                 .build();
         List<Training> mockTrainings = List.of(training);
-        when(session.createQuery(anyString(), eq(Training.class))).thenReturn(trainingQuery);
-        when(trainingQuery.setParameter("username", trainerUsername)).thenReturn(trainingQuery);
-        when(trainingQuery.getResultList()).thenReturn(mockTrainings);
-        List<Training> result = jdbcTrainingDao.findTrainingsByTrainerUsername(trainerUsername);
+
+        String expectedQuery = """
+            SELECT t.*
+            FROM training t
+            LEFT JOIN trainee trn ON t.trainee_id = trn.id
+            LEFT JOIN trainer tr ON t.trainer_id = tr.id
+            LEFT JOIN users u ON tr.user_id = u.id
+            LEFT JOIN training_type tt ON t.training_type_id = tt.id
+            WHERE u.username = :trainerUsername
+            """;
+
+        when(session.createNativeQuery(expectedQuery, Training.class)).thenReturn(nativeQuery);
+        when(nativeQuery.setParameter("trainerUsername", trainerUsername)).thenReturn(nativeQuery);
+        when(nativeQuery.getResultList()).thenReturn(mockTrainings);
+
+        List<Training> result = jdbcTrainingDao.findTrainingsBy(profile);
+
         assertEquals(mockTrainings, result);
+        verify(session).createNativeQuery(expectedQuery, Training.class);
+        verify(nativeQuery).setParameter("trainerUsername", trainerUsername);
+        verify(nativeQuery).getResultList();
     }
 
     /**
      * Tests finding training records when the training is found.
      *
-     * <p>This method verifies that {@link JDBCTrainingDao#findByUsername(String)} correctly returns
+     * <p>This method verifies that {@link JDBCTrainingDao#findByName(String)} correctly returns
      * the training record when it exists for the provided username.</p>
      *
      * @param username the username to search for.
@@ -142,35 +160,53 @@ public class JDBCTrainingDaoTest {
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
     void testFindByUsernameFound(String username) {
+        // Setup the mock Training object
         Training training = Training.builder()
                 .trainer(Trainer.builder()
-                        .user(User.builder().username(username).build()).build())
+                        .user(User.builder().username(username).build())
+                        .build())
                 .build();
+
+        // Create a mock Query object
+        Query<Training> trainingQuery = mock(Query.class);
+
+        // Set up the session and trainingQuery mocks
         when(session.createQuery(anyString(), eq(Training.class))).thenReturn(trainingQuery);
-        when(trainingQuery.setParameter("username", username)).thenReturn(trainingQuery);
+        when(trainingQuery.setParameter("trainingName", username)).thenReturn(trainingQuery);
         when(trainingQuery.uniqueResultOptional()).thenReturn(Optional.of(training));
-        Optional<Training> result = jdbcTrainingDao.findByUsername(username);
+
+        // Call the method under test
+        Optional<Training> result = jdbcTrainingDao.findByName(username);
+
+        // Validate the result
         assertTrue(result.isPresent());
         assertEquals(training, result.get());
+
+        // Verify interactions
+        verify(session).createQuery(anyString(), eq(Training.class));
+        verify(trainingQuery).setParameter("trainingName", username);
+        verify(trainingQuery).uniqueResultOptional();
     }
 
-    /**
-     * Tests finding training records when no training is found.
-     *
-     * <p>This method verifies that {@link JDBCTrainingDao#findByUsername(String)} correctly returns
-     * an empty result when no training record exists for the provided username.</p>
-     *
-     * @param username the username to search for.
-     */
+
     @ParameterizedTest
     @ArgumentsSource(TraineeTrainerNameArgumentsProvider.class)
     void testFindByUsernameNotFound(String username) {
+        Query<Training> trainingQuery = mock(Query.class);
+
         when(session.createQuery(anyString(), eq(Training.class))).thenReturn(trainingQuery);
-        when(trainingQuery.setParameter("username", username)).thenReturn(trainingQuery);
+        when(trainingQuery.setParameter("trainingName", username)).thenReturn(trainingQuery);
         when(trainingQuery.uniqueResultOptional()).thenReturn(Optional.empty());
-        Optional<Training> result = jdbcTrainingDao.findByUsername(username);
+
+        Optional<Training> result = jdbcTrainingDao.findByName(username);
+
         assertTrue(result.isEmpty());
+
+        verify(session).createQuery(anyString(), eq(Training.class));
+        verify(trainingQuery).setParameter("trainingName", username);
+        verify(trainingQuery).uniqueResultOptional();
     }
+
 
     /**
      * Tests retrieving all training types.
