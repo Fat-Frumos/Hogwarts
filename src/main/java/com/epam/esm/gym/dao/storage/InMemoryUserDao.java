@@ -60,7 +60,7 @@ public class InMemoryUserDao extends AbstractInMemoryDao<User> implements UserDa
      * @return an {@link Optional} containing the user if found, or empty if not found.
      */
     @Override
-    public Optional<User> findByUsername(String username) {
+    public Optional<User> findByName(String username) {
         return Optional.ofNullable(getUserBy(username));
     }
 

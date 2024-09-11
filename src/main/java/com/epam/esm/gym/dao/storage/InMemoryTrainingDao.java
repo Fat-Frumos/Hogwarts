@@ -4,6 +4,7 @@ import com.epam.esm.gym.dao.TrainingDao;
 import com.epam.esm.gym.domain.Trainer;
 import com.epam.esm.gym.domain.Training;
 import com.epam.esm.gym.domain.TrainingType;
+import com.epam.esm.gym.dto.training.TrainingProfile;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -67,7 +68,7 @@ public class InMemoryTrainingDao extends AbstractInMemoryDao<Training> implement
      * @return an {@link Optional} containing the {@link Training} if found, or an empty {@link Optional} if not found.
      */
     @Override
-    public Optional<Training> findByUsername(String username) {
+    public Optional<Training> findByName(String username) {
         return Optional.ofNullable(storage.get(username));
     }
 
@@ -92,15 +93,15 @@ public class InMemoryTrainingDao extends AbstractInMemoryDao<Training> implement
      * <p>This method searches the in-memory storage for all {@link Training} entities where the associated trainer's
      * username matches the provided name. If the trainer is not found, a {@link NoSuchElementException} is thrown.</p>
      *
-     * @param trainerUsername the username of the trainer whose trainings are to be retrieved.
+     * @param profile the username of the trainer whose trainings are to be retrieved.
      * @return a list of {@link Training} entities associated with the specified trainer.
      * @throws NoSuchElementException if no trainer with the specified username is found.
      */
     @Override
-    public List<Training> findTrainingsByTrainerUsername(String trainerUsername) {
-        Trainer trainer = trainerStorage.get(trainerUsername);
+    public List<Training> findTrainingsBy(TrainingProfile profile) {
+        Trainer trainer = trainerStorage.get(profile.getTrainerName());
         if (trainer == null) {
-            throw new NoSuchElementException("No trainer found with username: " + trainerUsername);
+            throw new NoSuchElementException("No trainer found with username: " + profile.getTrainerName());
         }
         return storage.values().stream()
                 .filter(training -> training.getTrainer().equals(trainer))

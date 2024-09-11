@@ -75,7 +75,7 @@ public class InMemoryTraineeDao extends AbstractInMemoryDao<Trainee> implements 
      * @return an {@link Optional} containing the {@link Trainee} if found, or an empty {@link Optional} if not found.
      */
     @Override
-    public Optional<Trainee> findByUsername(String username) {
+    public Optional<Trainee> findByName(String username) {
         return storage.values().stream()
                 .filter(trainee -> trainee.getUser().getUsername().equals(username))
                 .findFirst();

@@ -68,7 +68,7 @@ class InMemoryTrainerDaoTest {
         Trainer hermione = trainers.get(0);
         inMemoryTrainerDao.save(hermione);
         inMemoryTrainerDao.delete(hermione);
-        Optional<Trainer> foundTrainer = inMemoryTrainerDao.findByUsername(username);
+        Optional<Trainer> foundTrainer = inMemoryTrainerDao.findByName(username);
         assertFalse(foundTrainer.isPresent());
     }
 
@@ -91,7 +91,7 @@ class InMemoryTrainerDaoTest {
     @Test
     void testFindByUsername() {
         when(trainerStorage.get("Hermione.Granger")).thenReturn(trainer);
-        Optional<Trainer> foundTrainer = trainerDao.findByUsername("Hermione.Granger");
+        Optional<Trainer> foundTrainer = trainerDao.findByName("Hermione.Granger");
         assertTrue(foundTrainer.isPresent());
         assertEquals("Hermione.Granger", foundTrainer.get().getUser().getUsername());
     }

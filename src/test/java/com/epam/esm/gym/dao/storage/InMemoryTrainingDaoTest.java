@@ -59,7 +59,7 @@ class InMemoryTrainingDaoTest {
     void delete(Map<String, String> filters, Trainee trainee, Training training) {
         inMemoryTrainingDao.save(training);
         inMemoryTrainingDao.delete(training);
-        Optional<Training> deletedTraining = inMemoryTrainingDao.findByUsername(training.getTrainingName());
+        Optional<Training> deletedTraining = inMemoryTrainingDao.findByName(training.getTrainingName());
         assertTrue(deletedTraining.isEmpty());
     }
 }

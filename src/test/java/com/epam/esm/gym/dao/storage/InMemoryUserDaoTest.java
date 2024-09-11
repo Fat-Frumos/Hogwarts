@@ -83,14 +83,14 @@ class InMemoryUserDaoTest {
     @Test
     void findByUsername() {
         userMap.put(user.getUsername(), user);
-        Optional<User> result = dao.findByUsername("Hermione.Granger");
+        Optional<User> result = dao.findByName("Hermione.Granger");
         assertTrue(result.isPresent());
         assertEquals(user, result.get());
     }
 
     @Test
     void findByUsername_UserNotFound() {
-        Optional<User> result = dao.findByUsername("nonexistentUser");
+        Optional<User> result = dao.findByName("nonexistentUser");
         assertFalse(result.isPresent());
     }
 

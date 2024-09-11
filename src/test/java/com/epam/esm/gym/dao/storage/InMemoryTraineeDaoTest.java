@@ -30,7 +30,7 @@ class InMemoryTraineeDaoTest {
     void testFindByUsername(Trainee trainee) {
         inMemoryTraineeDao.save(trainee);
 
-        Optional<Trainee> foundTrainee = inMemoryTraineeDao.findByUsername(trainee.getUser().getUsername());
+        Optional<Trainee> foundTrainee = inMemoryTraineeDao.findByName(trainee.getUser().getUsername());
         assertTrue(foundTrainee.isPresent());
         assertEquals(trainee, foundTrainee.get());
     }
@@ -59,7 +59,7 @@ class InMemoryTraineeDaoTest {
                 .build();
 
         inMemoryTraineeDao.update(updatedTrainee);
-        Optional<Trainee> foundTrainee = inMemoryTraineeDao.findByUsername(trainee.getUser().getUsername());
+        Optional<Trainee> foundTrainee = inMemoryTraineeDao.findByName(trainee.getUser().getUsername());
 
         assertTrue(foundTrainee.isPresent());
         assertEquals(updatedTrainee, foundTrainee.get());
@@ -71,7 +71,7 @@ class InMemoryTraineeDaoTest {
         inMemoryTraineeDao.save(trainee);
         inMemoryTraineeDao.delete(trainee);
 
-        Optional<Trainee> foundTrainee = inMemoryTraineeDao.findByUsername(trainee.getUser().getUsername());
+        Optional<Trainee> foundTrainee = inMemoryTraineeDao.findByName(trainee.getUser().getUsername());
         assertFalse(foundTrainee.isPresent());
     }
 }

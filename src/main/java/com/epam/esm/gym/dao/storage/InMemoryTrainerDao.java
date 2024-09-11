@@ -65,7 +65,7 @@ public class InMemoryTrainerDao extends AbstractInMemoryDao<Trainer> implements 
      * @return an {@link Optional} containing the {@link Trainer} if found, or an empty {@link Optional} if not found.
      */
     @Override
-    public Optional<Trainer> findByUsername(String username) {
+    public Optional<Trainer> findByName(String username) {
         return Optional.ofNullable(storage.get(username));
     }
 
