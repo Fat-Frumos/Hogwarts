@@ -1,27 +1,31 @@
+# Use Maven for the build
 FROM maven:3.9.8-eclipse-temurin-21 AS build
+
+# Set the working directory
 WORKDIR /app
 
-COPY jms/pom.xml /app/jms/pom.xml
-RUN mvn -f /app/jms/pom.xml dependency:go-offline
+# Copy gym-service's pom.xml and source code, then build
+COPY gym-service/pom.xml gym-service/pom.xml
+COPY gym-service/src gym-service/src
+RUN mvn -f gym-service/pom.xml clean package -DskipTests
 
-COPY jms /app/jms
-RUN mvn -f /app/jms/pom.xml clean package -DskipTests
+# Copy jms's pom.xml and source code, then build
+COPY jms/pom.xml jms/pom.xml
+COPY jms/src jms/src
+RUN mvn -f jms/pom.xml clean package -DskipTests
 
+# Production stage
 FROM openjdk:21-slim
-COPY --from=build /app/gym-service/target/jms-0.0.1-jar-with-dependencies.jar jms.jar
 
+# Copy the built jms.jar into the gym-service image
+COPY --from=build /app/jms/target/jms-0.0.1-jar-with-dependencies.jar /app/jms.jar
+COPY --from=build /app/gym-service/target/gym-service-0.0.1-SNAPSHOT.jar /app/gym-service.jar
+
+# Set the working directory
+WORKDIR /app
+
+# Expose the necessary port
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "jms.jar"]
 
-
-COPY gym-service/pom.xml /app/gym-service/pom.xml
-RUN mvn -f /app/gym-service/pom.xml dependency:go-offline
-
-COPY gym-service /app/gym-service
-RUN mvn -f /app/gym-service/pom.xml clean package -DskipTests
-
-FROM openjdk:21-slim
-COPY --from=build /app/gym-service/target/gym-service-0.0.1-SNAPSHOT.jar gym-service.jar
-
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "gym-service.jar"]
+# Entry point for the gym-service
+ENTRYPOINT ["java", "-jar", "gym-service.jar", "--spring.profiles.active=prod", "--jms.jar=/app/jms.jar"]
