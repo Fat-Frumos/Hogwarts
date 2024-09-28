@@ -165,7 +165,7 @@
         <dependency>
             <groupId>com.epam.esm.gym.jms</groupId>
             <artifactId>jms</artifactId>
-            <version>3.3.3</version>
+            <version>0.0.1</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
