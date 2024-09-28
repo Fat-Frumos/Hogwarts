@@ -1,8 +1,8 @@
-FROM maven:3.8.4-openjdk-17-slim AS build
+FROM maven:3.9.8-eclipse-temurin-21 AS build
 COPY . .
 RUN mvn clean package -DskipTests
 
-FROM openjdk:17-slim
+FROM openjdk:21-slim
 COPY --from=build /target/gym-0.0.1.jar gym.jar
 
 EXPOSE 8080

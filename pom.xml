@@ -35,4 +35,15 @@
         <module>gym-service</module>
         <module>jms</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.epam.esm.gym</groupId>
+                <artifactId>jms</artifactId>
+                <version>0.0.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 </project>

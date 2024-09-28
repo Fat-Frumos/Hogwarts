@@ -432,7 +432,7 @@ Check conflicting dependencies
 
 `mvn -f ./workload/pom.xml clean install`
 
-`mvn -f ./broker/pom.xml clean install`
+`mvn -f ./jms/pom.xml clean install`
 
 ActiveMQ
 `activemq start`
