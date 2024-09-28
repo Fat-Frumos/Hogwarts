@@ -1,10 +1,9 @@
-# Dockerfile for config-server
-
 FROM maven:3.8.4-openjdk-17-slim AS build
 WORKDIR /app
 
-COPY config-server/pom.xml config-server/
-COPY config-server/src src/
+COPY . .
+
+WORKDIR /app/config-server
 
 RUN mvn clean package -DskipTests
 
