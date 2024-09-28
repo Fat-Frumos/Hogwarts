@@ -8,7 +8,7 @@ COPY ../jms/src jms/src
 COPY src gym-service/src
 
 RUN mvn -f jms/pom.xml clean install -DskipTests
-RUN mvn -f gym-service/pom.xml clean package -DskipTests
+RUN mvn -f gym-service/pom.xml clean package -DskipTests -e -X
 
 RUN ls -l gym-service/target
 
