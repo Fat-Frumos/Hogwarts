@@ -8,7 +8,7 @@ COPY jms /app/jms
 RUN mvn -f /app/jms/pom.xml clean package -DskipTests
 
 FROM openjdk:21-slim
-COPY --from=build /app/gym-service/target/jms-0.0.1.jar jms.jar
+COPY --from=build /app/gym-service/target/jms-0.0.1-jar-with-dependencies.jar jms.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "jms.jar"]
