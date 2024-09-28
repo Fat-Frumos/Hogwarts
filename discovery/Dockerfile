@@ -11,4 +11,4 @@ FROM openjdk:21-slim
 COPY --from=build /app/discovery/target/discovery-0.0.1-SNAPSHOT.jar discovery.jar
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "config-server.jar"]
+ENTRYPOINT ["java", "-jar", "discovery.jar"]
