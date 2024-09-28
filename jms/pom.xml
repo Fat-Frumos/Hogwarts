@@ -5,6 +5,7 @@
         <groupId>com.epam.esm</groupId>
         <artifactId>microservice</artifactId>
         <version>0.0.1</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>com.epam.esm.gym.jms</groupId>
     <artifactId>jms</artifactId>
