@@ -1,0 +1,45 @@
+server:
+  port: 8222
+
+  error:
+    whitelabel:
+      enabled: false
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+            - Path=/api/trainings/**
+            - Path=/api/trainers/**
+            - Path=/api/trainees/**
+            - Path=/api/workload/**
+        - id: training-service
+          uri: lb://TRAINING-SERVICE
+          predicates:
+            - Path=/api/trainings/**
+        - id: trainer-service
+          uri: lb://TRAINER-SERVICE
+          predicates:
+            - Path=/api/trainers/**
+        - id: trainee-service
+          uri: lb://TRAINEE-SERVICE
+          predicates:
+            - Path=/api/trainees/**
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    info:
+      enabled: true
+

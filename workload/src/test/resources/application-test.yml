@@ -1,0 +1,5 @@
+server:
+  local:
+    base: http://localhost:8090/api/auth/login
+  remote:
+    base: https://hogwart-gym.onrender.com

@@ -289,6 +289,154 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "BadRequestLogin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Missing password returns 400 Bad Request\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.message).to.exist;\r",
+									"    pm.expect(responseData.message).to.include(\"Required request parameter 'password' is not present\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"password\": \"Password123\",\"username\": \"Harry.Potter\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/login?username={{username}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "{{username}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Login OK",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let updateLogin = {\r",
+									"  \"username\": \"Severus.Snape\",\r",
+									"  \"oldPassword\": \"POISONusername\",\r",
+									"  \"newPassword\": \"POISON\"\r",
+									"};\r",
+									"\r",
+									"for (let key in updateLogin) {\r",
+									"  if (updateLogin.hasOwnProperty(key)) {\r",
+									"    pm.environment.set(key, updateLogin[key]);\r",
+									"  }\r",
+									"}\r",
+									"\r",
+									"const username = pm.environment.get(\"username\");\r",
+									"const oldPassword = pm.environment.get(\"oldPassword\");\r",
+									"const newPassword = pm.environment.get(\"newPassword\");\r",
+									"\r",
+									"pm.request.body.raw = JSON.stringify({\r",
+									"    username: username,\r",
+									"    oldPassword: oldPassword,\r",
+									"    newPassword: newPassword\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response schema is valid\", function () {\r",
+									"  var schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"      message: {\r",
+									"        type: \"string\"\r",
+									"      }\r",
+									"    },\r",
+									"    required: [\"message\"],\r",
+									"  };\r",
+									"\r",
+									"  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/api/login/change",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"login",
+								"change"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -826,7 +974,7 @@
 					"response": []
 				},
 				{
-					"name": "AuthJWTLogin Trainee",
+					"name": "Auth JWT Login",
 					"event": [
 						{
 							"listen": "test",
@@ -876,8 +1024,8 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const username = pm.globals.get(\"username\");\r",
-									"const password = pm.globals.get(\"password\");\r",
+									"const username = \"Lord.Voldemort\";\r",
+									"const password = \"You-Know-Who\";\r",
 									"console.log(username)\r",
 									"console.log(password)\r",
 									"if (!username || !password) {\r",
@@ -922,7 +1070,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Trainee Profile Dynamic",
+					"name": "Get Trainee Profile",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1013,6 +1161,99 @@
 						"method": "GET",
 						"header": [],
 						"url": {
+							"raw": "{{url}}/api/trainees/Harry.Potter",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainees",
+								"Harry.Potter"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Trainee Profile",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Schema is valid\", function () {\r",
+									"  var schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"      firstName: { type: \"string\" },\r",
+									"      lastName: { type: \"string\" },\r",
+									"      username: { type: \"string\" },\r",
+									"      address: { type: \"string\" },\r",
+									"      active: { type: \"boolean\" },\r",
+									"      dateOfBirth: { type: \"string\" },\r",
+									"      trainers: { type: \"array\" },\r",
+									"    },\r",
+									"    required: [\"firstName\", \"lastName\", \"username\", \"address\", \"active\", \"dateOfBirth\", \"trainers\"],\r",
+									"  };\r",
+									"\r",
+									"  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
+									"});\r",
+									"pm.test(\"Response properties are of the correct type\", function () {\r",
+									"  var response = pm.response.json();\r",
+									"\r",
+									"  pm.expect(response).to.have.property('firstName').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('lastName').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('username').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('address').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('active').that.is.a('boolean');\r",
+									"  pm.expect(response).to.have.property('dateOfBirth').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('trainers').that.is.an('array');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Save response to environment variables\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    if (response.username) {\r",
+									"        pm.globals.set(\"username\", response.username);\r",
+									"    } else {\r",
+									"        throw new Error(\"Response does not contain 'username'.\");\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"Harry.Potters\",\r\n  \"firstName\": \"Ron\",\r\n  \"lastName\": \"Potter\",\r\n  \"dateOfBirth\": \"1990-01-01\",\r\n  \"address\": \"4 Privet Drive, Little Whinging, Surrey\",\r\n  \"active\": true\r\n}"
+						},
+						"url": {
 							"raw": "{{url}}/api/trainees/{{username}}",
 							"host": [
 								"{{url}}"
@@ -1027,47 +1268,56 @@
 					"response": []
 				},
 				{
-					"name": "Update Trainee Profile",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"firstName\": \"Ronald\", \"lastName\": \"Weasley\"}"
-						},
-						"url": {
-							"raw": "{{url}}/api/trainees/ron.weasley@hogwarts.edu",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"trainees",
-								"ron.weasley@hogwarts.edu"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Delete Trainee Profile",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response content type is application/json\", function () {\r",
+									"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 204\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(204);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify the response content type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/api/trainees/ron.weasley",
+							"raw": "{{url}}/api/trainees/{{username}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
 								"trainees",
-								"ron.weasley"
+								"{{username}}"
 							]
 						}
 					},
@@ -1219,7 +1469,7 @@
 									"let userProfile = {\r",
 									"  \"firstName\": \"Severus\",\r",
 									"  \"lastName\": \"Snape\",\r",
-									"  \"specialization\": \"POISON\"\r",
+									"  \"specialization\": \"POTIONS\"\r",
 									"};\r",
 									"\r",
 									"pm.request.body.raw = JSON.stringify(userProfile);"
@@ -1339,7 +1589,7 @@
 					"response": []
 				},
 				{
-					"name": "AuthLogin Trainer",
+					"name": "Auth Login JWT Token",
 					"event": [
 						{
 							"listen": "test",
@@ -1441,20 +1691,908 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"// let userProfile = {\r",
-									"//   \"firstName\": \"Severus\",\r",
-									"//   \"lastName\": \"Snape\",\r",
-									"//   \"specialization\": \"POISON\"\r",
-									"// };\r",
-									"// const username = pm.globals.set(\"username\", userProfile['firstName'] + \".\"+ userProfile);\r",
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
 									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.have.property(\"username\").that.is.a('string').and.is.not.empty;\r",
+									"    pm.expect(response).to.have.property(\"firstName\").that.is.a('string').and.is.not.empty;\r",
+									"    pm.expect(response).to.have.property(\"lastName\").that.is.a('string').and.is.not.empty;\r",
+									"    pm.expect(response).to.have.property(\"specializations\").that.is.an('array');\r",
+									"    pm.expect(response).to.have.property(\"trainees\").that.is.an('array');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response schema validation\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.have.all.keys(\"username\", \"firstName\", \"lastName\", \"specializations\", \"trainees\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each specialization in the specializations array has a valid structure\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.specializations.forEach(spec => {\r",
+									"        pm.expect(spec).to.have.property(\"specialization\").that.is.a('string').and.is.not.empty;\r",
+									"        pm.expect(spec).to.have.property(\"trainingTypeId\").that.is.a('number');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Save response to environment variables\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.environment.set(\"username\", response.username);\r",
+									"    pm.environment.set(\"firstName\", response.firstName);\r",
+									"    pm.environment.set(\"lastName\", response.lastName);\r",
+									"    pm.environment.set(\"specializations\", JSON.stringify(response.specializations));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.username).to.exist;\r",
+									"    pm.expect(responseData.firstName).to.exist;\r",
+									"    pm.expect(responseData.lastName).to.exist;\r",
+									"    pm.expect(responseData.specializations).to.exist;\r",
+									"    pm.expect(responseData.trainees).to.exist;\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Each specialization in the specializations array has a valid structure\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData.specializations).to.be.an('array');\r",
+									"    responseData.specializations.forEach(function(specialization) {\r",
+									"        pm.expect(specialization).to.be.an('object');\r",
+									"        pm.expect(specialization.specialization).to.be.a('string');\r",
+									"        pm.expect(specialization.trainingTypeId).to.be.a('number');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"All keys are present in the response object\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('username');\r",
+									"    pm.expect(responseData).to.have.property('firstName');\r",
+									"    pm.expect(responseData).to.have.property('lastName');\r",
+									"    pm.expect(responseData).to.have.property('specializations');\r",
+									"    pm.expect(responseData).to.have.property('trainees');\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/trainers/{{username}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Trainer Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response schema is valid\", function () {\r",
+									"  var schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"      username: { type: \"string\" },\r",
+									"      firstName: { type: \"string\" },\r",
+									"      lastName: { type: \"string\" },\r",
+									"      specializations: {\r",
+									"        type: \"array\",\r",
+									"        items: {\r",
+									"          type: \"object\",\r",
+									"          properties: {\r",
+									"            specialization: { type: \"string\" },\r",
+									"            id: { type: \"number\" }\r",
+									"          },\r",
+									"          required: [\"specialization\", \"id\"]\r",
+									"        }\r",
+									"      },\r",
+									"      trainees: { type: \"array\" }\r",
+									"    },\r",
+									"    required: [\"username\", \"firstName\", \"lastName\", \"specializations\", \"trainees\"]\r",
+									"  };\r",
+									"\r",
+									"  var response = pm.response.json();\r",
+									"  pm.expect(tv4.validate(response, schema)).to.be.true;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Schema is valid\", function () {\r",
+									"  var schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"      firstName: { type: \"string\" },\r",
+									"      lastName: { type: \"string\" },\r",
+									"      username: { type: \"string\" },\r",
+									"      active: { type: \"boolean\" },\r",
+									"      trainees: { type: \"array\" },\r",
+									"    },\r",
+									"    required: [\"firstName\", \"lastName\", \"username\", \"active\", \"trainees\"],\r",
+									"  };\r",
+									"\r",
+									"  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
+									"});\r",
+									"pm.test(\"Response properties are of the correct type\", function () {\r",
+									"  var response = pm.response.json();\r",
+									"\r",
+									"  pm.expect(response).to.have.property('firstName').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('lastName').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('username').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('active').that.is.a('boolean');\r",
+									"  pm.expect(response).to.have.property('trainees').that.is.an('array');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Save response to environment variables\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    if (response.username) {\r",
+									"        pm.globals.set(\"username\", response.username);\r",
+									"        const username = pm.globals.get(\"username\");\r",
+									"        console.log(username);\r",
+									"    } else {\r",
+									"        throw new Error(\"Response does not contain 'username'.\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
 									"const username = pm.globals.get(\"username\");\r",
 									"const accessToken = pm.globals.get(\"access_token\");\r",
 									"\r",
-									"console.log(accessToken)\r",
-									"console.log(username)\r",
-									"\r",
 									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"Little.Harry\",\r\n  \"firstName\": \"Little\",\r\n  \"lastName\": \"Whinging\",\r\n  \"active\": true,\r\n   \"specialization\": \"POISON\"\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/api/trainers/{{username}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Trainer",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response content type is application/json\", function () {\r",
+									"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 204\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(204);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify the response content type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/trainers/Little.Whitest",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"Little.Whitest"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Trainers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the response contains required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.have.property(\"username\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"firstName\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"lastName\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"specializations\").that.is.an('array');\r",
+									"        pm.expect(trainer).to.have.property(\"trainees\").that.is.an('array');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the response schema validation\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.have.all.keys(\"username\", \"firstName\", \"lastName\", \"specializations\", \"trainees\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer's specializations and trainees array has valid structure\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        trainer.specializations.forEach(spec => {\r",
+									"            pm.expect(spec).to.have.property(\"specialization\").that.is.a('string');\r",
+									"            pm.expect(spec).to.have.property(\"trainingTypeId\").that.is.a('number');\r",
+									"        });\r",
+									"        trainer.trainees.forEach(trainee => {\r",
+									"            pm.expect(trainee).to.have.property(\"username\").that.is.a('string');\r",
+									"            pm.expect(trainee).to.have.property(\"firstName\").that.is.a('string');\r",
+									"            pm.expect(trainee).to.have.property(\"lastName\").that.is.a('string');\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has content type of application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response data length must be greater than zero\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1, \"Array should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer's username, firstName, lastName, and active status have correct data type\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    responseData.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.be.an('object');\r",
+									"        pm.expect(trainer.username).to.be.a('string');\r",
+									"        pm.expect(trainer.firstName).to.be.a('string');\r",
+									"        pm.expect(trainer.lastName).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/trainers/Theodore.Nott",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"Theodore.Nott"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Trainers unassigned",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the response contains required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.have.property(\"username\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"firstName\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"lastName\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"specializations\").that.is.an('array');\r",
+									"        pm.expect(trainer).to.have.property(\"trainees\").that.is.an('array');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the response schema validation\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.have.all.keys(\"username\", \"firstName\", \"lastName\", \"specializations\", \"trainees\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer's specializations and trainees array has valid structure\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        trainer.specializations.forEach(spec => {\r",
+									"            pm.expect(spec).to.have.property(\"specialization\").that.is.a('string');\r",
+									"            pm.expect(spec).to.have.property(\"trainingTypeId\").that.is.a('number');\r",
+									"        });\r",
+									"        trainer.trainees.forEach(trainee => {\r",
+									"            pm.expect(trainee).to.have.property(\"username\").that.is.a('string');\r",
+									"            pm.expect(trainee).to.have.property(\"firstName\").that.is.a('string');\r",
+									"            pm.expect(trainee).to.have.property(\"lastName\").that.is.a('string');\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has content type of application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response data length must be greater than zero\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1, \"Array should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer's username, firstName, lastName, and active status have correct data type\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    responseData.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.be.an('object');\r",
+									"        pm.expect(trainer.username).to.be.a('string');\r",
+									"        pm.expect(trainer.firstName).to.be.a('string');\r",
+									"        pm.expect(trainer.lastName).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/trainers/{{username}}/unassigned",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"{{username}}",
+								"unassigned"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trainer Trainings List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the response contains required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.have.property(\"username\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"firstName\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"lastName\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"specializations\").that.is.an('array');\r",
+									"        pm.expect(trainer).to.have.property(\"trainees\").that.is.an('array');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the response schema validation\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.have.all.keys(\"username\", \"firstName\", \"lastName\", \"specializations\", \"trainees\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer's specializations and trainees array has valid structure\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        trainer.specializations.forEach(spec => {\r",
+									"            pm.expect(spec).to.have.property(\"specialization\").that.is.a('string');\r",
+									"            pm.expect(spec).to.have.property(\"trainingTypeId\").that.is.a('number');\r",
+									"        });\r",
+									"        trainer.trainees.forEach(trainee => {\r",
+									"            pm.expect(trainee).to.have.property(\"username\").that.is.a('string');\r",
+									"            pm.expect(trainee).to.have.property(\"firstName\").that.is.a('string');\r",
+									"            pm.expect(trainee).to.have.property(\"lastName\").that.is.a('string');\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has content type of application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response data length must be greater than zero\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1, \"Array should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer's username, firstName, lastName, and active status have correct data type\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    responseData.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.be.an('object');\r",
+									"        pm.expect(trainer.username).to.be.a('string');\r",
+									"        pm.expect(trainer.firstName).to.be.a('string');\r",
+									"        pm.expect(trainer.lastName).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/trainers/{{username}}/trainings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"{{username}}",
+								"trainings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "activate Trainer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the response contains required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.have.property(\"username\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"firstName\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"lastName\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"specializations\").that.is.an('array');\r",
+									"        pm.expect(trainer).to.have.property(\"trainees\").that.is.an('array');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the response schema validation\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.have.all.keys(\"username\", \"firstName\", \"lastName\", \"specializations\", \"trainees\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer's specializations and trainees array has valid structure\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        trainer.specializations.forEach(spec => {\r",
+									"            pm.expect(spec).to.have.property(\"specialization\").that.is.a('string');\r",
+									"            pm.expect(spec).to.have.property(\"trainingTypeId\").that.is.a('number');\r",
+									"        });\r",
+									"        trainer.trainees.forEach(trainee => {\r",
+									"            pm.expect(trainee).to.have.property(\"username\").that.is.a('string');\r",
+									"            pm.expect(trainee).to.have.property(\"firstName\").that.is.a('string');\r",
+									"            pm.expect(trainee).to.have.property(\"lastName\").that.is.a('string');\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has content type of application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response data length must be greater than zero\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1, \"Array should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer's username, firstName, lastName, and active status have correct data type\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    responseData.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.be.an('object');\r",
+									"        pm.expect(trainer.username).to.be.a('string');\r",
+									"        pm.expect(trainer.firstName).to.be.a('string');\r",
+									"        pm.expect(trainer.lastName).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const password = pm.globals.get(\"password\");\r",
+									"console.log(username)\r",
+									"console.log(password)\r",
+									"if (!username || !password) {\r",
+									"    throw new Error(\"Global variables 'username' and 'password' must be set.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.body.raw = JSON.stringify({\r",
+									"    username: username,\r",
+									"    password: password\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/trainers/{{username}}?active=true",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"{{username}}"
+							],
+							"query": [
+								{
+									"key": "active",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AuthLogin Trainer Static",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response schema and save tokens\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.have.jsonSchema({\r",
+									"        type: \"object\",\r",
+									"        properties: {\r",
+									"            username: { type: \"string\" },\r",
+									"            access_token: { type: \"string\" },\r",
+									"            refresh_token: { type: \"string\" },\r",
+									"            expires_at: { type: \"string\" }\r",
+									"        },\r",
+									"        required: [\"username\", \"access_token\", \"refresh_token\", \"expires_at\"]\r",
+									"    });\r",
+									"\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.globals.set(\"username\", responseData.username);\r",
+									"    pm.globals.set(\"access_token\", responseData.access_token);\r",
+									"    pm.globals.set(\"refresh_token\", responseData.refresh_token);\r",
+									"    pm.globals.set(\"expires_at\", responseData.expires_at);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Authorization header is set\", function () {\r",
+									"    const accessToken = pm.globals.get(\"access_token\");\r",
+									"    console.log(accessToken)\r",
+									"\r",
+									"    if (accessToken) {\r",
+									"        pm.request.headers.add({\r",
+									"            key: \"Authorization\",\r",
+									"            value: `Bearer ${accessToken}`\r",
+									"        });\r",
+									"    } else {\r",
+									"        throw new Error(\"Access token is not set.\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let userProfile = {\r",
+									"  \"firstName\": \"Lord\",\r",
+									"  \"lastName\": \"Voldemort\",\r",
+									"  \"password\": \"You-Know-Who\"\r",
+									"};\r",
+									"pm.globals.set(\"username\", userProfile['firstName'] + \".\"+ userProfile['lastName']);\r",
+									"pm.globals.set(\"password\", userProfile['password'])\r",
+									"\r",
+									"const username = pm.variables.get(\"username\");\r",
+									"const password = pm.variables.get(\"password\");\r",
+									"\r",
+									"pm.request.body.raw = JSON.stringify({\r",
+									"    username: username,\r",
+									"    password: password\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/api/auth/kafka/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"kafka",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trainer Profile Broker",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let userProfile = {\r",
+									"  \"firstName\": \"Lord\",\r",
+									"  \"lastName\": \"Voldemort\",\r",
+									"  \"password\": \"You-Know-Who\"\r",
+									"};\r",
+									"pm.globals.set(\"username\", userProfile['firstName'] + \".\"+ userProfile['lastName']);\r",
+									"pm.globals.set(\"password\", userProfile['password'])\r",
+									"\r",
+									"const username = pm.variables.get(\"username\");\r",
+									"const password = pm.variables.get(\"password\");\r",
+									"\r",
+									"pm.request.body.raw = JSON.stringify({\r",
+									"    username: username,\r",
+									"    password: password\r",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -1523,193 +2661,31 @@
 						}
 					],
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/api/trainers/{{username}}",
+							"raw": "{{url}}/api/trainers/kafka/Theodore.Nott",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
 								"trainers",
-								"{{username}}"
+								"kafka",
+								"Theodore.Nott"
 							]
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "Training API",
+			"item": [
 				{
-					"name": "Update Trainer Profile",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"firstName\": \"Severus\", \"lastName\": \"Snape\"}"
-						},
-						"url": {
-							"raw": "{{url}}/api/trainers/severus.snape@hogwarts.edu",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"trainers",
-								"severus.snape@hogwarts.edu"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Trainer",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/api/trainers/severus.snape@hogwarts.edu",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"trainers",
-								"severus.snape@hogwarts.edu"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List All Trainers",
+					"name": "Add Training",
 					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response schema is valid\", function () {\r",
-									"  var schema = {\r",
-									"    type: \"array\",\r",
-									"    items: {\r",
-									"      type: \"object\",\r",
-									"      properties: {\r",
-									"        username: { type: \"string\" },\r",
-									"        firstName: { type: \"string\" },\r",
-									"        lastName: { type: \"string\" },\r",
-									"        specialization: {\r",
-									"          type: \"object\",\r",
-									"          properties: {\r",
-									"            id: { type: \"number\" },\r",
-									"            specialization: { type: \"string\" },\r",
-									"            trainers: { type: \"array\" },\r",
-									"            trainings: { type: \"array\" }\r",
-									"          },\r",
-									"          required: [\"id\", \"specialization\", \"trainers\", \"trainings\"]\r",
-									"        },\r",
-									"        active: { type: \"boolean\" },\r",
-									"        trainees: {\r",
-									"          type: \"array\",\r",
-									"          items: {\r",
-									"            type: \"object\",\r",
-									"            properties: {\r",
-									"              firstName: { type: \"string\" },\r",
-									"              lastName: { type: \"string\" },\r",
-									"              username: { type: \"string\" },\r",
-									"              address: { type: \"string\" },\r",
-									"              active: { type: \"boolean\" },\r",
-									"              dateOfBirth: { type: \"null\" },\r",
-									"              trainers: { type: \"null\" }\r",
-									"            },\r",
-									"            required: [\"firstName\", \"lastName\", \"username\", \"address\", \"active\", \"dateOfBirth\", \"trainers\"]\r",
-									"          }\r",
-									"        }\r",
-									"      },\r",
-									"      required: [\"username\", \"firstName\", \"lastName\", \"specialization\", \"active\", \"trainees\"]\r",
-									"    }\r",
-									"  };\r",
-									"\r",
-									"  var response = pm.response.json();\r",
-									"  pm.expect(tv4.validate(response, schema)).to.be.true;\r",
-									"});\r",
-									"// Test for response content type\r",
-									"pm.test(\"Response has content type of application/json\", function () {\r",
-									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
-									"});\r",
-									"// Verify the length of the response data\r",
-									"pm.test(\"The response data length must be greater than zero\", function () {\r",
-									"    const responseData = pm.response.json();\r",
-									"    pm.expect(responseData.length).to.be.greaterThan(0, \"Response data should not be empty\");\r",
-									"\r",
-									"    responseData.forEach((trainer) => {\r",
-									"        pm.expect(trainer.username).to.be.a('string');\r",
-									"        pm.expect(trainer.firstName).to.be.a('string');\r",
-									"        pm.expect(trainer.lastName).to.be.a('string');\r",
-									"        pm.expect(trainer.active).to.be.a('boolean');\r",
-									"\r",
-									"        pm.expect(trainer.specialization.id).to.be.a('number');\r",
-									"        pm.expect(trainer.specialization.specialization).to.be.a('string');\r",
-									"        pm.expect(trainer.specialization.trainers).to.be.an('array');\r",
-									"        pm.expect(trainer.specialization.trainings).to.be.an('array');\r",
-									"\r",
-									"        trainer.trainees.forEach((trainee) => {\r",
-									"            pm.expect(trainee.firstName).to.be.a('string');\r",
-									"            pm.expect(trainee.lastName).to.be.a('string');\r",
-									"            pm.expect(trainee.username).to.be.a('string');\r",
-									"            pm.expect(trainee.address).to.be.a('string');\r",
-									"            pm.expect(trainee.active).to.be.a('boolean');\r",
-									"            pm.expect(trainee.dateOfBirth).to.be.null;\r",
-									"            pm.expect(trainee.trainers).to.be.null;\r",
-									"        });\r",
-									"    });\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response has content type of application/json\", function () {\r",
-									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response data length must be greater than zero\", function () {\r",
-									"  const responseData = pm.response.json();\r",
-									"  \r",
-									"  pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1, \"Array should not be empty\");\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response time is less than 200ms\", function () {\r",
-									"  pm.expect(pm.response.responseTime).to.be.below(200);\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Each trainer's username, firstName, lastName, and active status have correct data type\", function () {\r",
-									"    const responseData = pm.response.json();\r",
-									"    \r",
-									"    pm.expect(responseData).to.be.an('array');\r",
-									"    responseData.forEach(trainer => {\r",
-									"        pm.expect(trainer).to.be.an('object');\r",
-									"        pm.expect(trainer.username).to.be.a('string');\r",
-									"        pm.expect(trainer.firstName).to.be.a('string');\r",
-									"        pm.expect(trainer.lastName).to.be.a('string');\r",
-									"        pm.expect(trainer.active).to.be.a('boolean');\r",
-									"    });\r",
-									"});\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
 						{
 							"listen": "prerequest",
 							"script": {
@@ -1735,88 +2711,6 @@
 						}
 					],
 					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/api/trainers",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"trainers"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "AuthLogin Trainer Static",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response schema and save tokens\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"    pm.response.to.have.jsonSchema({\r",
-									"        type: \"object\",\r",
-									"        properties: {\r",
-									"            username: { type: \"string\" },\r",
-									"            access_token: { type: \"string\" },\r",
-									"            refresh_token: { type: \"string\" },\r",
-									"            expires_at: { type: \"string\" }\r",
-									"        },\r",
-									"        required: [\"username\", \"access_token\", \"refresh_token\", \"expires_at\"]\r",
-									"    });\r",
-									"\r",
-									"    const responseData = pm.response.json();\r",
-									"\r",
-									"    pm.globals.set(\"username\", responseData.username);\r",
-									"    pm.globals.set(\"access_token\", responseData.access_token);\r",
-									"    pm.globals.set(\"refresh_token\", responseData.refresh_token);\r",
-									"    pm.globals.set(\"expires_at\", responseData.expires_at);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Authorization header is set\", function () {\r",
-									"    const accessToken = pm.globals.get(\"access_token\");\r",
-									"    console.log(accessToken)\r",
-									"\r",
-									"    if (accessToken) {\r",
-									"        pm.request.headers.add({\r",
-									"            key: \"Authorization\",\r",
-									"            value: `Bearer ${accessToken}`\r",
-									"        });\r",
-									"    } else {\r",
-									"        throw new Error(\"Access token is not set.\");\r",
-									"    }\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"let userProfile = {\r",
-									"  \"firstName\": \"Severus\",\r",
-									"  \"lastName\": \"Snape\",\r",
-									"  \"specialization\": \"POISON\",\r",
-									"  \"password\": \"POISON\"\r",
-									"};\r",
-									"pm.globals.set(\"username\", userProfile['firstName'] + \".\"+ userProfile['lastName']);\r",
-									"pm.globals.set(\"password\", userProfile['password'])\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
 						"method": "POST",
 						"header": [
 							{
@@ -1826,50 +2720,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\r\n    \"traineeUsername\": \"Harry.Potter\",\r\n    \"trainerUsername\": \"Little.Harry\",\r\n    \"trainingName\": \"Not Defense\",\r\n    \"trainingDate\": \"2024-11-01\",\r\n    \"trainingDuration\": 130\r\n}"
 						},
 						"url": {
-							"raw": "{{url}}/api/auth/login",
+							"raw": "{{url}}/api/trainings",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
-								"auth",
-								"login"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Training API",
-			"item": [
-				{
-					"name": "Add Training",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"title\": \"Potions Mastery\", \"description\": \"Advanced potions techniques.\", \"trainerUsername\": \"severus.snape@hogwarts.edu\", \"schedule\": \"2024-09-01T10:00:00Z\"}"
-						},
-						"url": {
-							"raw": "{{url}}/api/trainings/add",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"trainings",
-								"add"
+								"trainings"
 							]
 						}
 					},
@@ -1951,7 +2811,76 @@
 					"response": []
 				},
 				{
+					"name": "List All Trainings types",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/trainings/types",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "List All Trainings",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -2092,152 +3021,936 @@
 			]
 		},
 		{
-			"name": "BadRequestLogin",
-			"event": [
+			"name": "Workload",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Missing password returns 400 Bad Request\", function () {\r",
-							"    pm.response.to.have.status(400);\r",
-							"    const responseData = pm.response.json();\r",
-							"    pm.expect(responseData.message).to.exist;\r",
-							"    pm.expect(responseData.message).to.include(\"Required request parameter 'password' is not present\");\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const username = pm.globals.get(\"username\");\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"password\": \"Password123\",\"username\": \"Harry.Potter\"}",
-					"options": {
-						"raw": {
-							"language": "json"
+					"name": "workload-update",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"trainerUsername\": \"Little.Harry\",\r\n    \"trainerFirstName\": \"Theodore\",\r\n    \"trainerLastName\": \"Nott\",\r\n    \"isActive\": true,\r\n    \"trainingDate\": \"2024-11-01\",\r\n    \"trainingDuration\": 100,\r\n    \"actionType\": \"DELETE\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/trainings/update",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"update"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{url}}/api/login?username={{username}}",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"api",
-						"login"
-					],
-					"query": [
+				{
+					"name": "summary",
+					"event": [
 						{
-							"key": "username",
-							"value": "{{username}}"
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const password = pm.globals.get(\"password\");\r",
+									"console.log(username)\r",
+									"console.log(password)\r",
+									"if (!username || !password) {\r",
+									"    throw new Error(\"Global variables 'username' and 'password' must be set.\");\r",
+									"}\r",
+									"\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8060/api/workload/summary/Little.Harry",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8060",
+							"path": [
+								"api",
+								"workload",
+								"summary",
+								"Little.Harry"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Change Login OK",
-			"event": [
+			"name": "Message",
+			"item": [
 				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"let updateLogin = {\r",
-							"  \"username\": \"Severus.Snape\",\r",
-							"  \"oldPassword\": \"POISONusername\",\r",
-							"  \"newPassword\": \"POISON\"\r",
-							"};\r",
-							"\r",
-							"for (let key in updateLogin) {\r",
-							"  if (updateLogin.hasOwnProperty(key)) {\r",
-							"    pm.environment.set(key, updateLogin[key]);\r",
-							"  }\r",
-							"}\r",
-							"\r",
-							"const username = pm.environment.get(\"username\");\r",
-							"const oldPassword = pm.environment.get(\"oldPassword\");\r",
-							"const newPassword = pm.environment.get(\"newPassword\");\r",
-							"\r",
-							"pm.request.body.raw = JSON.stringify({\r",
-							"    username: username,\r",
-							"    oldPassword: oldPassword,\r",
-							"    newPassword: newPassword\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Response schema is valid\", function () {\r",
-							"  var schema = {\r",
-							"    type: \"object\",\r",
-							"    properties: {\r",
-							"      message: {\r",
-							"        type: \"string\"\r",
-							"      }\r",
-							"    },\r",
-							"    required: [\"message\"],\r",
-							"  };\r",
-							"\r",
-							"  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
+					"name": "send",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/messages?username",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"messages"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{url}}/api/login/change",
-					"host": [
-						"{{url}}"
+			]
+		},
+		{
+			"name": "Flow",
+			"item": [
+				{
+					"name": "1. Add new Trainer OK",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let userProfile = {\r",
+									"  \"firstName\": \"Severus\",\r",
+									"  \"lastName\": \"Snape\",\r",
+									"  \"specialization\": \"POTIONS\"\r",
+									"};\r",
+									"\r",
+									"pm.request.body.raw = JSON.stringify(userProfile);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response has required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.have.property(\"username\");\r",
+									"    pm.expect(response).to.have.property(\"password\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response schema validation\", function () {\r",
+									"    pm.response.to.have.jsonSchema({\r",
+									"        type: \"object\",\r",
+									"        properties: {\r",
+									"            username: { type: \"string\" },\r",
+									"            password: { type: \"string\" }\r",
+									"        },\r",
+									"        required: [\"username\", \"password\"]\r",
+									"    });\r",
+									"});\r",
+									"pm.test(\"Response has content type application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"pm.test(\"Response schema validation\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.have.property(\"username\").that.is.a('string');\r",
+									"    pm.expect(response).to.have.property(\"password\").that.is.a('string');\r",
+									"});\r",
+									"\r",
+									"const schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"        username: { type: \"string\" },\r",
+									"        password: { type: \"string\" }\r",
+									"    },\r",
+									"    required: [\"username\", \"password\"]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Response schema is valid\", function () {\r",
+									"    pm.response.to.have.jsonSchema(schema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 201\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(201);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields - username and password\", function () {\r",
+									"    const responseData = pm.response.json();    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('username');\r",
+									"    pm.expect(responseData).to.have.property('password');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Username and password are non-empty strings\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.username).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Username should not be empty\");\r",
+									"    pm.expect(responseData.password).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Password should not be empty\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Save response to environment variables\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    if (response.username && response.password) {\r",
+									"        pm.globals.set(\"username\", response.username);\r",
+									"        pm.globals.set(\"password\", response.password);\r",
+									"    } else {\r",
+									"        throw new Error(\"Response does not contain 'username' and 'password'.\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
 					],
-					"path": [
-						"api",
-						"login",
-						"change"
-					]
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/api/trainers/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Login OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields - message and statusCode\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.message).to.exist;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Message is a non-empty string\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Message should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Message is 'Authentication successful'\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData.message).to.eql(\"Authentication successful\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const password = pm.globals.get(\"password\");\r",
+									"\r",
+									"console.log(\"Username from globals:\", username);\r",
+									"console.log(\"Password from globals:\", password);\r",
+									"if (!username || !password) {\r",
+									"    throw new Error(\"Environment variables 'username' and 'password' must be set.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.url = pm.request.url.toString().replace(\"{{username}}\", username).replace(\"{{password}}\", password);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/login?username={{username}}&password={{password}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "{{username}}"
+								},
+								{
+									"key": "password",
+									"value": "{{password}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Auth Login JWT Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response schema and save tokens\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.have.jsonSchema({\r",
+									"        type: \"object\",\r",
+									"        properties: {\r",
+									"            username: { type: \"string\" },\r",
+									"            access_token: { type: \"string\" },\r",
+									"            refresh_token: { type: \"string\" },\r",
+									"            expires_at: { type: \"string\" }\r",
+									"        },\r",
+									"        required: [\"username\", \"access_token\", \"refresh_token\", \"expires_at\"]\r",
+									"    });\r",
+									"\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.globals.set(\"username\", responseData.username);\r",
+									"    pm.globals.set(\"access_token\", responseData.access_token);\r",
+									"    pm.globals.set(\"refresh_token\", responseData.refresh_token);\r",
+									"    pm.globals.set(\"expires_at\", responseData.expires_at);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Authorization header is set\", function () {\r",
+									"    const accessToken = pm.globals.get(\"access_token\");\r",
+									"    console.log(accessToken)\r",
+									"\r",
+									"    if (accessToken) {\r",
+									"        pm.request.headers.add({\r",
+									"            key: \"Authorization\",\r",
+									"            value: `Bearer ${accessToken}`\r",
+									"        });\r",
+									"    } else {\r",
+									"        throw new Error(\"Access token is not set.\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const password = pm.globals.get(\"password\");\r",
+									"console.log(username)\r",
+									"console.log(password)\r",
+									"if (!username || !password) {\r",
+									"    throw new Error(\"Global variables 'username' and 'password' must be set.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.body.raw = JSON.stringify({\r",
+									"    username: username,\r",
+									"    password: password\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/api/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. List All Trainings",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/trainings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Get Trainer Trainings List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the response contains required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.have.property(\"username\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"firstName\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"lastName\").that.is.a('string');\r",
+									"        pm.expect(trainer).to.have.property(\"specializations\").that.is.an('array');\r",
+									"        pm.expect(trainer).to.have.property(\"trainees\").that.is.an('array');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer in the response schema validation\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.have.all.keys(\"username\", \"firstName\", \"lastName\", \"specializations\", \"trainees\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer's specializations and trainees array has valid structure\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.forEach(trainer => {\r",
+									"        trainer.specializations.forEach(spec => {\r",
+									"            pm.expect(spec).to.have.property(\"specialization\").that.is.a('string');\r",
+									"            pm.expect(spec).to.have.property(\"trainingTypeId\").that.is.a('number');\r",
+									"        });\r",
+									"        trainer.trainees.forEach(trainee => {\r",
+									"            pm.expect(trainee).to.have.property(\"username\").that.is.a('string');\r",
+									"            pm.expect(trainee).to.have.property(\"firstName\").that.is.a('string');\r",
+									"            pm.expect(trainee).to.have.property(\"lastName\").that.is.a('string');\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has content type of application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response data length must be greater than zero\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1, \"Array should not be empty\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each trainer's username, firstName, lastName, and active status have correct data type\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    responseData.forEach(trainer => {\r",
+									"        pm.expect(trainer).to.be.an('object');\r",
+									"        pm.expect(trainer.username).to.be.a('string');\r",
+									"        pm.expect(trainer.firstName).to.be.a('string');\r",
+									"        pm.expect(trainer.lastName).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/trainers/{{username}}/trainings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"{{username}}",
+								"trainings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. Get Trainer Profile",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains required fields\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.have.property(\"username\").that.is.a('string').and.is.not.empty;\r",
+									"    pm.expect(response).to.have.property(\"firstName\").that.is.a('string').and.is.not.empty;\r",
+									"    pm.expect(response).to.have.property(\"lastName\").that.is.a('string').and.is.not.empty;\r",
+									"    pm.expect(response).to.have.property(\"specialization\").that.is.an('object').and.is.not.empty;\r",
+									"    pm.expect(response).to.have.property(\"trainees\").that.is.an('array');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response schema validation\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.have.all.keys(\"username\", \"firstName\", \"lastName\", \"trainerStatus\", \"trainings\", \"specialization\", \"trainees\");\r",
+									"    pm.expect(response.trainings).to.be.an('array');\r",
+									"    pm.expect(response.specialization).to.be.an('object');\r",
+									"    pm.expect(response.trainees).to.be.an('array');\r",
+									"    response.trainings.forEach((training) => {\r",
+									"        pm.expect(training).to.have.all.keys(\"trainerName\", \"trainingName\", \"trainingType\", \"trainingDuration\", \"trainingDate\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each specialization in the specializations array has a valid structure\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    response.specializations.forEach(spec => {\r",
+									"        pm.expect(spec).to.have.property(\"specialization\").that.is.a('string').and.is.not.empty;\r",
+									"        pm.expect(spec).to.have.property(\"trainingTypeId\").that.is.a('number');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Save response to environment variables\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.environment.set(\"username\", response.username);\r",
+									"    pm.environment.set(\"firstName\", response.firstName);\r",
+									"    pm.environment.set(\"lastName\", response.lastName);\r",
+									"    pm.environment.set(\"specialization\", JSON.stringify(response.specializations));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Trainings array is present and contains at least one training entry\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.trainings).to.exist.and.to.be.an('array').that.is.not.empty;\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Each training entry has a valid structure\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData.trainings).to.be.an('array');\r",
+									"    responseData.trainings.forEach(function(training) {\r",
+									"        pm.expect(training.trainerName).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+									"        pm.expect(training.trainingName).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+									"        pm.expect(training.trainingType).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+									"        pm.expect(training.trainingDuration).to.be.a('number');\r",
+									"        pm.expect(training.trainingDate).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Trainer status is a non-empty string with valid value\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.trainerStatus).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Trainer status should not be empty\");\r",
+									"    pm.expect(['active', 'inactive']).to.include(responseData.trainerStatus, \"Trainer status should be either 'active' or 'inactive'\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Trainees array is present and empty\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.trainees).to.exist.and.to.be.an('array').that.is.empty;\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Specialization object has a valid structure with a non-empty 'specialization' property\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.specialization).to.exist.and.to.be.an('object');\r",
+									"    pm.expect(responseData.specialization.specialization).to.exist.and.to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/trainers/{{username}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. Update Trainer Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response schema is valid\", function () {\r",
+									"  var schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"      username: { type: \"string\" },\r",
+									"      firstName: { type: \"string\" },\r",
+									"      lastName: { type: \"string\" },\r",
+									"      specializations: {\r",
+									"        type: \"array\",\r",
+									"        items: {\r",
+									"          type: \"object\",\r",
+									"          properties: {\r",
+									"            specialization: { type: \"string\" },\r",
+									"            id: { type: \"number\" }\r",
+									"          },\r",
+									"          required: [\"specialization\", \"id\"]\r",
+									"        }\r",
+									"      },\r",
+									"      trainees: { type: \"array\" }\r",
+									"    },\r",
+									"    required: [\"username\", \"firstName\", \"lastName\", \"specializations\", \"trainees\"]\r",
+									"  };\r",
+									"\r",
+									"  var response = pm.response.json();\r",
+									"  pm.expect(tv4.validate(response, schema)).to.be.true;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Schema is valid\", function () {\r",
+									"  var schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"      firstName: { type: \"string\" },\r",
+									"      lastName: { type: \"string\" },\r",
+									"      username: { type: \"string\" },\r",
+									"      active: { type: \"boolean\" },\r",
+									"      trainees: { type: \"array\" },\r",
+									"    },\r",
+									"    required: [\"firstName\", \"lastName\", \"username\", \"active\", \"trainees\"],\r",
+									"  };\r",
+									"\r",
+									"  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
+									"});\r",
+									"pm.test(\"Response properties are of the correct type\", function () {\r",
+									"  var response = pm.response.json();\r",
+									"\r",
+									"  pm.expect(response).to.have.property('firstName').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('lastName').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('username').that.is.a('string');\r",
+									"  pm.expect(response).to.have.property('active').that.is.a('boolean');\r",
+									"  pm.expect(response).to.have.property('trainees').that.is.an('array');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Save response to environment variables\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    if (response.username) {\r",
+									"        pm.globals.set(\"username\", response.username);\r",
+									"        const username = pm.globals.get(\"username\");\r",
+									"        console.log(username);\r",
+									"    } else {\r",
+									"        throw new Error(\"Response does not contain 'username'.\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"Little.Harry\",\r\n  \"firstName\": \"Little\",\r\n  \"lastName\": \"Whinging\",\r\n  \"active\": true\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/api/trainers/{{username}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainers",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. Add Training",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const username = pm.globals.get(\"username\");\r",
+									"const accessToken = pm.globals.get(\"access_token\");\r",
+									"const refreshToken = pm.globals.get(\"refresh_token\");\r",
+									"const expiresAt = pm.globals.get(\"expires_at\");\r",
+									"\r",
+									"const currentDate = new Date();\r",
+									"const expirationDate = new Date(expiresAt);\r",
+									"\r",
+									"if (currentDate >= expirationDate) {\r",
+									"    console.log(\"Token has expired. Please refresh the token.\");\r",
+									"}\r",
+									"\r",
+									"pm.request.headers.add({key: 'Authorization', value: `Bearer ${accessToken}`});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"traineeUsername\": \"Harry.Potter\",\r\n    \"trainerUsername\": \"Little.Harry\",\r\n    \"trainingName\": \"Defense\",\r\n    \"trainingDate\": \"2025-09-01\",\r\n    \"trainingDuration\": 30\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/api/trainings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"trainings"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		}
 	]
 }

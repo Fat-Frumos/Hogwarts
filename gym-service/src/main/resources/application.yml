@@ -1,0 +1,17 @@
+spring:
+  config:
+    import: optional:configserver:http://localhost:8888
+  application:
+    name: gym-service
+
+actuator:
+  prometheus:
+    url: http://localhost:8090/actuator/prometheus
+  info:
+    url: http://localhost:8090/actuator/info
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.transaction: DEBUG
+    org.springframework.transaction: DEBUG

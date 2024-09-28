@@ -1,0 +1,22 @@
+server:
+  port: 8050
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://oregon-postgres.render.com:5432/gym_user
+    username: admin_gym_user
+    password: tuZdX3joSSGMZ8RESK5ZhognKKwH9kbN
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    info:
+      enabled: true

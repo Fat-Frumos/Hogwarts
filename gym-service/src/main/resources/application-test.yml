@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+  sql:
+    init:
+      mode: never
+
+  main:
+    allow-bean-definition-overriding: true
+
+actuator:
+  prometheus:
+    url: http://localhost:8080/actuator/prometheus
+  info:
+    url: http://localhost:8080/actuator/info
+
+
